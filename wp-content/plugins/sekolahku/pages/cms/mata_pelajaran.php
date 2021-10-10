@@ -62,6 +62,7 @@ if($action_type != null){
 //get urls
 $modul_name = 'matapelajaran';
 $list_url = admin_url('/admin.php?page='.$modul_name);
+$bab_url = admin_url('/admin.php?page=bab&matapelajaran_id=');
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -292,6 +293,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <?php echo $data->name; ?>
 
                     <div class="row-actions action_container">
+                        <span class="edit">
+                            <a href="<?php echo $bab_url.$data->id ?>" aria-label="Edit">
+                                Kelola Bab
+                            </a> 
+                            | 
+                        </span>
                         <span class="edit">
                             <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
                                 Edit

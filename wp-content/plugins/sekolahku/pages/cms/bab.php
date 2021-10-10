@@ -1,8 +1,7 @@
 <?php
 global $wpdb;
-$table_name = $wpdb->prefix . 'sekolahku_kelas';
-$table_name_mapel = $wpdb->prefix . 'sekolahku_matapelajaran';
-$table_name_mapel_kelas = $wpdb->prefix . 'sekolahku_matapelajaran_kelas';
+$table_mapel_name = $wpdb->prefix . 'sekolahku_matapelajaran';
+$table_name = $wpdb->prefix . 'sekolahku_bab';
 
 //var
 $is_add = false;
@@ -12,6 +11,17 @@ $is_delete = false;
 $is_bulk_delete = false;
 $success = [];
 $errors = [];
+
+//get parent id
+$parent_id = $_GET['matapelajaran_id'];
+if($parent_id == null){
+    $errors[] = 'Matapelajaran tidak ditemukan';
+}else{
+    $matapelajaran = $wpdb->get_row("SELECT * FROM $table_mapel_name WHERE id = $parent_id");
+    if($matapelajaran == null){
+        $errors[] = 'Matapelajaran tidak ditemukan';
+    }
+}
 
 //get page to show
 $action_type = $_GET['action_type'];
@@ -24,10 +34,13 @@ if($_POST['action_type_val'] != null){
 }
 
 //set label
-$action_label = get_admin_page_title();
+$action_label = "Bab";
+if(count($errors) < 1){
+    $action_label .= " (".$matapelajaran->name.")";
+}
 if($action_type != null){
     $name = '';
-    $selected_mapel_ids = [];
+    $description = '';
     $is_active = 1;
 
     if($action_type == 'add'){
@@ -42,13 +55,8 @@ if($action_type != null){
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
             $name = $data->name;
+            $description = $data->description;
             $is_active = $data->is_active;
-
-            //get mapel ids
-            $mapel_ids_before = $wpdb->get_results("SELECT matapelajaran_id FROM ".$table_name_mapel_kelas." WHERE kelas_id = $id");
-            foreach($mapel_ids_before as $mapel_id){
-                $selected_mapel_ids[] = $mapel_id->matapelajaran_id;
-            }
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -69,8 +77,8 @@ if($action_type != null){
 }
 
 //get urls
-$modul_name = 'kelas';
-$list_url = admin_url('/admin.php?page='.$modul_name);
+$modul_name = 'bab';
+$list_url = admin_url('/admin.php?page='.$modul_name.'&matapelajaran_id='.$matapelajaran->id);
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -79,6 +87,8 @@ $delete_url = $list_url.'&action_type=delete&id=';
 if(count($errors) < 1){
     if($_POST['submit']){
         $name = $_POST['name'];
+        $description = $_POST['description'];
+        $matapelajaran_id = $_POST['matapelajaran_id'];
         $is_active = $_POST['is_active'] == 'on' ? 1 : 0;
 
         //validation
@@ -86,58 +96,36 @@ if(count($errors) < 1){
             $errors[] = '<b>Nama Kelas</b> Tidak Boleh Kosong';
         }
 
-        //get mata pelajarans ids
-        $mapel_ids = [];
-        if(isset($_POST['mata_pelajaran'])){
-            $mapel_ids = $_POST['mata_pelajaran'];
-        }
-
         if(count($errors) == 0){
             //all input valid
-            $kelas_id = null;
             //check if edit or add
             if($is_add){
                 //insert into wpdb database
                 $wpdb->insert(
                     $table_name,
                     array(
+                        'matapelajaran_id' => $matapelajaran_id,
                         'name' => $name,
+                        'description' => $description,
                         'is_active' => $is_active
                     ),
                     array(
                         '%s',
                         '%s',
+                        '%s',
+                        '%s',
                     )
                 );
-
-                $kelas_id = $wpdb->insert_id;
             }else if($is_edit){
-                $kelas_id = $id;
                 //update into wpdb database
                 $wpdb->update(
                     $table_name,
                     array(
                         'name' => $name,
+                        'description' => $description,
                         'is_active' => $is_active
                     ),
                     array('id' => $id)
-                );
-            }
-
-            //re-insert mata pelajaran
-            $wpdb->delete($table_name_mapel_kelas, array('kelas_id' => $kelas_id));
-
-            foreach($mapel_ids as $mapel_id){
-                $wpdb->insert(
-                    $table_name_mapel_kelas,
-                    array(
-                        'kelas_id' => $kelas_id,
-                        'matapelajaran_id' => $mapel_id
-                    ),
-                    array(
-                        '%d',
-                        '%d'
-                    )
                 );
             }
 
@@ -223,17 +211,17 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT DISTINCT k.*, GROUP_CONCAT(m.name) as list_mapel FROM ".$table_name." AS k LEFT JOIN ".$table_name_mapel_kelas." AS mk ON k.id = mk.kelas_id LEFT JOIN ".$table_name_mapel." AS m ON mk.matapelajaran_id = m.id ";
+$query = "SELECT * FROM ".$table_name.' WHERE matapelajaran_id='.$matapelajaran->id;
 $keyword = '';
 
 //filter
 if($_POST['keyword']){
     $keyword = $_POST['keyword'];
-    $query .= " WHERE k.name LIKE '%".$keyword."%'";
+    $query .= " AND name LIKE '%".$keyword."%'";
 }
 
 //order by query
-$query .= " GROUP BY k.id ORDER BY k.updated_on DESC";
+$query .= " ORDER BY id DESC";
 
 $list_of_data_total = $wpdb->get_results($query);
 
@@ -301,9 +289,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         <span class="sorting-indicator"></span>
                     </a>
                 </th>
-                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Mata Pelajaran</span>
+                        <span>Deskripsi</span>
                         <span class="sorting-indicator"></span>
                     </a>
                 </th>
@@ -336,6 +324,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <div class="row-actions action_container">
                         <span class="edit">
                             <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
+                                Kelola Bab
+                            </a> 
+                            | 
+                        </span>
+                        <span class="edit">
+                            <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
                                 Edit
                             </a> 
                             | 
@@ -348,7 +342,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </td>
                 <td class="column-status" data-colname="status">
-                    <?php echo $data->list_mapel; ?>
+                    <?php echo $data->description; ?>
                 </td>
                 <td class="column-status" data-colname="status">
                     <?php 
@@ -376,7 +370,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Mata Pelajaran</span>
+                        <span>Deskripsi</span>
                         <span class="sorting-indicator"></span>
                     </a>
                 </th>
@@ -396,28 +390,19 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
-
-//get mata pelajaran
-$list_of_mata_pelajaran = $wpdb->get_results('SELECT * FROM '.$table_name_mapel.' ORDER BY name DESC');
 ?>
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
+    <input type="hidden" name="matapelajaran_id" value="<?php echo $matapelajaran->id; ?>"/>
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="name">Nama Kelas</label></th>
+                <th scope="row"><label for="name">Nama Bab</label></th>
                 <td><input type="text" class="regular-text" name="name" value="<?php echo $name; ?>" maxlength="100"></td>
             </tr>
             <tr>
-                <th scope="row"><label for="mata_pelajaran">Mata Pelajaran</label></th>
-                <td>
-                    <select name="mata_pelajaran[]" class="multiple_select2 regular-text" multiple="multiple">
-                        <option value="">Pilih Mata Pelajaran</option>
-                        <?php foreach($list_of_mata_pelajaran as $key => $data){ ?>
-                        <option value="<?php echo $data->id; ?>" <?php echo in_array ($data->id, $selected_mapel_ids) ? 'selected' : ''; ?>><?php echo $data->name; ?></option>
-                        <?php } ?>
-                    </select>
-                </td>
+                <th scope="row"><label for="name">Deskripsi Bab</label></th>
+                <td><textarea rows="5" cols="100" name="description" maxlength="250"><?php echo $description; ?></textarea></td>
             </tr>
             <tr>
                 <th scope="row"><label for="is_active">Status</label></th>

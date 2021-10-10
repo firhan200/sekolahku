@@ -24,7 +24,9 @@ function pluginprefix_activate() {
 	//get table name
 	$table_kelas = $wpdb->prefix . $plugin_name . "_kelas"; 
 	$table_mata_pelajaran = $wpdb->prefix . $plugin_name . "_matapelajaran"; 
+	$table_bab = $wpdb->prefix . $plugin_name . "_bab"; 
 	$table_mata_pelajaran_kelas = $wpdb->prefix . $plugin_name . "_matapelajaran_kelas"; 
+	$table_pengguna = $wpdb->prefix . $plugin_name . "_pengguna"; 
 
 	//check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$table_kelas'") != $table_kelas) {
@@ -75,6 +77,45 @@ function pluginprefix_activate() {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
 	}
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_bab'") != $table_bab) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_bab (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		matapelajaran_id mediumint(9) NOT NULL,
+		name varchar(255) NOT NULL,
+		description varchar(255) NOT NULL,
+		is_active smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_pengguna'") != $table_pengguna) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_pengguna (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		full_name varchar(255) NOT NULL,
+		email_address varchar(255) NOT NULL,
+		password varchar(100) NOT NULL,
+		account_type smallint(2) NOT NULL, /* teacher or student */
+		gender smallint(2) NOT NULL,
+		is_active smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
 }
 
 register_activation_hook( __FILE__, 'pluginprefix_activate' );
@@ -96,6 +137,12 @@ function add_plugin_cms_menu(){
 
     /* Mata Pelajaran */
     add_submenu_page("sekolahku", "Mata Pelajaran", "Mata Pelajaran", "manage_options", "matapelajaran", "mata_pelajaran_page");
+
+	/* Bab */
+    add_submenu_page(null, "Bab", "Bab", "manage_options", "bab", "bab_page");
+
+	/* Pengguna */
+    add_submenu_page("sekolahku", "Guru & Siswa", "Guru & Siswa", "manage_options", "pengguna", "pengguna_page");
 }
 
 /* create administrator menu */
@@ -136,6 +183,10 @@ function kelas_page(){
 
 function mata_pelajaran_page(){
     include_once( __DIR__ . '/pages/cms/mata_pelajaran.php' );
+}
+
+function bab_page(){
+    include_once( __DIR__ . '/pages/cms/bab.php' );
 }
 
 /* Main Page */
