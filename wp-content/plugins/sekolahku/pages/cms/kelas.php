@@ -15,7 +15,10 @@ $errors = [];
 $action_type = $_GET['action_type'];
 
 if($_POST['action_type_val'] != null){
-    $action_type = $_POST['action_type_val'];
+    $action_type_val = $_POST['action_type_val'];
+    if($action_type_val == 'bulk_delete'){
+        $action_type = $action_type_val;
+    }
 }
 
 //set label
@@ -184,8 +187,18 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$table_name = $wpdb->prefix . 'sekolahku_kelas';
-$query = "SELECT * FROM ".$table_name." ORDER BY id DESC";
+$query = "SELECT * FROM ".$table_name;
+$keyword = '';
+
+//filter
+if($_POST['keyword']){
+    $keyword = $_POST['keyword'];
+    $query .= " WHERE name LIKE '%".$keyword."%'";
+}
+
+//order by query
+$query .= " ORDER BY id DESC";
+
 $list_of_data_total = $wpdb->get_results($query);
 
 //limit
@@ -222,6 +235,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <form action="<?php echo $list_url ?>" method="post">
     <input type="hidden" name="page" value="<?php echo $modul_name; ?>"/>
 
+    <p class="search-box">
+        <label class="screen-reader-text" for="post-search-input">Cari:</label>
+        <input type="search" id="post-search-input" name="keyword" value="<?php echo $keyword; ?>">
+		<input type="submit" id="search-submit" class="button" value="search">
+    </p>
+
     <div class="tablenav top">
         <div class="alignleft actions bulkactions">
             <label for="bulk-action-selector-top" class="screen-reader-text">Pilih tindakan sekaligus</label>
@@ -241,13 +260,13 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <input id="cb-select-all-1" type="checkbox">
                 </td>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                    <a href="<?php echo $list_url; ?>&orderby=nama&amp;order=asc">
+                    <a href="#">
                         <span>Nama</span>
                         <span class="sorting-indicator"></span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                    <a href="<?php echo $list_url; ?>&orderby=status&amp;order=asc">
+                    <a href="#">
                         <span>Status</span>
                         <span class="sorting-indicator"></span>
                     </a>
@@ -305,13 +324,13 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <input id="cb-select-all-2" type="checkbox">
                 </td>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="<?php echo $list_url; ?>&orderby=title&amp;order=asc">
+                    <a href="#">
                         <span>Nama</span>
                         <span class="sorting-indicator"></span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="<?php echo $list_url; ?>&orderby=title&amp;order=asc">
+                    <a href="#">
                         <span>Status</span>
                         <span class="sorting-indicator"></span>
                     </a>

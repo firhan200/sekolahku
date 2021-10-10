@@ -23,7 +23,8 @@ function pluginprefix_activate() {
 
 	//get table name
 	$table_kelas = $wpdb->prefix . $plugin_name . "_kelas"; 
-	$table_mata_pelajaran = $wpdb->prefix . $plugin_name . "_mata_pelajaran"; 
+	$table_mata_pelajaran = $wpdb->prefix . $plugin_name . "_matapelajaran"; 
+	$table_mata_pelajaran_kelas = $wpdb->prefix . $plugin_name . "_matapelajaran_kelas"; 
 
 	//check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$table_kelas'") != $table_kelas) {
@@ -59,6 +60,22 @@ function pluginprefix_activate() {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
 	}
+
+    //check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_mata_pelajaran_kelas'") != $table_mata_pelajaran_kelas) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_mata_pelajaran_kelas (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		kelas_id mediumint(9) NOT NULL,
+		matapelajaran_id mediumint(9) NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
 }
 
 register_activation_hook( __FILE__, 'pluginprefix_activate' );
@@ -77,11 +94,9 @@ function add_plugin_cms_menu(){
 
     /* Kelas */
     add_submenu_page("sekolahku", "Kelas", "Kelas", "manage_options", "kelas", "kelas_page");
-    add_submenu_page(null, "Tambah Kelas", "Tambah Kelas", "manage_options", "tambah_kelas", "tambah_kelas_page");
 
     /* Mata Pelajaran */
-    add_submenu_page("sekolahku", "Mata Pelajaran", "Mata Pelajaran", "manage_options", "mata_pelajaran", "mata_pelajaran_page");
-    add_submenu_page(null, "Tambah Mata Pelajaran", "Tambah Mata Pelajaran", "manage_options", "tambah_mata_pelajaran", "tambah_mata_pelajaran_page");
+    add_submenu_page("sekolahku", "Mata Pelajaran", "Mata Pelajaran", "manage_options", "matapelajaran", "mata_pelajaran_page");
 }
 
 /* create administrator menu */
@@ -96,16 +111,8 @@ function kelas_page(){
     include_once( __DIR__ . '/pages/cms/kelas.php' );
 }
 
-function tambah_kelas_page(){
-    include_once( __DIR__ . '/pages/cms/kelas_tambah.php' );
-}
-
 function mata_pelajaran_page(){
     include_once( __DIR__ . '/pages/cms/mata_pelajaran.php' );
-}
-
-function tambah_mata_pelajaran_page(){
-    include_once( __DIR__ . '/pages/cms/mata_pelajaran_tambah.php' );
 }
 
 /* Main Page */
