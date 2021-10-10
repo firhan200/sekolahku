@@ -49,7 +49,6 @@ function pluginprefix_activate() {
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql = "CREATE TABLE $table_mata_pelajaran (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
-		kelas_id mediumint(9) NOT NULL,
 		name varchar(255) NOT NULL,
 		is_active smallint(1) DEFAULT 1 NOT NULL,
 		created_on timestamp DEFAULT current_timestamp,
@@ -100,6 +99,30 @@ function add_plugin_cms_menu(){
 }
 
 /* create administrator menu */
+
+/* Add Assets */
+
+/* Append Style */
+add_action("admin_enqueue_scripts", 'addStyle');
+
+/* Append Scripts */
+add_action("admin_enqueue_scripts", 'addScripts');
+
+/* add Style */
+function addStyle(){
+	wp_enqueue_style("sekolahku-style-select2", plugins_url("/assets/css/select2.min.css", __FILE__));
+	wp_enqueue_style("sekolahku-style", plugins_url("/assets/css/style.css", __FILE__));
+}
+
+/* add Scripts */
+function addScripts(){
+	wp_enqueue_script("sekolahku-script-jquery", plugins_url("/assets/js/jquery-3.6.0.min.js", __FILE__), array("jquery"));
+	wp_enqueue_script("sekolahku-script-select2", plugins_url("/assets/js/select2.min.js", __FILE__), array("jquery"));
+	wp_enqueue_script("sekolahku-script", plugins_url("/assets/js/app.js", __FILE__), array("jquery"));
+}
+
+/* Add Assets */
+
 
 /* Main Page */
 

@@ -1,6 +1,8 @@
 <?php
 global $wpdb;
 $table_name = $wpdb->prefix . 'sekolahku_kelas';
+$table_name_mapel = $wpdb->prefix . 'sekolahku_matapelajaran';
+$table_name_mapel_kelas = $wpdb->prefix . 'sekolahku_matapelajaran_kelas';
 
 //var
 $is_add = false;
@@ -25,6 +27,7 @@ if($_POST['action_type_val'] != null){
 $action_label = get_admin_page_title();
 if($action_type != null){
     $name = '';
+    $selected_mapel_ids = [];
     $is_active = 1;
 
     if($action_type == 'add'){
@@ -40,6 +43,12 @@ if($action_type != null){
         if($data != null){
             $name = $data->name;
             $is_active = $data->is_active;
+
+            //get mapel ids
+            $mapel_ids_before = $wpdb->get_results("SELECT matapelajaran_id FROM ".$table_name_mapel_kelas." WHERE kelas_id = $id");
+            foreach($mapel_ids_before as $mapel_id){
+                $selected_mapel_ids[] = $mapel_id->matapelajaran_id;
+            }
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -77,12 +86,19 @@ if(count($errors) < 1){
             $errors[] = '<b>Nama Kelas</b> Tidak Boleh Kosong';
         }
 
+        //get mata pelajarans ids
+        $mapel_ids = [];
+        if(isset($_POST['mata_pelajaran'])){
+            $mapel_ids = $_POST['mata_pelajaran'];
+        }
+
         if(count($errors) == 0){
             //all input valid
+            $kelas_id = null;
             //check if edit or add
             if($is_add){
                 //insert into wpdb database
-                $wpdb->insert(
+                $kelas_id = $wpdb->insert(
                     $table_name,
                     array(
                         'name' => $name,
@@ -94,6 +110,7 @@ if(count($errors) < 1){
                     )
                 );
             }else if($is_edit){
+                $kelas_id = $id;
                 //update into wpdb database
                 $wpdb->update(
                     $table_name,
@@ -102,6 +119,23 @@ if(count($errors) < 1){
                         'is_active' => $is_active
                     ),
                     array('id' => $id)
+                );
+            }
+
+            //re-insert mata pelajaran
+            $wpdb->delete($table_name_mapel_kelas, array('kelas_id' => $kelas_id));
+
+            foreach($mapel_ids as $mapel_id){
+                $wpdb->insert(
+                    $table_name_mapel_kelas,
+                    array(
+                        'kelas_id' => $kelas_id,
+                        'matapelajaran_id' => $mapel_id
+                    ),
+                    array(
+                        '%d',
+                        '%d'
+                    )
                 );
             }
 
@@ -345,6 +379,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
+
+//get mata pelajaran
+$list_of_mata_pelajaran = $wpdb->get_results('SELECT * FROM '.$table_name_mapel.' ORDER BY name DESC');
 ?>
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
@@ -353,6 +390,17 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tr>
                 <th scope="row"><label for="name">Nama Kelas</label></th>
                 <td><input type="text" class="regular-text" name="name" value="<?php echo $name; ?>" maxlength="100"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="mata_pelajaran">Mata Pelajaran</label></th>
+                <td>
+                    <select name="mata_pelajaran[]" class="multiple_select2 regular-text" multiple="multiple">
+                        <option value="">Pilih Mata Pelajaran</option>
+                        <?php foreach($list_of_mata_pelajaran as $key => $data){ ?>
+                        <option value="<?php echo $data->id; ?>" <?php echo in_array ($data->id, $selected_mapel_ids) ? 'selected' : ''; ?>><?php echo $data->name; ?></option>
+                        <?php } ?>
+                    </select>
+                </td>
             </tr>
             <tr>
                 <th scope="row"><label for="is_active">Status</label></th>
