@@ -98,7 +98,7 @@ if(count($errors) < 1){
             //check if edit or add
             if($is_add){
                 //insert into wpdb database
-                $kelas_id = $wpdb->insert(
+                $wpdb->insert(
                     $table_name,
                     array(
                         'name' => $name,
@@ -109,6 +109,8 @@ if(count($errors) < 1){
                         '%s',
                     )
                 );
+
+                $kelas_id = $wpdb->insert_id;
             }else if($is_edit){
                 $kelas_id = $id;
                 //update into wpdb database
@@ -221,17 +223,17 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT * FROM ".$table_name;
+$query = "SELECT DISTINCT k.*, GROUP_CONCAT(m.name) as list_mapel FROM ".$table_name." AS k LEFT JOIN ".$table_name_mapel_kelas." AS mk ON k.id = mk.kelas_id LEFT JOIN ".$table_name_mapel." AS m ON mk.matapelajaran_id = m.id ";
 $keyword = '';
 
 //filter
 if($_POST['keyword']){
     $keyword = $_POST['keyword'];
-    $query .= " WHERE name LIKE '%".$keyword."%'";
+    $query .= " WHERE k.name LIKE '%".$keyword."%'";
 }
 
 //order by query
-$query .= " ORDER BY id DESC";
+$query .= " GROUP BY k.id ORDER BY k.id DESC";
 
 $list_of_data_total = $wpdb->get_results($query);
 
@@ -301,6 +303,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Mata Pelajaran</span>
+                        <span class="sorting-indicator"></span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>Status</span>
                         <span class="sorting-indicator"></span>
                     </a>
@@ -340,6 +348,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </td>
                 <td class="column-status" data-colname="status">
+                    <?php echo $data->list_mapel; ?>
+                </td>
+                <td class="column-status" data-colname="status">
                     <?php 
                         if($data->is_active == 1){ 
                             echo '<span class="badge bg-success">Aktif</span>';
@@ -360,6 +371,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Nama</span>
+                        <span class="sorting-indicator"></span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Mata Pelajaran</span>
                         <span class="sorting-indicator"></span>
                     </a>
                 </th>
