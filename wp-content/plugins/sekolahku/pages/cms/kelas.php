@@ -7,11 +7,16 @@ $is_add = false;
 $is_edit = false;
 $is_list = false;
 $is_delete = false;
+$is_bulk_delete = false;
 $success = [];
 $errors = [];
 
 //get page to show
 $action_type = $_GET['action_type'];
+
+if($_POST['action_type_val'] != null){
+    $action_type = $_POST['action_type_val'];
+}
 
 //set label
 $action_label = get_admin_page_title();
@@ -44,6 +49,8 @@ if($action_type != null){
         if($data == null){
             $errors[] = 'Data tidak ditemukan';
         }
+    }else if($action_type == 'bulk_delete'){
+        $is_bulk_delete = true;
     }
 }else{
     $is_list = true;
@@ -121,6 +128,33 @@ if(count($errors) < 1){
 
         echo "<script>window.history.pushState('page2', 'Title', '".$list_url."');</script>";
     }
+
+    //check if bulk delete
+    if($is_bulk_delete){
+        //get id
+        $posts_to_delete = $_POST['post'];
+        $ids = null;
+        foreach($posts_to_delete as $key => $postId){
+            if($key == count($posts_to_delete) - 1){
+                $ids .= $postId;
+            }else{
+                $ids .= $postId.',';
+            }
+        }
+
+        if($ids != null){
+            //delete from wpdb database
+            $wpdb->query("DELETE FROM ".$table_name." WHERE id IN (".$ids.")");
+
+            //success
+            $success[] = 'Data berhasil dihapus';
+
+            //show list
+            $is_list = true;
+
+            echo "<script>window.history.pushState('page2', 'Title', '".$list_url."');</script>";
+        }
+    }
 }
 ?>
 
@@ -185,25 +219,40 @@ $nextlink = ($page < $pages) ? '<a href="'.$list_url.'&on_page=' . ($page + 1) .
 $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 ?>
 
-<table class="wp-list-table widefat fixed striped table-view-list posts">
-    <thead>
-        <tr>
-            <td id="cb" class="manage-column column-cb check-column">
-                <label class="screen-reader-text" for="cb-select-all-1">Pilih Semua</label>
-                <input id="cb-select-all-1" type="checkbox">
-            </td>
-            <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                <a href="<?php echo $list_url; ?>&orderby=nama&amp;order=asc">
-                    <span>Nama</span>
-                    <span class="sorting-indicator"></span>
-                </a>
-            </th>
-            <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                <a href="<?php echo $list_url; ?>&orderby=status&amp;order=asc">
-                    <span>Status</span>
-                    <span class="sorting-indicator"></span>
-                </a>
-            </th>
+<form action="<?php echo $list_url ?>" method="post">
+    <input type="hidden" name="page" value="<?php echo $modul_name; ?>"/>
+
+    <div class="tablenav top">
+        <div class="alignleft actions bulkactions">
+            <label for="bulk-action-selector-top" class="screen-reader-text">Pilih tindakan sekaligus</label>
+            <select name="action_type_val" id="bulk-action-selector-top">
+                <option value="-1">Tindakan Massal</option>
+                <option value="bulk_delete">Hapus</option>
+            </select>
+            <input type="submit" id="doaction" class="button action" value="Terapkan">
+        </div>
+    </div>
+
+    <table class="wp-list-table widefat fixed striped table-view-list posts">
+        <thead>
+            <tr>
+                <td id="cb" class="manage-column column-cb check-column">
+                    <label class="screen-reader-text" for="cb-select-all-1">Pilih Semua</label>
+                    <input id="cb-select-all-1" type="checkbox">
+                </td>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="<?php echo $list_url; ?>&orderby=nama&amp;order=asc">
+                        <span>Nama</span>
+                        <span class="sorting-indicator"></span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="<?php echo $list_url; ?>&orderby=status&amp;order=asc">
+                        <span>Status</span>
+                        <span class="sorting-indicator"></span>
+                    </a>
+                </th>
+            </tr>
         </thead>
         <tbody>
             <?php foreach($list_of_data as $key => $data){ ?>
@@ -212,7 +261,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <label class="screen-reader-text" for="cb-select-1">
                         Pilih <?php echo $data->name; ?>
                     </label>
-                    <input id="cb-select-1" type="checkbox" name="post[]" value="1">
+                    <input id="cb-select-1" type="checkbox" name="post[]" value="<?php echo $data->id; ?>">
                     <div class="locked-indicator">
                         <span class="locked-indicator-icon" aria-hidden="true"></span>
                         <span class="screen-reader-text">
@@ -270,7 +319,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             </tr>
         </tfoot>
     </table>
-
+</form>
     <?php
     // Display the paging information
     echo '<div id="paging"><p>', $prevlink, ' Halaman <b>', $page, '</b> dari <b>', $pages, '</b> , Menampilkan <b>', $start, '-', $end, '</b> dari <b>', $total, '</b> Hasil ', $nextlink, ' </p></div>';
