@@ -1,6 +1,8 @@
 <?php
 global $wpdb;
 $table_name = $wpdb->prefix . 'sekolahku_matapelajaran';
+$table_name_mapel_kelas = $wpdb->prefix . 'sekolahku_matapelajaran_kelas';
+$table_name_bab = $wpdb->prefix . 'sekolahku_bab';
 
 //var
 $is_add = false;
@@ -124,6 +126,18 @@ if(count($errors) < 1){
             array('id' => $id)
         );
 
+        //delete relationship
+        $wpdb->delete(
+            $table_name_bab,
+            array('matapelajaran_id' => $id)
+        );
+
+        //delete relationship
+        $wpdb->delete(
+            $table_name_mapel_kelas,
+            array('matapelajaran_id' => $id)
+        );
+
         //success
         $success[] = 'Data berhasil dihapus';
 
@@ -143,6 +157,20 @@ if(count($errors) < 1){
                 $ids .= $postId;
             }else{
                 $ids .= $postId.',';
+            }
+            
+            if($postId != null && $postId != ""){
+                //delete relationship
+                $wpdb->delete(
+                    $table_name_bab,
+                    array('matapelajaran_id' => $postId)
+                );
+
+                //delete relationship
+                $wpdb->delete(
+                    $table_name_mapel_kelas,
+                    array('matapelajaran_id' => $postId)
+                );
             }
         }
 

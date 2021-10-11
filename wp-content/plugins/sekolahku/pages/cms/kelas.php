@@ -159,6 +159,12 @@ if(count($errors) < 1){
             array('id' => $id)
         );
 
+        //delete relationship
+        $wpdb->delete(
+            $table_name_mapel_kelas,
+            array('kelas_id' => $id)
+        );
+
         //success
         $success[] = 'Data berhasil dihapus';
 
@@ -178,6 +184,15 @@ if(count($errors) < 1){
                 $ids .= $postId;
             }else{
                 $ids .= $postId.',';
+            }
+
+            //delete relationship
+            if($postId != null && $postId != ""){
+                //delete relationship
+                $wpdb->delete(
+                    $table_name_mapel_kelas,
+                    array('kelas_id' => $postId)
+                );
             }
         }
 
