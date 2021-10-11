@@ -27,6 +27,7 @@ function pluginprefix_activate() {
 	$table_bab = $wpdb->prefix . $plugin_name . "_bab"; 
 	$table_mata_pelajaran_kelas = $wpdb->prefix . $plugin_name . "_matapelajaran_kelas"; 
 	$table_pengguna = $wpdb->prefix . $plugin_name . "_pengguna"; 
+	$table_pengguna_kelas = $wpdb->prefix . $plugin_name . "_pengguna_kelas"; 
 
 	//check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$table_kelas'") != $table_kelas) {
@@ -116,6 +117,22 @@ function pluginprefix_activate() {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
 	}
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_pengguna_kelas'") != $table_pengguna_kelas) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_pengguna_kelas (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		pengguna_id mediumint(9) NOT NULL,
+		kelas_id mediumint(9) NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
 }
 
 register_activation_hook( __FILE__, 'pluginprefix_activate' );
@@ -187,6 +204,10 @@ function mata_pelajaran_page(){
 
 function bab_page(){
     include_once( __DIR__ . '/pages/cms/bab.php' );
+}
+
+function pengguna_page(){
+    include_once( __DIR__ . '/pages/cms/pengguna.php' );
 }
 
 /* Main Page */
