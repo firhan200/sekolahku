@@ -88,6 +88,7 @@ if(count($errors) < 1){
     if($_POST['submit']){
         $name = $_POST['name'];
         $email_address = $_POST['email_address'];
+        $password = $_POST['password'];
         $account_type = $_POST['account_type'];
         $gender = $_POST['gender'];
         $is_active = $_POST['is_active'] == 'on' ? 1 : 0;
@@ -95,6 +96,12 @@ if(count($errors) < 1){
         //validation
         if(empty($name)){
             $errors[] = '<b>Nama</b> Tidak Boleh Kosong';
+        }
+
+        if($is_add){
+            if(empty($password)){
+                $errors[] = '<b>Password</b> Tidak Boleh Kosong';
+            }
         }
 
         if(empty($email_address)){
@@ -129,16 +136,19 @@ if(count($errors) < 1){
             //check if edit or add
             if($is_add){
                 //insert into wpdb database
+                $encrypted_password = sha1($password);
                 $wpdb->insert(
                     $table_name,
                     array(
                         'full_name' => $name,
                         'email_address' => $email_address,
+                        'password' => $encrypted_password,
                         'account_type' => $account_type,
                         'gender' => $gender,
                         'is_active' => $is_active
                     ),
                     array(
+                        '%s',
                         '%s',
                         '%s',
                         '%d',
@@ -151,15 +161,23 @@ if(count($errors) < 1){
             }else if($is_edit){
                 $pengguna_id = $id;
                 //update into wpdb database
+
+                $updatedArr = array(
+                    'full_name' => $name,
+                    'email_address' => $email_address,
+                    'account_type' => $account_type,
+                    'gender' => $gender,
+                    'is_active' => $is_active
+                );
+
+                //check if update password
+                if($password != null && $password != ''){
+                    $updatedArr['password'] = sha1($password);
+                }
+
                 $wpdb->update(
                     $table_name,
-                    array(
-                        'full_name' => $name,
-                        'email_address' => $email_address,
-                        'account_type' => $account_type,
-                        'gender' => $gender,
-                        'is_active' => $is_active
-                    ),
+                    $updatedArr,
                     array('id' => $id)
                 );
             }
@@ -370,7 +388,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Mata Pelajaran</span>
+                        <span>Kelas</span>
                         <span class="sorting-indicator"></span>
                     </a>
                 </th>
@@ -470,7 +488,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Mata Pelajaran</span>
+                        <span>Kelas</span>
                         <span class="sorting-indicator"></span>
                     </a>
                 </th>
@@ -513,11 +531,28 @@ $list_of_kelas = $wpdb->get_results('SELECT * FROM '.$table_name_kelas.' ORDER B
                 <td><input type="email" class="regular-text" name="email_address" value="<?php echo $email_address; ?>" maxlength="150" required></td>
             </tr>
             <tr>
+                <th scope="row"><label for="name">Password</label></th>
+                <td>
+                    <div class="wp-pwd">
+                        <span class="password-input-wrapper">
+                            <input type="password" name="password" id="password" class="regular-text" autocomplete="off" <?php echo $is_add ? 'required' : ''; ?>>
+                        </span>
+                        <button type="button" class="button btn-password-show wp-hide-pw hide-if-no-js" data-toggle="0" aria-label="Tampilkan sandi">
+                            <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+                            <span class="text">Tampilkan</span>
+                        </button>
+                    </div>
+                    <?php if($is_edit){
+                        echo '<div class="alert alert-warning">Kosongkan <b>Password</b> apabila tidak ingin mengubah password lama.</div>';
+                    } ?>
+                </td>
+            </tr>
+            <tr>
                 <th scope="row"><label for="name">Tipe Akun</label></th>
                 <td>
                     <select name="account_type">
                         <option value="1" <?php if($account_type == 1) echo 'selected'; ?>>Siswa</option>
-                        <option value="2" <?php if($account_type == 1) echo 'selected'; ?>>Guru</option>
+                        <option value="2" <?php if($account_type == 2) echo 'selected'; ?>>Guru</option>
                     </select>
                 </td>
             </tr>
