@@ -219,8 +219,8 @@ if(count($errors) < 1){
 
         //delete relationship
         $wpdb->delete(
-            $table_name_mapel_kelas,
-            array('kelas_id' => $id)
+            $table_name_pengguna_kelas,
+            array('pengguna_id' => $id)
         );
 
         //success
@@ -248,8 +248,8 @@ if(count($errors) < 1){
             if($postId != null && $postId != ""){
                 //delete relationship
                 $wpdb->delete(
-                    $table_name_mapel_kelas,
-                    array('kelas_id' => $postId)
+                    $table_name_pengguna_kelas,
+                    array('pengguna_id' => $postId)
                 );
             }
         }

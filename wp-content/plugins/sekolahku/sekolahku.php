@@ -13,6 +13,48 @@ if(!defined('ABSPATH')){
 	exit;
 }
 
+$sekolahku_pages = array(
+	'login' => 'sekolahku-masuk',
+	'register' => 'sekolahku-daftar'
+);
+
+/* 
+* Front-End Page Handler
+*/
+add_action('template_redirect','front_page_redirect_handler');
+function front_page_redirect_handler(){
+	global $post;
+	global $sekolahku_pages;
+
+	$is_found = false;
+
+	if (is_page()) {
+		if($post->post_name == $sekolahku_pages['login']){
+			$is_found = true;
+		
+			//render page
+			$page =  __DIR__ . '/pages/front/login.php';
+		}
+		else if($post->post_name == $sekolahku_pages['register']){
+			$is_found = true;
+		
+			//render page
+			$page =  __DIR__ . '/pages/front/register.php';
+		}
+	}
+
+	if ($is_found) {
+		include_once(__DIR__ . '/pages/front/header.php');
+		include_once($page);
+		include_once(__DIR__ . '/pages/front/footer.php');
+
+		exit;
+	}
+}
+/* 
+* Front-End Page Handler
+*/
+
 /**
  * Activate the plugin.
  */
@@ -133,9 +175,64 @@ function pluginprefix_activate() {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
 	}
+
+	create_pages();
+
+	set_transient( 'activated_plugin_msg', true, 5 );
+}
+
+function create_pages(){
+    global $wpdb;
+		
+	$sekolahku_pages = array(
+		'login' => 'sekolahku-masuk',
+		'register' => 'sekolahku-daftar'
+	);
+
+	/* CREATE FRONT END PAGE POST */
+	$login_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'.$sekolahku_pages['login'].'"');
+	if($login_page == null){
+		$login_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Masuk',
+			'post_name' => '"'.$sekolahku_pages['login'].'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$register_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'.$sekolahku_pages['register'].'"');
+	if($register_page == null){
+		$register_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Daftar',
+			'post_name' => '"'.$sekolahku_pages['register'].'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+	/* CREATE FRONT END PAGE POST */
 }
 
 register_activation_hook( __FILE__, 'pluginprefix_activate' );
+
+add_action( 'admin_notices', 'sekolahku_admin_notice' );
+
+function sekolahku_admin_notice(){
+	global $wpdb;
+	global $sekolahku_pages;
+
+	/* Check transient, if available display notice */
+    if( get_transient( 'activated_plugin_msg' ) ){
+		//show notice here
+        /* Delete transient, only display this notice once. */
+        delete_transient( 'activated_plugin_msg' );
+    }
+}
 /**
  * Activate the plugin.
  */

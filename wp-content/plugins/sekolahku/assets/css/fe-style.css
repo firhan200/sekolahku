@@ -1,0 +1,34 @@
+/*
+Default Color: #6C63FF
+*/
+
+.form-control{
+    height:45px;
+    border-left:0px;
+}
+
+.input-group-text{
+    background-color: transparent;
+    color:#ced4da;
+}
+
+.btn-default{
+    background-color:#6C63FF;
+    color:#fff;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.btn-default:hover{
+    background-color:#fff;
+    color:#6C63FF;
+}
+
+.link-default, .link-default:hover, .link-default:focus{
+    color:#6C63FF;
+}
+
+.btn-round{
+    padding-left:55px;
+    padding-right:55px;
+    border-radius:25px;
+}
