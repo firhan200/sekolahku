@@ -309,4 +309,5 @@ function pengguna_page(){
 
 /* Main Page */
 
+include_once( __DIR__ . '/functions.php' );
 ?>

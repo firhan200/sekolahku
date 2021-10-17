@@ -15,4 +15,4 @@ $my_plugin = plugin_dir_url('').'sekolahku';
     <link href="<?php echo $my_plugin; ?>/assets/css/fe-style.css" rel="stylesheet"></link>
 </head>
 <body>
-    
+    <input type="hidden" id="host_url" value="<?php echo get_site_url(); ?>"/>    
