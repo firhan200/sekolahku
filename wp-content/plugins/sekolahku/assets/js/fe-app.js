@@ -12,7 +12,7 @@ $(document).ready(function(){
         var submit_btn = $(this).find("button[type='submit']");
 
         $.ajax({
-            url:'/sekolahku/wp-admin/admin-ajax.php?action=login_user&noheader=true',
+            url: hostUrl + '/wp-admin/admin-ajax.php?action=login_user&noheader=true',
             type: 'POST',
             contentType: "application/json; charset=utf-8",
             data:JSON.stringify(formData),
@@ -55,7 +55,7 @@ $(document).ready(function(){
         var submit_btn = $(this).find("button[type='submit']");
 
         $.ajax({
-            url:'/sekolahku/wp-admin/admin-ajax.php?action=register_user&noheader=true',
+            url: hostUrl + '/wp-admin/admin-ajax.php?action=register_user&noheader=true',
             type: 'POST',
             contentType: "application/json; charset=utf-8",
             data:JSON.stringify(formData),
