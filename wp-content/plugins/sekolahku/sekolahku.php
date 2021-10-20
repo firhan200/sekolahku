@@ -13,6 +13,13 @@ if(!defined('ABSPATH')){
 	exit;
 }
 
+//define
+define('PILIHAN_GANDA', 1);
+define('PILIHAN_GANDA_KOMPLEKS', 2);
+
+define('PILIHAN_GANDA_LABEL', 'Pilihan Ganda');
+define('PILIHAN_GANDA_KOMPLEKS_LABEL', 'Pilihan Ganda Kompleks');
+
 $sekolahku_pages = array(
 	'login' => 'sekolahku-masuk',
 	'register' => 'sekolahku-daftar'
@@ -70,6 +77,10 @@ function pluginprefix_activate() {
 	$table_mata_pelajaran_kelas = $wpdb->prefix . $plugin_name . "_matapelajaran_kelas"; 
 	$table_pengguna = $wpdb->prefix . $plugin_name . "_pengguna"; 
 	$table_pengguna_kelas = $wpdb->prefix . $plugin_name . "_pengguna_kelas"; 
+
+	//table soal soal
+	$table_soal = $wpdb->prefix . $plugin_name . "_soal"; 
+	$table_soal_pilihan = $wpdb->prefix . $plugin_name . "_soal_pilihan"; 
 
 	//check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$table_kelas'") != $table_kelas) {
@@ -176,6 +187,46 @@ function pluginprefix_activate() {
 		dbDelta( $sql );
 	}
 
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_soal'") != $table_soal) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_soal (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		title varchar(150) NOT NULL,
+		question TEXT NOT NULL,
+		explanation TEXT NULL,
+		question_type mediumint(9) NOT NULL,
+		is_lock smallint(1) DEFAULT 0 NOT NULL,
+		is_active smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_soal_pilihan'") != $table_soal_pilihan) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_soal_pilihan (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		soal_id mediumint(9) NOT NULL,
+		label TEXT NOT NULL,
+		score mediumint(9) NOT NULL,
+		is_active smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
+
 	create_pages();
 
 	set_transient( 'activated_plugin_msg', true, 5 );
@@ -257,6 +308,9 @@ function add_plugin_cms_menu(){
 
 	/* Pengguna */
     add_submenu_page("sekolahku", "Guru & Siswa", "Guru & Siswa", "manage_options", "pengguna", "pengguna_page");
+
+	/* Pengguna */
+    add_submenu_page("sekolahku", "Soal", "Soal", "manage_options", "soal", "soal_page");
 }
 
 /* create administrator menu */
@@ -305,6 +359,10 @@ function bab_page(){
 
 function pengguna_page(){
     include_once( __DIR__ . '/pages/cms/pengguna.php' );
+}
+
+function soal_page(){
+    include_once( __DIR__ . '/pages/cms/soal.php' );
 }
 
 /* Main Page */

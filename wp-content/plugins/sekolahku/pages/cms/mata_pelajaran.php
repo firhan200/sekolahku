@@ -291,13 +291,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Nama</span>
-                        <span class="sorting-indicator"></span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Status</span>
-                        <span class="sorting-indicator"></span>
                     </a>
                 </th>
             </tr>
@@ -361,13 +359,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Nama</span>
-                        <span class="sorting-indicator"></span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Status</span>
-                        <span class="sorting-indicator"></span>
                     </a>
                 </th>
             </tr>
