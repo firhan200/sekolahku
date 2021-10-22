@@ -81,6 +81,8 @@ function pluginprefix_activate() {
 	//table soal soal
 	$table_soal = $wpdb->prefix . $plugin_name . "_soal"; 
 	$table_soal_pilihan = $wpdb->prefix . $plugin_name . "_soal_pilihan"; 
+	$table_paket = $wpdb->prefix . $plugin_name . "_paket"; 
+	$table_paket_soal = $wpdb->prefix . $plugin_name . "_paket_soal"; 
 
 	//check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$table_kelas'") != $table_kelas) {
@@ -227,6 +229,43 @@ function pluginprefix_activate() {
 		dbDelta( $sql );
 	}
 
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_paket'") != $table_paket) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_paket (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		name varchar(150) NOT NULL,
+		description TEXT NULL,
+		is_lock smallint(1) DEFAULT 0 NOT NULL,
+		is_active smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_paket_soal'") != $table_paket_soal) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_paket_soal (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		paket_id mediumint(9) NOT NULL,
+		soal_id mediumint(9) NOT NULL,
+		is_active smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
+
 	create_pages();
 
 	set_transient( 'activated_plugin_msg', true, 5 );
@@ -309,8 +348,14 @@ function add_plugin_cms_menu(){
 	/* Pengguna */
     add_submenu_page("sekolahku", "Guru & Siswa", "Guru & Siswa", "manage_options", "pengguna", "pengguna_page");
 
-	/* Pengguna */
+	/* Soal */
     add_submenu_page("sekolahku", "Soal", "Soal", "manage_options", "soal", "soal_page");
+
+	/* Paket */
+    add_submenu_page("sekolahku", "Paket", "Paket", "manage_options", "paket", "paket_page");
+
+	/* Paket Soal */
+    add_submenu_page(null, "Paket Soal", "Paket Soal", "manage_options", "paket_soal", "paket_soal_page");
 }
 
 /* create administrator menu */
@@ -363,6 +408,14 @@ function pengguna_page(){
 
 function soal_page(){
     include_once( __DIR__ . '/pages/cms/soal.php' );
+}
+
+function paket_page(){
+    include_once( __DIR__ . '/pages/cms/paket.php' );
+}
+
+function paket_soal_page(){
+    include_once( __DIR__ . '/pages/cms/paket_soal.php' );
 }
 
 /* Main Page */
