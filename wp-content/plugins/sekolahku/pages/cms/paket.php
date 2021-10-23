@@ -1,6 +1,7 @@
 <?php
 global $wpdb;
 $table_name = $wpdb->prefix . 'sekolahku_paket';
+$table_mapel = $wpdb->prefix . 'sekolahku_matapelajaran';
 $table_paket_soal = $wpdb->prefix . 'sekolahku_paket_soal';
 
 //var
@@ -25,9 +26,11 @@ if($_POST['action_type_val'] != null){
 //set label
 $action_label = get_admin_page_title();
 if($action_type != null){
+    $matapelajaran_id = null;
     $name = '';
     $description = '';
     $is_active = 1;
+    $is_lock = 0;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -40,8 +43,10 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
+            $matapelajaran_id = $data->matapelajaran_id;
             $name = $data->name;
             $description = $data->description;
+            $is_lock = $data->is_lock;
             $is_active = $data->is_active;
         }else{
             $errors[] = 'Data tidak ditemukan';
@@ -73,13 +78,19 @@ $delete_url = $list_url.'&action_type=delete&id=';
 //check if submit
 if(count($errors) < 1){
     if($_POST['submit']){
+        $matapelajaran_id = $_POST['matapelajaran_id'];
         $name = $_POST['name'];
         $description = $_POST['description'];
+        $is_lock = $_POST['is_lock'] == 'on' ? 1 : 0;
         $is_active = $_POST['is_active'] == 'on' ? 1 : 0;
 
         //validation
         if(empty($name)){
             $errors[] = '<b>Nama Kelas</b> Tidak Boleh Kosong';
+        }
+
+        if(empty($matapelajaran_id)){
+            $errors[] = '<b>Mata Pelajaran</b> Tidak Boleh Kosong';
         }
 
         if(count($errors) == 0){
@@ -90,14 +101,18 @@ if(count($errors) < 1){
                 $wpdb->insert(
                     $table_name,
                     array(
+                        'matapelajaran_id' => $matapelajaran_id,
                         'name' => $name,
                         'description' => $description,
-                        'is_active' => $is_active
+                        'is_active' => $is_active,
+                        'is_lock' => $is_lock
                     ),
                     array(
+                        '%d',
                         '%s',
                         '%s',
                         '%s',
+                        '%d',
                     )
                 );
             }else if($is_edit){
@@ -105,9 +120,11 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
+                        'matapelajaran_id' => $matapelajaran_id,
                         'name' => $name,
                         'description' => $description,
-                        'is_active' => $is_active
+                        'is_active' => $is_active,
+                        'is_lock' => $is_lock
                     ),
                     array('id' => $id)
                 );
@@ -212,7 +229,7 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT *, (SELECT COUNT(*) FROM ".$table_paket_soal." WHERE paket_id=".$table_name.".id) AS total_questions FROM ".$table_name;
+$query = "SELECT p.*, m.name AS matapelajaran_name, (SELECT COUNT(*) FROM ".$table_paket_soal." WHERE paket_id=p.id) AS total_questions FROM ".$table_name." AS p LEFT JOIN ".$table_mapel." AS m ON p.matapelajaran_id=m.id";
 $keyword = '';
 
 //filter
@@ -222,7 +239,7 @@ if($_POST['keyword']){
 }
 
 //order by query
-$query .= " ORDER BY id DESC";
+$query .= " ORDER BY p.id DESC";
 
 $list_of_data_total = $wpdb->get_results($query);
 
@@ -291,7 +308,17 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Mata Pelajaran</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>Jumlah Soal</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Kunci</span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
@@ -305,6 +332,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <?php foreach($list_of_data as $key => $data){ ?>
             <tr id="post-<?php echo $key+1; ?>" class="type-post">
                 <th scope="row" class="check-column">
+                    <?php if(!$data->is_lock){ ?>
                     <label class="screen-reader-text" for="cb-select-1">
                         Pilih <?php echo $data->name; ?>
                     </label>
@@ -315,6 +343,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                             “<?php echo $data->name; ?>” terkunci
                         </span>
                     </div>
+                    <?php } ?>
                 </th>
                 <td class="title column-title has-row-actions column-primary page-name">
                     <?php echo $data->name; ?>
@@ -332,15 +361,31 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                             </a> 
                             | 
                         </span>
+                        <?php if(!$data->is_lock){ ?>
                         <span class="delete">
                             <a href="<?php echo $delete_url.$data->id ?>" onclick="return confirm('Hapus <?php echo $data->name; ?>?')" aria-label="Delete">
                                 Delete
                             </a>
                         </span>
+                        <?php }else{ ?>
+                            <span class="delete">
+                            Paket Terkunci
+                        </span>
+                        <?php } ?>
                     </div>
                 </td>
                 <td class="column-status" data-colname="status">
-                    <?php echo $data->total_questions; ?>
+                    <?php echo $data->matapelajaran_name; ?>
+                </td>
+                <td class="column-status" data-colname="status">
+                    <a href="<?php echo $soal_url.$data->id ?>"><?php echo $data->total_questions; ?></a>
+                </td>
+                <td class="column-status" data-colname="status">
+                    <?php 
+                        if($data->is_lock == 1){ 
+                            echo '<span class="badge bg-success">Dikunci</span>';
+                        }
+                    ?>
                 </td>
                 <td class="column-status" data-colname="status">
                     <?php 
@@ -367,7 +412,17 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Mata Pelajaran</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>Jumlah Soal</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Kunci</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
@@ -385,6 +440,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
+    $list_matapelajaran = $wpdb->get_results('SELECT * FROM '.$table_mapel.' ORDER BY name ASC');
 ?>
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
@@ -392,11 +448,40 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
         <tbody>
             <tr>
                 <th scope="row"><label for="name">Nama Paket</label></th>
-                <td><input type="text" class="regular-text" name="name" value="<?php echo $name; ?>" maxlength="100"></td>
+                <td><input type="text" class="regular-text" name="name" value="<?php echo $name; ?>" maxlength="100" <?php echo $is_lock ? 'readonly' : '' ?>></td>
             </tr>
             <tr>
                 <th scope="row"><label for="name">Deskripsi</label></th>
-                <td><textarea rows="5" cols="100" name="description" maxlength="250"><?php echo $description; ?></textarea></td>
+                <td><textarea rows="5" cols="100" name="description" maxlength="250" <?php echo $is_lock ? 'readonly' : '' ?>><?php echo $description; ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Mata Pelajaran</label></th>
+                <td>
+                    <?php if(!$is_lock){ ?>
+                    <select name="matapelajaran_id" required <?php echo $is_lock ? 'readonly' : '' ?>>
+                        <option value="">-- Pilih Mata Pelajaran --</option>
+                        <?php 
+                        foreach($list_matapelajaran as $matapelajaran){
+                            $isSelected = $matapelajaran->id == $matapelajaran_id ? 'selected' : '';
+                            echo '<option value="'.$matapelajaran->id.'" '.$isSelected.'>#'.$matapelajaran->id.' '.$matapelajaran->name.'</option>';
+                        }
+                        ?>
+                    </select>
+                    <?php }else{ ?>
+                        <input type="hidden" class="regular-text" name="matapelajaran_id" value="<?php echo $matapelajaran_id; ?>" readonly />
+                        <input type="text" class="regular-text" name="matapelajaran_id_label" value="<?php 
+                        foreach($list_matapelajaran as $matapelajaran){
+                            if($matapelajaran->id == $matapelajaran_id){
+                                echo '#'.$matapelajaran->id.' '.$matapelajaran->name;
+                            }
+                        }
+                        ?>" readonly />
+                    <?php } ?>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="is_active">Kunci Paket</label></th>
+                <td><input class="form-control" name="is_lock" type="checkbox" <?php echo $is_lock==1 ? 'checked' : ''; ?> />&nbsp;Paket yang di kunci tidak dapat di ubah!</td>
             </tr>
             <tr>
                 <th scope="row"><label for="is_active">Status</label></th>

@@ -80,4 +80,14 @@ $(document).ready(function(){
                             '</div>';
         return optionTemplate;
     }
+
+    /* UJIAN */
+    $('input[name="dates"]').daterangepicker({
+        timePicker: true,
+        timePicker24Hour: true,
+        locale: {
+            format: 'DD/MM/YYYY, HH:mm'
+        }
+    });
+    /* UJIAN */
 });

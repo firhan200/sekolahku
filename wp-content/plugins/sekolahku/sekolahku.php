@@ -77,12 +77,15 @@ function pluginprefix_activate() {
 	$table_mata_pelajaran_kelas = $wpdb->prefix . $plugin_name . "_matapelajaran_kelas"; 
 	$table_pengguna = $wpdb->prefix . $plugin_name . "_pengguna"; 
 	$table_pengguna_kelas = $wpdb->prefix . $plugin_name . "_pengguna_kelas"; 
-
+	
 	//table soal soal
 	$table_soal = $wpdb->prefix . $plugin_name . "_soal"; 
 	$table_soal_pilihan = $wpdb->prefix . $plugin_name . "_soal_pilihan"; 
 	$table_paket = $wpdb->prefix . $plugin_name . "_paket"; 
-	$table_paket_soal = $wpdb->prefix . $plugin_name . "_paket_soal"; 
+	$table_paket_soal = $wpdb->prefix . $plugin_name . "_paket_soal";
+	
+	//table ujian
+	$table_ujian = $wpdb->prefix . $plugin_name . "_ujian"; 
 
 	//check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$table_kelas'") != $table_kelas) {
@@ -235,6 +238,7 @@ function pluginprefix_activate() {
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql = "CREATE TABLE $table_paket (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		matapelajaran_id mediumint(9) NOT NULL,
 		name varchar(150) NOT NULL,
 		description TEXT NULL,
 		is_lock smallint(1) DEFAULT 0 NOT NULL,
@@ -257,6 +261,27 @@ function pluginprefix_activate() {
 		paket_id mediumint(9) NOT NULL,
 		soal_id mediumint(9) NOT NULL,
 		is_active smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_ujian'") != $table_ujian) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_ujian (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		paket_id mediumint(9) NOT NULL,
+		kelas_id mediumint(9) NOT NULL,
+		duration_seconds mediumint(9.) NOT NULL,
+		start_date datetime NOT NULL,
+		end_date datetime NOT NULL,
+		randomize_questions smallint(1) DEFAULT 1 NOT NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
 		PRIMARY KEY  (id)
@@ -356,6 +381,9 @@ function add_plugin_cms_menu(){
 
 	/* Paket Soal */
     add_submenu_page(null, "Paket Soal", "Paket Soal", "manage_options", "paket_soal", "paket_soal_page");
+
+	/* Ujian */
+    add_submenu_page("sekolahku", "Ujian", "Ujian", "manage_options", "ujian", "ujian_page");
 }
 
 /* create administrator menu */
@@ -371,13 +399,16 @@ add_action("admin_enqueue_scripts", 'addScripts');
 /* add Style */
 function addStyle(){
 	wp_enqueue_style("sekolahku-style-select2", plugins_url("/assets/css/select2.min.css", __FILE__));
+	wp_enqueue_style("sekolahku-style-daterangepicker", plugins_url("/assets/css/daterangepicker.css", __FILE__));
 	wp_enqueue_style("sekolahku-style", plugins_url("/assets/css/style.css", __FILE__));
 }
 
 /* add Scripts */
 function addScripts(){
 	wp_enqueue_script("sekolahku-script-jquery", plugins_url("/assets/js/jquery-3.6.0.min.js", __FILE__), array("jquery"));
+	wp_enqueue_script("sekolahku-script-moment", plugins_url("/assets/js/moment.min.js", __FILE__), array("jquery"));
 	wp_enqueue_script("sekolahku-script-select2", plugins_url("/assets/js/select2.min.js", __FILE__), array("jquery"));
+	wp_enqueue_script("sekolahku-script-daterangepicker", plugins_url("/assets/js/daterangepicker.min.js", __FILE__));
 	wp_enqueue_script("sekolahku-script", plugins_url("/assets/js/app.js", __FILE__), array("jquery"));
 }
 
@@ -416,6 +447,10 @@ function paket_page(){
 
 function paket_soal_page(){
     include_once( __DIR__ . '/pages/cms/paket_soal.php' );
+}
+
+function ujian_page(){
+    include_once( __DIR__ . '/pages/cms/ujian.php' );
 }
 
 /* Main Page */

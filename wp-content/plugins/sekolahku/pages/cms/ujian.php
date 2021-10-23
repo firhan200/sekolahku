@@ -1,8 +1,13 @@
 <?php
 global $wpdb;
+$table_name = $wpdb->prefix . 'sekolahku_ujian';
 $table_paket = $wpdb->prefix . 'sekolahku_paket';
-$table_soal = $wpdb->prefix . 'sekolahku_soal';
-$table_name = $wpdb->prefix . 'sekolahku_paket_soal';
+$table_mapel = $wpdb->prefix . 'sekolahku_matapelajaran';
+$table_kelas = $wpdb->prefix . 'sekolahku_kelas';
+
+define('UJIAN_SEDANG_BERLANGSUNG', 'Sedang Berlangsung');
+define('UJIAN_BELUM_DIMULAI', 'Belum Dimulai');
+define('UJIAN_SUDAH_BERAKHIR', 'Sudah Berakhir');
 
 //var
 $is_add = false;
@@ -12,22 +17,6 @@ $is_delete = false;
 $is_bulk_delete = false;
 $success = [];
 $errors = [];
-
-//get parent id
-$parent_id = $_GET['paket_id'];
-if($parent_id == null){
-    $errors[] = 'Paket tidak ditemukan';
-}else{
-    $paket = $wpdb->get_row("SELECT * FROM $table_paket WHERE id = $parent_id");
-    if($paket == null){
-        $errors[] = 'Paket tidak ditemukan';
-    }
-}
-
-//check if is lock
-if($paket->is_lock){
-    $errors[] = "Tidak dapat mengubah soal-soal karena paket <b>Terkunci</b>";
-}
 
 //get page to show
 $action_type = $_GET['action_type'];
@@ -40,13 +29,13 @@ if($_POST['action_type_val'] != null){
 }
 
 //set label
-$action_label = "Paket Soal";
-if(count($errors) < 1){
-    $action_label .= " (".$paket->name.")";
-}
+$action_label = get_admin_page_title();
 if($action_type != null){
-    $soal_id = null;
-    $is_active = 1;
+    $paket_id = null;
+    $kelas_id = '';
+    $dates = null;
+    $duration_seconds = 3600;
+    $randomize_questions = 1;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -59,8 +48,14 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
-            $soal_id = $data->soal_id;
-            $is_active = $data->is_active;
+            $paket_id = $data->paket_id;
+            $kelas_id = $data->kelas_id;
+            $randomize_questions = $data->randomize_questions;
+            $duration_seconds = $data->duration_seconds;
+
+            $start_date_data = date("d/m/Y, H:i", strtotime($data->start_date)); 
+            $end_date_data = date("d/m/Y, H:i", strtotime($data->end_date)); 
+            $dates = $start_date_data.' - '.$end_date_data;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -81,9 +76,9 @@ if($action_type != null){
 }
 
 //get urls
-$modul_name = 'paket_soal';
-$list_url = admin_url('/admin.php?page='.$modul_name.'&paket_id='.$paket->id);
-$soal_url = admin_url('/admin.php?page=soal&action_type=edit&id=');
+$modul_name = 'ujian';
+$list_url = admin_url('/admin.php?page='.$modul_name);
+$paket_soal_url = admin_url('/admin.php?page=paket_soal&paket_id=');
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -91,13 +86,56 @@ $delete_url = $list_url.'&action_type=delete&id=';
 //check if submit
 if(count($errors) < 1){
     if($_POST['submit']){
-        $soal_id = $_POST['soal_id'];
         $paket_id = $_POST['paket_id'];
-        $is_active = $_POST['is_active'] == 'on' ? 1 : 0;
+        $kelas_id = $_POST['kelas_id'];
+        $duration_seconds = $_POST['duration_seconds'] * 60; //convert to seconds
+        $randomize_questions = $_POST['randomize_questions'] == 'on' ? 1 : 0;
+        $dates_new = $_POST['dates'];
+
+        /* PREPARE DATES */       
+        //explode daterange into start and end date
+        $dates_new = explode("-", $dates_new);
+        $start_date = trim($dates_new[0]);
+        $end_date = trim($dates_new[1]);
+
+        //start date arr
+        $startDateArr = explode(",", $start_date);
+        $startTime = $startDateArr[1];
+        
+        //explode d-m-Y string format
+        $start_date_exploded = explode("/", $startDateArr[0]);
+        $start_day = trim($start_date_exploded[0]);
+        $start_month = trim($start_date_exploded[1]);
+        $start_year = trim($start_date_exploded[2]);
+        
+        //start date arr
+        $endDateArr = explode(",", $end_date);
+        $endTime = $endDateArr[1];
+
+        $end_date_exploded = explode("/", $endDateArr[0]);
+        $end_day = trim($end_date_exploded[0]);
+        $end_month = trim($end_date_exploded[1]);
+        $end_year = trim($end_date_exploded[2]);
+        
+        $start_date_val = $start_year."-".$start_month."-".$start_day.' '.$startTime.':00';
+        $end_date_val = $end_year."-".$end_month."-".$end_day.' '.$endTime.':59';
+        /* PREPARE DATES */
 
         //validation
-        if(empty($soal_id)){
-            $errors[] = '<b>Soal</b> Tidak Boleh Kosong';
+        if(empty($paket_id)){
+            $errors[] = '<b>Paket</b> Tidak Boleh Kosong';
+        }
+
+        if(empty($kelas_id)){
+            $errors[] = '<b>Kelas</b> Tidak Boleh Kosong';
+        }
+
+        if(empty($dates)){
+            $errors[] = '<b>Waktu Ujian</b> Tidak Boleh Kosong';
+        }
+
+        if(empty($duration_seconds) || $duration_seconds == 0){
+            $errors[] = '<b>Durasi Ujian</b> Tidak Boleh Kosong';
         }
 
         if(count($errors) == 0){
@@ -109,13 +147,19 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'paket_id' => $paket_id,
-                        'soal_id' => $soal_id,
-                        'is_active' => $is_active
+                        'kelas_id' => $kelas_id,
+                        'start_date' => $start_date_val,
+                        'end_date' => $end_date_val,
+                        'randomize_questions' => $randomize_questions,
+                        'duration_seconds' => $duration_seconds
                     ),
                     array(
                         '%d',
                         '%d',
-                        '%d'
+                        '%s',
+                        '%s',
+                        '%d',
+                        '%d',
                     )
                 );
             }else if($is_edit){
@@ -123,8 +167,12 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
-                        'soal_id' => $soal_id,
-                        'is_active' => $is_active
+                        'paket_id' => $paket_id,
+                        'kelas_id' => $kelas_id,
+                        'start_date' => $start_date_val,
+                        'end_date' => $end_date_val,
+                        'randomize_questions' => $randomize_questions,
+                        'duration_seconds' => $duration_seconds
                     ),
                     array('id' => $id)
                 );
@@ -162,11 +210,18 @@ if(count($errors) < 1){
         //get id
         $posts_to_delete = $_POST['post'];
         $ids = null;
-        foreach($posts_to_delete as $key => $postId){
-            if($key == count($posts_to_delete) - 1){
-                $ids .= $postId;
-            }else{
-                $ids .= $postId.',';
+
+        if($posts_to_delete != null){
+            foreach($posts_to_delete as $key => $postId){
+                if($key == count($posts_to_delete) - 1){
+                    $ids .= $postId;
+                }else{
+                    $ids .= $postId.',';
+                }
+                
+                if($postId != null && $postId != ""){
+                    //delete relationship
+                }
             }
         }
 
@@ -176,12 +231,12 @@ if(count($errors) < 1){
 
             //success
             $success[] = 'Data berhasil dihapus';
-
-            //show list
-            $is_list = true;
-
-            echo "<script>window.history.pushState('page2', 'Title', '".$list_url."');</script>";
         }
+
+        //show list
+        $is_list = true;
+
+        echo "<script>window.history.pushState('page2', 'Title', '".$list_url."');</script>";
     }
 }
 ?>
@@ -191,7 +246,7 @@ if(count($errors) < 1){
         <?php echo $action_label; ?>
     </h1>
 
-    <?php if($is_list & !$paket->is_lock){ ?>
+    <?php if($is_list){ ?>
     <a href="<?php echo $add_url; ?>" class="page-title-action">Tambah Baru</a>
     <?php } ?>
 
@@ -212,17 +267,17 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT ps.*, s.title AS question_title, s.question_type as question_type FROM ".$table_name.' AS ps LEFT JOIN '.$table_soal.' AS s ON ps.soal_id=s.id WHERE ps.paket_id='.$paket->id;
+$query = "SELECT u.*, p.name AS paket_name, k.name AS kelas_name FROM ".$table_name." AS u LEFT JOIN ".$table_paket." AS p ON u.paket_id=p.id LEFT JOIN ".$table_kelas." AS k ON u.kelas_id=k.id";
 $keyword = '';
 
 //filter
 if($_POST['keyword']){
     $keyword = $_POST['keyword'];
-    $query .= " AND name LIKE '%".$keyword."%'";
+    $query .= " WHERE p.name LIKE '%".$keyword."%'";
 }
 
 //order by query
-$query .= " ORDER BY id DESC";
+$query .= " ORDER BY u.id DESC";
 
 $list_of_data_total = $wpdb->get_results($query);
 
@@ -255,6 +310,8 @@ $prevlink = ($page > 1) ? '<a href="'.$list_url.'&on_page=1" title="First page" 
 $nextlink = ($page < $pages) ? '<a href="'.$list_url.'&on_page=' . ($page + 1) . '" class="next-page button" title="Next page">Laman Selanjutnya</a> <a href="'.$list_url.'&on_page=' . $pages . '" title="Last page" class="next-page button">Akhir</a>' : '';
 
 $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
+
+$current_time = $wpdb->get_row('SELECT NOW() AS data')->data;
 ?>
 
 <form action="<?php echo $list_url ?>" method="post">
@@ -286,12 +343,22 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Judul Soal</span>
+                        <span>Paket Soal</span>
                     </a>
                 </th>
-                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Jenis Soal</span>
+                        <span>Kelas</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Waktu Ujian</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Acak Soal</span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
@@ -302,57 +369,77 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             </tr>
         </thead>
         <tbody>
-            <?php foreach($list_of_data as $key => $data){ ?>
+            <?php foreach($list_of_data as $key => $data){
+
+            $status = "";
+            if($data->start_date <= $current_time && $data->end_date >= $current_time){ 
+                $status = UJIAN_SEDANG_BERLANGSUNG;
+            }else if($current_time < $data->start_date){
+                $status = UJIAN_BELUM_DIMULAI;
+            }else if($current_time > $data->end_date){
+                $status = UJIAN_SUDAH_BERAKHIR;
+            }    
+            ?>
             <tr id="post-<?php echo $key+1; ?>" class="type-post">
                 <th scope="row" class="check-column">
-                    <?php if(!$paket->is_lock){ ?>
+                    <?php if(!$data->is_lock){ ?>
                     <label class="screen-reader-text" for="cb-select-1">
-                        Pilih <?php echo $data->question_title; ?>
+                        Pilih <?php echo $data->name; ?>
                     </label>
                     <input id="cb-select-1" type="checkbox" name="post[]" value="<?php echo $data->id; ?>">
                     <div class="locked-indicator">
                         <span class="locked-indicator-icon" aria-hidden="true"></span>
                         <span class="screen-reader-text">
-                            “<?php echo $data->question_title; ?>” terkunci
+                            “<?php echo $data->name; ?>” terkunci
                         </span>
                     </div>
                     <?php } ?>
                 </th>
                 <td class="title column-title has-row-actions column-primary page-name">
-                    <?php echo '<a href="'.$soal_url.$data->soal_id.'">'.$data->question_title.'</a>'; ?>
+                    <?php echo '<a href="'.$paket_soal_url.$data->paket_id.'">'.$data->paket_name.'</a>'; ?>
 
                     <div class="row-actions action_container">
-                        <?php if(!$paket->is_lock){ ?>
+                        <?php if($status != UJIAN_SEDANG_BERLANGSUNG && $status != UJIAN_SUDAH_BERAKHIR){ ?>
                         <span class="edit">
                             <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
                                 Edit
                             </a> 
                             | 
                         </span>
+                        <?php } ?>
+                        <?php if(!$data->is_lock){ ?>
                         <span class="delete">
                             <a href="<?php echo $delete_url.$data->id ?>" onclick="return confirm('Hapus <?php echo $data->name; ?>?')" aria-label="Delete">
                                 Delete
                             </a>
                         </span>
+                        <?php }else{ ?>
+                            <span class="delete">
+                            Paket Terkunci
+                        </span>
                         <?php } ?>
                     </div>
                 </td>
                 <td class="column-status" data-colname="status">
+                    <?php echo $data->kelas_name; ?>
+                </td>
+                <td class="column-status" data-colname="status">
+                    <?php
+                    $start_date = date("H:i, d M y", strtotime($data->start_date));
+                    $end_date = date("H:i, d M y", strtotime($data->end_date));
+                    echo $start_date.' - '.$end_date;
+                    ?>
+                </td>
+                <td class="column-status" data-colname="status">
                     <?php 
-                        if($data->question_type == PILIHAN_GANDA){ 
-                            echo PILIHAN_GANDA_LABEL;
-                        }else if($data->question_type == PILIHAN_GANDA_KOMPLEKS){ 
-                            echo PILIHAN_GANDA_KOMPLEKS_LABEL;
+                        if($data->randomize_questions == 1){ 
+                            echo '<span class="badge bg-success">Iya</span>';
                         }
                     ?>
                 </td>
                 <td class="column-status" data-colname="status">
                     <?php 
-                        if($data->is_active == 1){ 
-                            echo '<span class="badge bg-success">Aktif</span>';
-                        }else{
-                            echo '<span class="badge bg-danger">Tidak Aktif</span>';
-                        }
+                       echo $status;
                     ?>
                 </td>
             </tr>
@@ -366,12 +453,22 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Judul Soal</span>
+                        <span>Paket Soal</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Jenis Soal</span>
+                        <span>Kelas</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Waktu Ujian</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Acak Soal</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
@@ -389,47 +486,61 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
-    $selected_soal_ids = $wpdb->get_results('SELECT * FROM '.$table_name.' WHERE paket_id = '.$paket->id);
-    $current_soal_ids = "";
-    foreach($selected_soal_ids as $selected_soal_id){
-        if($is_edit && $selected_soal_id->soal_id != $soal_id){
-            $current_soal_ids .= $selected_soal_id->soal_id.",";
-        }
-    }
+    $list_paket = $wpdb->get_results('SELECT p.*, m.name AS matapelajaran_name FROM '.$table_paket.' AS p LEFT JOIN '.$table_mapel.' AS m ON p.matapelajaran_id=m.id ORDER BY p.name ASC');
 
-    $selected_soal_ids_query = 'SELECT * FROM '.$table_soal.' WHERE is_active = 1';
-
-    if($current_soal_ids != ""){
-        //remove last comma
-        $current_soal_ids = substr($current_soal_ids, 0, -1);
-
-        $selected_soal_ids_query .= ' AND id NOT IN ('.$current_soal_ids.')';
-    }
-
-    $list_soal = $wpdb->get_results($selected_soal_ids_query);
+    $list_kelas = $wpdb->get_results('SELECT * FROM '.$table_kelas.' ORDER BY name ASC');
 ?>
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
-    <input type="hidden" name="paket_id" value="<?php echo $paket->id; ?>"/>
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="name">Soal</label></th>
+                <th scope="row"><label for="name">Paket Soal</label></th>
                 <td>
-                    <select name="soal_id" required>
-                        <option value="">-- Pilih Soal --</option>
+                    <?php if(!$is_lock){ ?>
+                    <select name="paket_id" required <?php echo $is_lock ? 'readonly' : '' ?>>
+                        <option value="">-- Pilih Paket Soal --</option>
                         <?php 
-                        foreach($list_soal as $soal){
-                            $isSelected = $soal->id == $soal_id ? 'selected' : '';
-                            echo '<option value="'.$soal->id.'" '.$isSelected.'>#'.$soal->id.' '.$soal->title.'</option>';
+                        foreach($list_paket as $paket){
+                            $isSelected = $paket->id == $paket_id ? 'selected' : '';
+                            echo '<option value="'.$paket->id.'" '.$isSelected.'>('.$paket->matapelajaran_name.') - '.$paket->name.'</option>';
                         }
                         ?>
                     </select>
+                    <?php }else{ ?>
+                        <input type="hidden" class="regular-text" name="paket_id" value="<?php echo $matapelajaran_id; ?>" readonly />
+                    <?php } ?>
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="is_active">Status</label></th>
-                <td><input class="form-control" name="is_active" type="checkbox" <?php echo $is_active==1 ? 'checked' : ''; ?>/>&nbsp;Is Active</td>
+                <th scope="row"><label for="name">Kelas</label></th>
+                <td>
+                    <?php if(!$is_lock){ ?>
+                    <select name="kelas_id" required <?php echo $is_lock ? 'readonly' : '' ?>>
+                        <option value="">-- Pilih Kelas --</option>
+                        <?php 
+                        foreach($list_kelas as $kelas){
+                            $isSelected = $kelas->id == $kelas_id ? 'selected' : '';
+                            echo '<option value="'.$kelas->id.'" '.$isSelected.'>'.$kelas->name.'</option>';
+                        }
+                        ?>
+                    </select>
+                    <?php }else{ ?>
+                        <input type="hidden" class="regular-text" name="kelas_id" value="<?php echo $matapelajaran_id; ?>" readonly />
+                    <?php } ?>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Waktu Ujian</label></th>
+                <td><input type="text" class="regular-text" name="dates" value="<?php echo $dates; ?>" maxlength="100"/></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Durasi Ujian (Menit)</label></th>
+                <td><input type="number" class="regular-text" name="duration_seconds" value="<?php echo ($duration_seconds / 60); ?>" maxlength="6"/></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="randomize_questions">Acak Soal</label></th>
+                <td><input class="form-control" name="randomize_questions" type="checkbox" <?php echo $randomize_questions==1 ? 'checked' : ''; ?> />&nbsp;Acak Penampilan Soal Saat Pengerjaan Oleh Siswa</td>
             </tr>
             <tr>
                 <td>
