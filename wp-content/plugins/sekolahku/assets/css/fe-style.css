@@ -7,6 +7,10 @@ Default Color: #6C63FF
     border-left:0px;
 }
 
+.bg-default{
+    background-color: #6C63FF !important;
+}
+
 .input-group-text{
     background-color: transparent;
     color:#ced4da;
@@ -31,4 +35,56 @@ Default Color: #6C63FF
     padding-left:55px;
     padding-right:55px;
     border-radius:25px;
+}
+
+.menu_container{
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 1px -1px 12px #ced4da;
+}
+
+.menu{
+    padding-bottom:20px;
+    padding-top:20px;
+    color:#ced4da;
+    display:block;
+    font-size:14pt;
+}
+
+.menu:hover, .menu.active{
+    color:#6C63FF;
+}
+
+.box{
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    padding:10px;
+    border-radius: 10px;
+}
+
+.t-sm{
+    font-size:10pt !important;
+}
+
+.t-xs{
+    font-size:8pt !important;
+}
+
+.setting-list{
+    list-style: none;
+    padding:0;
+}
+
+.setting-list > li > a{
+    padding:10px;
+    color:#1c1c1c;
+    text-decoration: none;
+    border: 1px solid #ced4da;
+    display: block;
+    border-radius: 10px;
+}
+
+.setting-list > li > a:hover{
+    background-color: #fafafa;
 }

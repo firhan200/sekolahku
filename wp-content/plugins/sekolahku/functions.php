@@ -7,6 +7,7 @@ if(!defined('ABSPATH')){
 //register ajax
 add_action('wp_ajax_register_user', 'register_user');
 add_action('wp_ajax_login_user', 'login_user');
+add_action('wp_ajax_logout_user', 'logout_user');
 
 global $wpdb;
 
@@ -25,6 +26,12 @@ LOGIN USER
 function login_user(){
     global $wpdb;
     global $table_pengguna;
+    global $table_pengguna_kelas;
+
+    //to set session
+    if ( ! session_id() ) {
+        session_start();
+    }
 
     $response = array(
         'is_success' => true,
@@ -62,6 +69,16 @@ function login_user(){
             $response['is_success'] = false;
             $response['errors'][] = 'Pengguna tidak ditemukan.';
         }
+    }
+
+    if($response['is_success']){
+        //get kelas ids
+        $kelas_ids = $wpdb->get_var("SELECT GROUP_CONCAT(kelas_id) FROM ".$table_pengguna_kelas." WHERE pengguna_id = '".$user->id."'");
+
+        //set session
+        $_SESSION[SESSION_ID] = $user->id;
+        $_SESSION[SESSION_NAME] = $user->full_name;
+        $_SESSION[SESSION_KELAS_IDS] = $kelas_ids;
     }
 
     wp_send_json($response);
@@ -174,5 +191,34 @@ function register_user(){
 }
 /*
 REGISTER USER 
+*/
+
+/*
+LOGOUT USER 
+*/
+function logout_user(){
+    global $wpdb;
+    global $table_pengguna;
+
+    //to set session
+    if ( ! session_id() ) {
+        session_start();
+    }
+
+    $response = array(
+        'is_success' => true,
+        'errors' => [],
+        'data' => null
+    );
+
+    //destroy session
+    session_destroy();
+
+    wp_send_json($response);
+
+    exit;
+}
+/*
+LOGOUT USER 
 */
 ?>

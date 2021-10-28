@@ -5,10 +5,6 @@ $table_paket = $wpdb->prefix . 'sekolahku_paket';
 $table_mapel = $wpdb->prefix . 'sekolahku_matapelajaran';
 $table_kelas = $wpdb->prefix . 'sekolahku_kelas';
 
-define('UJIAN_SEDANG_BERLANGSUNG', 'Sedang Berlangsung');
-define('UJIAN_BELUM_DIMULAI', 'Belum Dimulai');
-define('UJIAN_SUDAH_BERAKHIR', 'Sudah Berakhir');
-
 //var
 $is_add = false;
 $is_edit = false;
@@ -130,7 +126,7 @@ if(count($errors) < 1){
             $errors[] = '<b>Kelas</b> Tidak Boleh Kosong';
         }
 
-        if(empty($dates)){
+        if(empty($dates_new)){
             $errors[] = '<b>Waktu Ujian</b> Tidak Boleh Kosong';
         }
 

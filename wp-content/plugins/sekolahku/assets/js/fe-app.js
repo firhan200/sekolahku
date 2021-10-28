@@ -1,6 +1,21 @@
 $(document).ready(function(){
     var hostUrl = $("#host_url").val();
 
+    $(".logout_btn").click(function(){
+        var confirm = window.confirm("Apakah anda yakin ingin keluar?");
+        if(confirm){
+            $.ajax({
+                url: hostUrl + '/wp-admin/admin-ajax.php?action=logout_user&noheader=true',
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                data: {},
+                success: function(data){
+                    window.location.href = hostUrl + "/sekolahku-masuk";
+                }
+            });
+        }
+    })
+
     $("#sekolahku_login_form").submit(function(e){
         e.preventDefault();
         
@@ -89,4 +104,18 @@ $(document).ready(function(){
         })
     });
 
+    setInterval(function(){
+        $(".to_ago").each(function(){
+            //get raw
+            var from = $(this).data('from');
+            var to = $(this).data('to');
+    
+            //parse to moment obj
+            var fromMoment = moment(from, 'YYYY-MM-DD hh:mm:ss');
+            var toMoment = moment(to, 'YYYY-MM-DD hh:mm:ss');
+    
+            //get ago
+            $(this).html(toMoment.locale('id').fromNow());
+        });
+    }, 1000);
 })

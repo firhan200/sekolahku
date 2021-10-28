@@ -20,14 +20,57 @@ define('PILIHAN_GANDA_KOMPLEKS', 2);
 define('PILIHAN_GANDA_LABEL', 'Pilihan Ganda');
 define('PILIHAN_GANDA_KOMPLEKS_LABEL', 'Pilihan Ganda Kompleks');
 
+define('SESSION_ID', 'sekolahku_user_id');
+define('SESSION_NAME', 'sekolahku_user_name');
+define('SESSION_KELAS_IDS', 'sekolahku_kelas_ids');
+
+define('UJIAN_SEDANG_BERLANGSUNG', 'Sedang Berlangsung');
+define('UJIAN_BELUM_DIMULAI', 'Belum Dimulai');
+define('UJIAN_SUDAH_BERAKHIR', 'Sudah Berakhir');
+
 $sekolahku_pages = array(
 	'login' => 'sekolahku-masuk',
-	'register' => 'sekolahku-daftar'
+	'register' => 'sekolahku-daftar',
+	'dashboard' => 'sekolahku-dashboard',
+	'setting' => 'sekolahku-pengaturan',
+	'quiz' => 'sekolahku-quiz',
 );
 
 /* 
 * Front-End Page Handler
 */
+function is_authorize(){
+	global $sekolahku_pages;
+
+	if ( ! session_id() ) {
+        session_start();
+    }
+
+	//get site url
+	$host_url = get_site_url();
+
+	if(!isset($_SESSION[SESSION_ID])){
+		echo '<script type="text/javascript">window.location.href = "'.$host_url.'/'.$sekolahku_pages['login'].'"</script>';
+		die();
+	}
+}
+
+function is_guest(){
+	global $sekolahku_pages;
+
+	if ( ! session_id() ) {
+        session_start();
+    }
+
+	//get site url
+	$host_url = get_site_url();
+
+	if(isset($_SESSION[SESSION_ID])){
+		echo '<script type="text/javascript">window.location.href = "'.$host_url.'/'.$sekolahku_pages['dashboard'].'";</script>';
+		die();
+	}
+}
+
 add_action('template_redirect','front_page_redirect_handler');
 function front_page_redirect_handler(){
 	global $post;
@@ -35,18 +78,54 @@ function front_page_redirect_handler(){
 
 	$is_found = false;
 
+	$pages_dir = array(
+		'login' => __DIR__ . '/pages/front/login.php',
+		'register' => __DIR__ . '/pages/front/register.php',
+		'dashboard' => __DIR__ . '/pages/front/dashboard.php',
+		'setting' => __DIR__ . '/pages/front/setting.php',
+		'quiz' => __DIR__ . '/pages/front/quiz.php',
+	);
+
 	if (is_page()) {
 		if($post->post_name == $sekolahku_pages['login']){
+			is_guest();
+
 			$is_found = true;
 		
 			//render page
-			$page =  __DIR__ . '/pages/front/login.php';
+			$page =  $pages_dir['login'];
 		}
 		else if($post->post_name == $sekolahku_pages['register']){
+			is_guest();
+
 			$is_found = true;
 		
 			//render page
-			$page =  __DIR__ . '/pages/front/register.php';
+			$page =  $pages_dir['register'];
+		}
+		else if($post->post_name == $sekolahku_pages['dashboard']){
+			is_authorize();
+
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir['dashboard'];
+		}
+		else if($post->post_name == $sekolahku_pages['setting']){
+			is_authorize();
+
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir['setting'];
+		}
+		else if($post->post_name == $sekolahku_pages['quiz']){
+			is_authorize();
+
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir['quiz'];
 		}
 	}
 
@@ -301,7 +380,10 @@ function create_pages(){
 		
 	$sekolahku_pages = array(
 		'login' => 'sekolahku-masuk',
-		'register' => 'sekolahku-daftar'
+		'register' => 'sekolahku-daftar',
+		'dashboard' => 'sekolahku-dashboard',
+		'setting' => 'sekolahku-pengaturan',
+		'quiz' => 'sekolahku-quiz',
 	);
 
 	/* CREATE FRONT END PAGE POST */
@@ -309,7 +391,7 @@ function create_pages(){
 	if($login_page == null){
 		$login_post_id = wp_insert_post(array (
 			'post_type' => 'page',
-			'post_title' => 'Masuk',
+			'post_title' => 'Sekolahku - Masuk',
 			'post_name' => '"'.$sekolahku_pages['login'].'"',
 			'post_content' => '',
 			'post_status' => 'publish',
@@ -322,8 +404,47 @@ function create_pages(){
 	if($register_page == null){
 		$register_post_id = wp_insert_post(array (
 			'post_type' => 'page',
-			'post_title' => 'Daftar',
+			'post_title' => 'Sekolahku - Daftar',
 			'post_name' => '"'.$sekolahku_pages['register'].'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$dashboard_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'.$sekolahku_pages['dashboard'].'"');
+	if($dashboard_page == null){
+		$dashboard_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Sekolahku - Dashboard',
+			'post_name' => '"'.$sekolahku_pages['dashboard'].'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$setting_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'.$sekolahku_pages['setting'].'"');
+	if($setting_page == null){
+		$setting_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Sekolahku - Pengaturan',
+			'post_name' => '"'.$sekolahku_pages['setting'].'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$quiz_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'.$sekolahku_pages['quiz'].'"');
+	if($quiz_page == null){
+		$quiz_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Sekolahku - Ujian',
+			'post_name' => '"'.$sekolahku_pages['quiz'].'"',
 			'post_content' => '',
 			'post_status' => 'publish',
 			'comment_status' => 'closed',   // if you prefer

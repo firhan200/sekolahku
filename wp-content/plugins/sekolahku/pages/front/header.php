@@ -16,3 +16,18 @@ $my_plugin = plugin_dir_url('').'sekolahku';
 </head>
 <body>
     <input type="hidden" id="host_url" value="<?php echo get_site_url(); ?>"/>    
+
+    <?php
+    if ( ! session_id() ) {
+        session_start();
+    }
+
+    //check if login
+    if(isset($_SESSION[SESSION_ID])){
+        ?>
+        <!-- logged in header -->
+
+        <!-- logged in header -->
+        <?php
+    }
+    ?>
