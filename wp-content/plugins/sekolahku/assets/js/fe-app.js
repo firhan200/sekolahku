@@ -53,6 +53,13 @@ $(document).ready(function(){
                         $("#login_errors_message").append('<li>'+errMessage+'</li>');
                     }
                 }
+            },
+            error: function(err){
+                email_address.attr('disabled', false);
+                password.attr('disabled', false);
+                submit_btn.attr('disabled', false);
+                var message = err.statusText+": "+err.responseText;
+                alert(message);
             }
         })
     });
@@ -118,4 +125,80 @@ $(document).ready(function(){
             $(this).html(toMoment.locale('id').fromNow());
         });
     }, 1000);
+
+    function padDigits(number, digits) {
+        return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
+    }
+
+    if($(".quiz_timer").length){
+        //create function timer countdown from start date and end date
+        var startDate = $(".quiz_timer").data('start-date');
+        var endDate = $(".quiz_timer").data('end-date');
+        
+        var startDateTime = new Date(startDate);
+
+        setInterval(function(){
+            renderTimer(startDateTime, endDate, $(".quiz_timer"));
+
+            startDateTime = new Date(startDateTime.getTime() + 1000);
+        }, 1000);
+        
+        function renderTimer(startDate, endDate, $elem){
+            // Get today's date and time
+            var now = startDate;
+                
+            // Find the distance between now and the count down date
+            var distance = new Date(endDate) - now;
+                
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+            // Output the result in an element with id="demo"
+            var label = "";
+            if(days > 0){
+                label = days + " hari ";
+            }
+            if(hours > 0){
+                label += '<span class="digits">'+padDigits(hours, 2) + "</span>:";
+            }
+            
+            label += '<span class="digits">'+padDigits(minutes, 2) + "</span>:";
+
+            label += '<span class="digits">'+padDigits(seconds, 2) + "</span>";
+
+            $elem.html(label);
+                
+            // If the count down is over, write some text 
+            if (distance < 0) {
+                clearInterval(x);
+                $elem.text("EXPIRED");
+            }
+        }
+    }
+
+    function save_ujian(){
+        var form = $("#quiz_form");
+        var formDataArr = form.serializeArray();
+
+        $.ajax({
+            url: hostUrl + '/wp-admin/admin-ajax.php?action=submit_quiz&noheader=true',
+            type: 'POST',
+            contentType: "application/json; charset=utf-8",
+            data:JSON.stringify(formDataArr),
+            beforeSend: function(){
+            },
+            success: function(res){
+                console.log(res);
+            }
+        });
+    }
+
+    $("#quiz_form").submit(function(e){
+        e.preventDefault();
+
+        save_ujian();
+    })
 })

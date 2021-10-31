@@ -5,9 +5,17 @@ if(!defined('ABSPATH')){
 }
 
 //register ajax
+add_action('wp_ajax_nopriv_register_user', 'register_user');
 add_action('wp_ajax_register_user', 'register_user');
+
+add_action('wp_ajax_nopriv_login_user', 'login_user');
 add_action('wp_ajax_login_user', 'login_user');
+
+add_action('wp_ajax_nopriv_logout_user', 'logout_user');
 add_action('wp_ajax_logout_user', 'logout_user');
+
+add_action('wp_ajax_nopriv_submit_quiz', 'submit_quiz');
+add_action('wp_ajax_submit_quiz', 'submit_quiz');
 
 global $wpdb;
 

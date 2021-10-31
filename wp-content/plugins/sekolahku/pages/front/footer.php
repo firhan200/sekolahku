@@ -10,7 +10,7 @@ $link = get_site_url();
     }
 
     //check if login
-    if(isset($_SESSION[SESSION_ID])){
+    if(isset($_SESSION[SESSION_ID]) && !isset($hide_menu)){
         ?>
         <!-- logged in footer -->
         <div class="container-fluid menu_container">

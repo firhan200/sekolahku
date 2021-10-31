@@ -13,6 +13,8 @@ if(!defined('ABSPATH')){
 	exit;
 }
 
+include_once( __DIR__ . '/functions.php' );
+
 //define
 define('PILIHAN_GANDA', 1);
 define('PILIHAN_GANDA_KOMPLEKS', 2);
@@ -27,6 +29,9 @@ define('SESSION_KELAS_IDS', 'sekolahku_kelas_ids');
 define('UJIAN_SEDANG_BERLANGSUNG', 'Sedang Berlangsung');
 define('UJIAN_BELUM_DIMULAI', 'Belum Dimulai');
 define('UJIAN_SUDAH_BERAKHIR', 'Sudah Berakhir');
+
+define('QUIZ_ONGOING', 0);
+define('QUIZ_FINISHED', 1);
 
 $sekolahku_pages = array(
 	'login' => 'sekolahku-masuk',
@@ -165,6 +170,8 @@ function pluginprefix_activate() {
 	
 	//table ujian
 	$table_ujian = $wpdb->prefix . $plugin_name . "_ujian"; 
+	$table_ujian_pengguna = $wpdb->prefix . $plugin_name . "_ujian_pengguna"; 
+	$table_ujian_pengguna_jawaban = $wpdb->prefix . $plugin_name . "_ujian_pengguna_jawaban"; 
 
 	//check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$table_kelas'") != $table_kelas) {
@@ -361,6 +368,45 @@ function pluginprefix_activate() {
 		start_date datetime NOT NULL,
 		end_date datetime NOT NULL,
 		randomize_questions smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_ujian_pengguna'") != $table_ujian_pengguna) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_ujian_pengguna (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		ujian_id mediumint(9) NOT NULL,
+		pengguna_id mediumint(9) NOT NULL,
+		score double(5,2) NULL,
+		start_date datetime NOT NULL,
+		end_date datetime NULL,
+		status smallint(1) DEFAULT 0 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$table_ujian_pengguna_jawaban'") != $table_ujian_pengguna_jawaban) {
+		//table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $table_ujian_pengguna_jawaban (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		ujian_pengguna_id mediumint(9) NOT NULL,
+		soal_id mediumint(9) NOT NULL,
+		soal_pilihan_id mediumint(9) NOT NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
 		PRIMARY KEY  (id)
@@ -576,5 +622,4 @@ function ujian_page(){
 
 /* Main Page */
 
-include_once( __DIR__ . '/functions.php' );
 ?>
