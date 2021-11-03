@@ -7,6 +7,7 @@ $is_valid = false;
 $menu_quiz = true;
 $hide_menu = true;
 $is_resume = false;
+$is_finish = false;
 $current_time = $wpdb->get_var("SELECT NOW()");
 
 if ( ! session_id() ) {
@@ -25,14 +26,24 @@ if($quiz_id != null){
 if($is_valid){
     //check ujian pengguna
     $ujian_pengguna_data = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'sekolahku_ujian_pengguna AS up WHERE ujian_id='.$quiz->id.' AND pengguna_id='.$_SESSION[SESSION_ID]);
-    if($ujian_pengguna_data ==null){
+    if($ujian_pengguna_data == null){
         //insert new
         $is_resume = false;
+        $is_finish = false;
     }else{
-        $is_resume = true;
+        if($ujian_pengguna_data->status == QUIZ_ONGOING){
+            //resume
+            $is_resume = true;
+        }
+        else if($ujian_pengguna_data->status == QUIZ_FINISHED){
+            //resume
+            $is_finish = true;
+        }
     }
 
-    if(!$is_resume){
+    //not resume and not finish yet
+    if(!$is_resume && !$is_finish){
+        //create new
         $ujian_pengguna_data = array(
             'ujian_id' => $quiz->id,
             'pengguna_id' => $_SESSION[SESSION_ID],
@@ -43,6 +54,9 @@ if($is_valid){
         //insert into wp_sekolahku_ujian_pengguna
         $wpdb->insert($wpdb->prefix.'sekolahku_ujian_pengguna', $ujian_pengguna_data);
 
+        //get last insert id
+        $ujian_pengguna_data['id'] = $wpdb->insert_id;
+
         $ujian_pengguna_data = (object) $ujian_pengguna_data;
     }
 }
@@ -50,7 +64,7 @@ if($is_valid){
 $end_on = date("Y-m-d H:i:s", strtotime($ujian_pengguna_data->start_date) + $quiz->duration_seconds);
 
 //check if timeout
-if($is_valid){
+if($is_valid && !$is_finish){
     if($current_time > $end_on){
         //timeout, finish quiz now
         $ujian_pengguna_data->status = QUIZ_FINISHED;
@@ -61,7 +75,7 @@ if($is_valid){
 }
 
 //get questions and answer
-if($is_valid){
+if($is_valid && !$is_finish){
     //get questions
     $questions = $wpdb->get_results('SELECT s.* FROM '.$wpdb->prefix.'sekolahku_paket_soal AS ps LEFT JOIN '.$wpdb->prefix.'sekolahku_soal AS s ON ps.soal_id=s.id WHERE ps.paket_id='.$quiz->paket_id);
 
@@ -77,10 +91,30 @@ if($is_valid){
 
     //get answers
     $answers = $wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'sekolahku_soal_pilihan WHERE soal_id IN ('.$question_ids.')');
+
+    /* get old answer */
+    $old_answers = $wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'sekolahku_ujian_pengguna_jawaban WHERE ujian_pengguna_id='.$ujian_pengguna_data->id);
 }
 ?>
 
-<?php if($is_valid){ ?>
+<?php 
+if($is_valid){ 
+    if($is_finish){
+        ?>
+        <div class="container mb-5">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <a href="<?php echo get_site_url().'/sekolahku-dashboard'; ?>" class="out_quiz link-dark ms-2"><h4><i class="fa fa-arrow-left"></i></h4></a>
+                </div>
+            </div>
+            <h4 class="fw-light mb-4">
+                Ujian Telah Selesai
+                <a href="<?php echo get_site_url(); ?>">Lihat Hasil Ujian</a>
+            </h4>
+        </div>
+        <?php
+    }else{
+?>
 <div class="fixed-top quiz_header">
     <div class="container">
         <div class="row">
@@ -103,6 +137,9 @@ if($is_valid){
 </div>
 <div class="container mb-5 quiz_container">
     <form action="#!" id="quiz_form" method="post">
+        <input type="hidden" name="ujian_pengguna_id" value="<?php echo $ujian_pengguna_data->id; ?>"/>
+        <input type="hidden" name="paket_id" value="<?php echo $quiz->paket_id; ?>"/>
+
         <div class="row mt-4">
             <?php
             foreach($questions as $index => $question){
@@ -120,11 +157,22 @@ if($is_valid){
                     <?php
                     foreach($answers as $answer){
                         if($answer->soal_id == $question->id){
+                            //check if selected on old answer
+                            $isChecked = false;
+                            foreach($old_answers as $old_answer){
+                                if($old_answer->soal_pilihan_id == $answer->id && $old_answer->soal_id == $question->id){
+                                    $isChecked = true;
+                                    break;
+                                }
+                            }
+
+                            $checkedValue = $isChecked ? 'checked' : '';
+
                             if($question->question_type == PILIHAN_GANDA){
                                 echo '<div class="row">';
                                 echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
                                 echo '<label class="labl">';
-                                echo '<input name="answer['.$question->id.']" type="radio" value="'.$answer->id.'"/>';
+                                echo '<input class="answer" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="radio" value="'.$answer->id.'" '.$checkedValue.'/>';
                                 echo '<div>'.$answer->label.'</div>';
                                 echo '</label>';
                                 echo '</div>';
@@ -133,7 +181,7 @@ if($is_valid){
                                 echo '<div class="row">';
                                 echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
                                 echo '<label class="labl">';
-                                echo '<input name="answer['.$question->id.']" type="checkbox" value="'.$answer->id.'"/>';
+                                echo '<input class="answer" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="checkbox" value="'.$answer->id.'" '.$checkedValue.'/>';
                                 echo '<div>'.$answer->label.'</div>';
                                 echo '</label>';
                                 echo '</div>';
@@ -152,7 +200,8 @@ if($is_valid){
         </div>
     </form>
 </div>
-<?php }else{ ?>
+<?php }
+}else{ ?>
 <div class="container mb-5">
     <div class="row mb-2">
         <div class="col-12">

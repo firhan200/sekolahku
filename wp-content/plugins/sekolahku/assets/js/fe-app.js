@@ -179,15 +179,30 @@ $(document).ready(function(){
         }
     }
 
-    function save_ujian(){
-        var form = $("#quiz_form");
-        var formDataArr = form.serializeArray();
+    function save_ujian(is_finish = false){
+        var paket_id = $("input[name='paket_id']").val();
+        var ujian_pengguna_id = $("input[name='ujian_pengguna_id']").val();
+        var answers = [];
+        var answersElement = $(".answer");
+        for(var i =0; i < answersElement.length; i++){
+            if(answersElement[i].checked){
+                var soalId = $(answersElement[i]).data('soal-id');
+                answers.push({
+                    'soal_id' : soalId,
+                    'soal_pilihan_id' : answersElement[i].value
+                });
+            }
+        }
 
         $.ajax({
             url: hostUrl + '/wp-admin/admin-ajax.php?action=submit_quiz&noheader=true',
             type: 'POST',
-            contentType: "application/json; charset=utf-8",
-            data:JSON.stringify(formDataArr),
+            data:JSON.stringify({
+                'is_finish' : is_finish,
+                'paket_id' : paket_id,
+                'ujian_pengguna_id' : ujian_pengguna_id,
+                'answers' : answers
+            }),
             beforeSend: function(){
             },
             success: function(res){
@@ -196,9 +211,13 @@ $(document).ready(function(){
         });
     }
 
+    setInterval(function(){
+        save_ujian();
+    }, 5000);
+
     $("#quiz_form").submit(function(e){
         e.preventDefault();
 
-        save_ujian();
+        save_ujian(true);
     })
 })
