@@ -173,8 +173,7 @@ $(document).ready(function(){
                 
             // If the count down is over, write some text 
             if (distance < 0) {
-                clearInterval(x);
-                $elem.text("EXPIRED");
+                save_ujian(true);
             }
         }
     }
@@ -212,7 +211,7 @@ $(document).ready(function(){
             success: function(res){
                 if(res.is_success){
                     if(is_finish){
-                        window.location.href = hostUrl + "/sekolahku-dashboard";
+                        window.location.reload();
                     }
                 }else{
                     alert(res.errors);

@@ -41,6 +41,7 @@ if($action_type != null){
         if($data != null){
             $title = $data->title;
             $question = $data->question;
+            $explanation = $data->explanation;
             $question_type = $data->question_type;
             $is_lock = $data->is_lock;
             $is_active = $data->is_active;
@@ -136,6 +137,7 @@ if(count($errors) < 1){
         }else{
             $title = $_POST['title'];
             $question = $_POST['question'];
+            $explanation = $_POST['explanation'];
             $question_type = $_POST['question_type'];
             $is_lock = $_POST['is_lock'] == 'on' ? 1 : 0;
             $is_active = $_POST['is_active'] == 'on' ? 1 : 0;
@@ -167,6 +169,7 @@ if(count($errors) < 1){
                         array(
                             'title' => $title,
                             'question' => $question,
+                            'explanation' => $explanation,
                             'question_type' => $question_type,
                             'is_active' => $is_active,
                             'is_lock' => $is_lock
@@ -188,6 +191,7 @@ if(count($errors) < 1){
                         array(
                             'title' => $title,
                             'question' => $question,
+                            'explanation' => $explanation,
                             'question_type' => $question_type,
                             'is_active' => $is_active,
                             'is_lock' => $is_lock
@@ -208,6 +212,8 @@ if(count($errors) < 1){
                 $is_list = true;
 
                 echo "<script>window.history.pushState('page2', 'Title', '".$list_url."');</script>";
+            }else{
+                $is_lock = false;
             }
         }
     }else if($_POST['unlock']){
@@ -515,12 +521,14 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
+
+    
 ?>
 
 <input type="hidden" id="PILIHAN_GANDA" value="<?php echo PILIHAN_GANDA; ?>"/>
 <input type="hidden" id="PILIHAN_GANDA_KOMPLEKS" value="<?php echo PILIHAN_GANDA_KOMPLEKS; ?>"/>
 
-<form method="post">
+<form id="soal_form" method="post">
     <?php if(!$is_lock){ ?>
         <input type="hidden" name="submit" value="true"/>
     <?php }else{ ?>
@@ -534,7 +542,19 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             </tr>
             <tr>
                 <th scope="row"><label for="name">Soal</label></th>
-                <td><input type="text" class="regular-text" name="question" value="<?php echo $question; ?>" maxlength="200" <?php echo $is_lock ? 'disabled' : '' ?>></td>
+                <td>
+                    <?php 
+                    $wp_editor_setting = array(
+                        'textarea_name' => 'question',
+                    );
+
+                    if($is_lock){
+                        $wp_editor_setting['tinymce']['readonly'] = true;
+                    }
+
+                    wp_editor( $question, 'soal_wysiwyg', $wp_editor_setting); 
+                    ?>
+                </td>
             </tr>
             <tr>
                 <th scope="row"><label for="name">Tipe Soal</label></th>
@@ -579,6 +599,22 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <?php if(!$is_lock){ ?>
                     <a href="#!" id="add_answer_option">+&nbsp;Tambah Jawaban</a>
                     <?php } ?>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Pembahasan Soal</label></th>
+                <td>
+                    <?php 
+                    $wp_editor_expla_setting = array(
+                        'textarea_name' => 'explanation',
+                    );
+
+                    if($is_lock){
+                        $wp_editor_expla_setting['tinymce']['readonly'] = true;
+                    }
+
+                    wp_editor( $explanation, 'explanation_wysiwyg', $wp_editor_expla_setting); 
+                    ?>
                 </td>
             </tr>
             <tr>

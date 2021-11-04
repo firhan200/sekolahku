@@ -110,10 +110,14 @@ if($is_valid){
             <h4 class="fw-light mb-4">
                 <div class="row">
                     <div class="col-sm-12 col-md-6 col-lg-4 offset-md-3 offset-lg-4">
-                        <div class="text-center display-5">
+                        <div class="text-center display-6">
                             Ujian Telah Berakhir
                         </div>
                         <img src="<?php echo $my_plugin.'/assets/img/finish.png'; ?>" alt="" class="img-fluid"/>
+                        <div class="text-center">
+                            <div class="title">Nilai Anda:</div>
+                            <div class="display-6"><?php echo $ujian_pengguna_data->score; ?></div>
+                        </div>
                     </div>
                 </div>
             </h4>
@@ -306,7 +310,7 @@ if($is_valid){
     <h4 class="fw-light mb-4">
         <div class="row">
             <div class="col-sm-12 col-md-6 col-lg-4 offset-md-3 offset-lg-4">
-                <div class="text-center display-5">
+                <div class="text-center display-6">
                     Ujian Tidak Ditemukan
                 </div>
                 <img src="<?php echo $my_plugin.'/assets/img/empty.png'; ?>" alt="" class="img-fluid"/>
