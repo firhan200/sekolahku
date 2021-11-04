@@ -221,6 +221,7 @@ if($is_valid){
 <div class="container mb-5 quiz_container">
     <div id="quiz_container">
         <form action="#!" id="quiz_form" method="post">
+            <input type="hidden" id="on_quiz" value="true" />
             <input type="hidden" name="ujian_pengguna_id" value="<?php echo $ujian_pengguna_data->id; ?>"/>
             <input type="hidden" name="paket_id" value="<?php echo $quiz->paket_id; ?>"/>
 

@@ -34,6 +34,7 @@ $table_paket = $wpdb->prefix . $plugin_name . "_paket";
 $table_paket_soal = $wpdb->prefix . $plugin_name . "_paket_soal"; 
 $table_soal = $wpdb->prefix . $plugin_name . "_soal"; 
 $table_soal_pilihan = $wpdb->prefix . $plugin_name . "_soal_pilihan"; 
+$table_ujian = $wpdb->prefix . $plugin_name . "_ujian"; 
 $table_ujian_pengguna = $wpdb->prefix . $plugin_name . "_ujian_pengguna"; 
 $table_ujian_pengguna_jawaban = $wpdb->prefix . $plugin_name . "_ujian_pengguna_jawaban"; 
 
@@ -451,6 +452,13 @@ Submit Quiz
 History Quiz
 */
 function history(){
+    global $wpdb;
+    global $table_ujian;
+    global $table_paket;
+    global $table_kelas;
+    global $table_mata_pelajaran;
+    global $table_ujian_pengguna;
+    
     //to set session
     if ( ! session_id() ) {
         session_start();
@@ -460,6 +468,7 @@ function history(){
     $response = array(
         'is_success' => true,
         'errors' => [],
+        'page' => 1,
         'data' => null
     );
 
@@ -469,8 +478,29 @@ function history(){
 
     //check data
     if($data != null){
+        //get vars
+        $page = $data['page'];
+        $per_page = 10;
 
+        //parse to res
+        $response['page'] = $page;
+
+        //init query
+        $query = 'SELECT u.*, p.name AS paket_name, k.name AS kelas_name, m.name AS matapelajaran_name, up.status AS ujian_status, up.score AS score, up.end_date AS ujian_end_date, up.start_date AS ujian_start_date FROM '.$table_ujian.' AS u LEFT JOIN '.$table_paket.' AS p ON u.paket_id=p.id LEFT JOIN '.$table_kelas.' AS k ON u.kelas_id=k.id LEFT JOIN '.$table_mata_pelajaran.' AS m ON p.matapelajaran_id=m.id LEFT JOIN '.$table_ujian_pengguna.' AS up ON up.ujian_id=u.id WHERE u.kelas_id IN (28) AND up.status='.QUIZ_FINISHED;
+
+        //ordering
+        $query .= ' ORDER BY u.id DESC';
+
+        //pagination
+        $query .= ' LIMIT '.(($page - 1) * $per_page).', '.$per_page;
+
+        //get results
+        $list_ujian = $wpdb->get_results($query);
+
+        //check results
+        $response['data'] = $list_ujian;
     }
+
 
     wp_send_json($response);
 

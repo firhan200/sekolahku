@@ -19,4 +19,16 @@ if ( ! session_id() ) {
     <h4 class="fw-light mb-4">
         Riwayat Ujian
     </h4>
+
+    <div id="quiz_list_container" class="row">
+        
+    </div>
+    <div id="load_more_btn" class="text-center">
+        <a href="#" class="btn btn-default">Load More</a>
+    </div>
+    <div id="loading" class="text-center" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
 </div>

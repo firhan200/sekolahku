@@ -173,7 +173,9 @@ $(document).ready(function(){
                 
             // If the count down is over, write some text 
             if (distance < 0) {
-                save_ujian(true);
+                if($("#on_quiz").length){
+                    save_ujian(true);
+                }
             }
         }
     }
@@ -220,9 +222,11 @@ $(document).ready(function(){
         });
     }
 
-    setInterval(function(){
-        save_ujian();
-    }, 5000);
+    if($("#on_quiz").length){
+        setInterval(function(){
+            save_ujian();
+        }, 5000);
+    }
 
     $("#quiz_form").submit(function(e){
         e.preventDefault();
@@ -232,4 +236,84 @@ $(document).ready(function(){
             save_ujian(true);
         }
     })
+
+    /* Quiz History */
+    var quizHistoryPage = 1;
+
+    //get first data
+    if($("#quiz_list_container").length){
+        getQuiz(quizHistoryPage);
+    }
+
+    $("#load_more_btn").click(function(){
+        quizHistoryPage++;
+        getQuiz(quizHistoryPage);
+    })
+
+    function getQuiz(page){
+        $.ajax({
+            url: hostUrl + '/wp-admin/admin-ajax.php?action=history&noheader=true',
+            type: 'POST',
+            data:JSON.stringify({
+                'page' : page,
+            }),
+            beforeSend: function(){
+                $("#loading").show();
+                $("#load_more_btn").hide();
+            },
+            success: function(res){
+                $("#load_more_btn").show();
+                $("#loading").hide();
+
+                if(res.is_success){
+                    if(res.data.length < 1){
+                        $("#load_more_btn").hide();
+                    }
+
+                    for(var i = 0; i < res.data.length; i++){
+                        var quiz = res.data[i];
+
+                        $("#quiz_list_container").append(generateQuizTemplate(quiz));
+                    }
+                }else{
+                    alert(res.errors);
+                }
+            }
+        });
+    }
+
+    function generateQuizTemplate(data){
+        var pembahasanUrl = hostUrl + "/sekolahku-quiz?id="+data.id;
+
+        var html = '';
+
+        html += '<div class="box mb-4">';
+        html += '<div class="row">';
+
+        html += '<div class="col-12 col-md-6">';
+        html += '<div class="fs-6">';
+        html += data.paket_name;
+        html += '</div>';
+
+        html += '<div class="t-sm">';
+        html += data.matapelajaran_name;
+        html += ' - '+data.kelas_name;
+        html += '</div>';
+
+        html += '<div class="t-sm">';
+        html += 'Selesai Pengerjaan: <span class="to_ago" data-from="'+moment.now()+'" data-to="'+data.ujian_end_date+'">-</span>';
+        html += '</div>';
+        html += '</div>';
+
+        html += '<div class="col-12 col-md-6 text-end">';
+        html += '<div>Nilai : <b>'+data.score+'</b></div>';
+        html += '<div class="mt-2"><a href="'+pembahasanUrl+'" class="btn btn-default btn-sm">Lihat Pembahasan&nbsp;<i class="fa fa-chevron-right"></i></a></div>';
+        html += '</div>';
+
+        html += '</div>';
+        html += '</div>';
+
+        return html;
+    }
+    /* Quiz History */
 })
