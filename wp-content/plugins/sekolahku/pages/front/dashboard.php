@@ -23,7 +23,7 @@ if ( ! session_id() ) {
             <p>Ujian yang Akan Datang</p>
             <div class="row">
                 <?php
-                $list_ujian = $wpdb->get_results('SELECT u.*, p.name AS paket_name, k.name AS kelas_name, m.name AS matapelajaran_name, up.status AS ujian_status, up.score AS score, up.end_date AS ujian_end_date FROM '.$wpdb->prefix.'sekolahku_ujian AS u LEFT JOIN '.$wpdb->prefix.'sekolahku_paket AS p ON u.paket_id=p.id LEFT JOIN '.$wpdb->prefix.'sekolahku_kelas AS k ON u.kelas_id=k.id LEFT JOIN '.$wpdb->prefix.'sekolahku_matapelajaran AS m ON p.matapelajaran_id=m.id LEFT JOIN '.$wpdb->prefix.'sekolahku_ujian_pengguna AS up ON up.ujian_id=u.id WHERE u.kelas_id IN ('.$_SESSION[SESSION_KELAS_IDS].') ORDER BY id DESC');
+                $list_ujian = $wpdb->get_results('SELECT u.*, p.name AS paket_name, k.name AS kelas_name, m.name AS matapelajaran_name, up.status AS ujian_status, up.score AS score, up.end_date AS ujian_end_date, up.start_date AS ujian_start_date FROM '.$wpdb->prefix.'sekolahku_ujian AS u LEFT JOIN '.$wpdb->prefix.'sekolahku_paket AS p ON u.paket_id=p.id LEFT JOIN '.$wpdb->prefix.'sekolahku_kelas AS k ON u.kelas_id=k.id LEFT JOIN '.$wpdb->prefix.'sekolahku_matapelajaran AS m ON p.matapelajaran_id=m.id LEFT JOIN '.$wpdb->prefix.'sekolahku_ujian_pengguna AS up ON up.ujian_id=u.id WHERE u.kelas_id IN ('.$_SESSION[SESSION_KELAS_IDS].') ORDER BY u.id DESC LIMIT 0,4');
                 foreach($list_ujian as $ujian){
                     $status = "";
                     if($ujian->start_date <= $current_time && $ujian->end_date >= $current_time){ 
@@ -44,6 +44,35 @@ if ( ! session_id() ) {
                                     <div class="t-sm">
                                         <?php echo $ujian->matapelajaran_name.' - '.$ujian->kelas_name; ?>
                                     </div>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <?php if($ujian->ujian_status == QUIZ_ONGOING){ ?>
+                                        <?php 
+                                        if($status == UJIAN_SEDANG_BERLANGSUNG){
+                                            if($ujian->ujian_status == NULL){
+                                                echo '<a href="'.$quiz_link.$ujian->id.'" class="btn btn-default btn-sm"><i class="fa fa-pen"></i>&nbsp;Kerjakan</a>';
+                                            }else{
+                                                if($ujian->ujian_status == QUIZ_ONGOING){
+                                                    echo '<a href="'.$quiz_link.$ujian->id.'" class="btn btn-default btn-sm"><i class="fa fa-redo-alt"></i>&nbsp;Lanjutkan</a>';
+                                                    echo '<div class="fs-6 fw-light t-sm">Tersisa: <strong><span class="quiz_timer_state" data-start-date="'.$current_time.'" data-end-date="'.(date("Y-m-d H:i:s", strtotime($ujian->ujian_start_date) + $ujian->duration_seconds)).'">-</span></strong></div>';
+                                                }
+                                            }
+                                        }else if($status == UJIAN_BELUM_DIMULAI){ 
+                                            echo '<a href="#" class="btn btn-default btn-sm"><i class="fa fa-clock"></i>&nbsp;Belum Dimulai</a>';
+                                        }else if($status == UJIAN_SUDAH_BERAKHIR){
+                                            echo '<a href="#" class="btn btn-default btn-sm"><i class="fa fa-check"></i>&nbsp;Selesai</a>';
+                                        } 
+                                        ?>
+                                    <?php }else{ ?>
+                                        <?php echo $ujian->score; ?>
+                                        <div class="fs-6 t-sm">
+                                            <a href="<?php echo $quiz_link.$ujian->id; ?>" href="link-dark">Pembahasan <i class="fa fa-chevron-right"></i></a>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-7">
                                     <?php if($ujian->ujian_status == QUIZ_ONGOING){ ?>
                                         <?php if($status == UJIAN_BELUM_DIMULAI){ ?>
                                             <div class="fs-6 fw-light t-sm">Mulai <span class="to_ago" data-from="<?php echo $current_time; ?>" data-to="<?php echo $ujian->start_date; ?>">-</span></div>
@@ -53,22 +82,11 @@ if ( ! session_id() ) {
                                     <?php }else{ ?>
                                         <div class="fs-6 fw-light t-sm">Dikerjakan <span class="to_ago" data-from="<?php echo $current_time; ?>" data-to="<?php echo $ujian->ujian_end_date; ?>">-</span></div>
                                     <?php } ?>
-                                    <div class="t-xs mt-1">
+                                </div>
+                                <div class="col-5">
+                                    <div class="t-xs mt-1 text-end">
                                         <i class="fa fa-clock"></i>&nbsp;<?php echo ($ujian->duration_seconds) / 60; ?> Menit
                                     </div>
-                                </div>
-                                <div class="col-6 text-end">
-                                    <?php if($ujian->ujian_status == QUIZ_ONGOING){ ?>
-                                    <?php if($status == UJIAN_SEDANG_BERLANGSUNG){ ?>
-                                        <a href="<?php echo $quiz_link.$ujian->id; ?>" class="btn btn-default btn-sm"><i class="fa fa-pen"></i>&nbsp;Kerjakan</a>
-                                    <?php }else if($status == UJIAN_BELUM_DIMULAI){ ?>
-                                        <a href="#" class="btn btn-default btn-sm"><i class="fa fa-clock"></i>&nbsp;Belum Dimulai</a>
-                                    <?php }else if($status == UJIAN_SUDAH_BERAKHIR){ ?>
-                                        <a href="#" class="btn btn-default btn-sm"><i class="fa fa-check"></i>&nbsp;Selesai</a>
-                                    <?php } ?>
-                                    <?php }else{ ?>
-                                        <?php echo $ujian->score; ?>
-                                    <?php } ?>
                                 </div>
                             </div>
                         </div>

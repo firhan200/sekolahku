@@ -75,7 +75,7 @@ if($is_valid && !$is_finish){
 }
 
 //get questions and answer
-if($is_valid && !$is_finish){
+if($is_valid){
     //get questions
     $questions = $wpdb->get_results('SELECT s.* FROM '.$wpdb->prefix.'sekolahku_paket_soal AS ps LEFT JOIN '.$wpdb->prefix.'sekolahku_soal AS s ON ps.soal_id=s.id WHERE ps.paket_id='.$quiz->paket_id);
 
@@ -108,9 +108,88 @@ if($is_valid){
                 </div>
             </div>
             <h4 class="fw-light mb-4">
-                Ujian Telah Selesai
-                <a href="<?php echo get_site_url(); ?>">Lihat Hasil Ujian</a>
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-4 offset-md-3 offset-lg-4">
+                        <div class="text-center display-5">
+                            Ujian Telah Berakhir
+                        </div>
+                        <img src="<?php echo $my_plugin.'/assets/img/finish.png'; ?>" alt="" class="img-fluid"/>
+                    </div>
+                </div>
             </h4>
+            <div class="row mt-5">
+                <div class="box mb-4">
+                    <h4>Pembahasan</h4>
+                </div>
+                <?php
+                foreach($questions as $index => $question){
+                    $question_number = $index + 1;
+                    ?>
+                    <div class="questions mb-4">
+                        <?php echo $question_number.'. '.$question->question; ?>
+                        <div class="fw-bold mt-3">Jawaban:</div>
+                        <?php
+                        if($question->question_type == PILIHAN_GANDA_KOMPLEKS){
+                            echo '<div class="text-muted fw-italic"><i class="fa fa-info-circle"></i> Dapat Dipilih Lebih Dari Satu:</div>';
+                        }
+                        ?>
+                        <div class="mb-3"></div>
+                        <?php
+                        foreach($answers as $answer){
+                            if($answer->soal_id == $question->id){
+                                //check if selected on old answer
+                                $isChecked = false;
+                                $isCorrect = false;
+
+                                foreach($old_answers as $old_answer){
+                                    if($old_answer->soal_pilihan_id == $answer->id && $old_answer->soal_id == $question->id){
+                                        $isChecked = true;
+                                        break;
+                                    }
+                                }
+
+                                if($answer->score > 0){
+                                    $isCorrect = true;
+                                }
+
+                                $checkedValue = $isChecked ? 'checked' : '';
+
+                                if($question->question_type == PILIHAN_GANDA){
+                                    echo '<div class="row">';
+                                    echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
+                                    if($isCorrect){
+                                        echo '<i class="correct fa fa-check-circle"></i>';
+                                    }
+                                    echo '<label class="labl labl-explain">';
+                                    echo '<input class="answer '.$correctValue.'" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="radio" value="'.$answer->id.'" '.$checkedValue.' disabled/>';
+                                    echo '<div>'.$answer->label.'</div>';
+                                    echo '</label>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                }else if($question->question_type == PILIHAN_GANDA_KOMPLEKS){
+                                    echo '<div class="row">';
+                                    echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
+                                    if($isCorrect){
+                                        echo '<i class="correct fa fa-check-circle"></i>';
+                                    }
+                                    echo '<label class="labl labl-explain">';
+                                    echo '<input class="answer '.$correctValue.'" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="checkbox" value="'.$answer->id.'" '.$checkedValue.' disabled/>';
+                                    echo '<div>'.$answer->label.'</div>';
+                                    echo '</label>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                }
+                            }
+                        }
+                    ?>
+                </div>
+                <?php
+            }
+            ?>
+            </div>
+            <div class="text-center mt-5">
+                <a href="<?php echo get_site_url().'/sekolahku-dashboard'; ?>" class="btn btn-default btn-sm"><i class="fa fa-home"></i>&nbsp;Kembali ke Beranda</a>
+            </div>
         </div>
         <?php
     }else{
@@ -130,86 +209,112 @@ if($is_valid){
                 </div>
             </div>
             <div class="col-12 col-sm-12 col-md-5 text-center text-sm-center text-md-end quiz_timer_container">
-                <b>Waktu Tersisa:</b> <span class="quiz_timer mt-2" data-end-date="<?php echo $end_on; ?>" data-start-date="<?php echo $current_time; ?>"></span>
+                <b>Waktu Tersisa:</b> <span class="quiz_timer quiz_timer_state mt-2" data-end-date="<?php echo $end_on; ?>" data-start-date="<?php echo $current_time; ?>"></span>
             </div>
         </div>
     </div>
 </div>
 <div class="container mb-5 quiz_container">
-    <form action="#!" id="quiz_form" method="post">
-        <input type="hidden" name="ujian_pengguna_id" value="<?php echo $ujian_pengguna_data->id; ?>"/>
-        <input type="hidden" name="paket_id" value="<?php echo $quiz->paket_id; ?>"/>
+    <div id="quiz_container">
+        <form action="#!" id="quiz_form" method="post">
+            <input type="hidden" name="ujian_pengguna_id" value="<?php echo $ujian_pengguna_data->id; ?>"/>
+            <input type="hidden" name="paket_id" value="<?php echo $quiz->paket_id; ?>"/>
 
-        <div class="row mt-4">
-            <?php
-            foreach($questions as $index => $question){
-                $question_number = $index + 1;
-                ?>
-                <div class="questions mb-4">
-                    <?php echo $question_number.'. '.$question->question; ?>
-                    <div class="fw-bold mt-3">Jawaban:</div>
-                    <?php
-                    if($question->question_type == PILIHAN_GANDA_KOMPLEKS){
-                        echo '<div class="text-muted fw-italic"><i class="fa fa-info-circle"></i> Dapat Dipilih Lebih Dari Satu:</div>';
-                    }
+            <div class="row mt-4">
+                <?php
+                foreach($questions as $index => $question){
+                    $question_number = $index + 1;
                     ?>
-                    <div class="mb-3"></div>
-                    <?php
-                    foreach($answers as $answer){
-                        if($answer->soal_id == $question->id){
-                            //check if selected on old answer
-                            $isChecked = false;
-                            foreach($old_answers as $old_answer){
-                                if($old_answer->soal_pilihan_id == $answer->id && $old_answer->soal_id == $question->id){
-                                    $isChecked = true;
-                                    break;
+                    <div class="questions mb-4">
+                        <?php echo $question_number.'. '.$question->question; ?>
+                        <div class="fw-bold mt-3">Jawaban:</div>
+                        <?php
+                        if($question->question_type == PILIHAN_GANDA_KOMPLEKS){
+                            echo '<div class="text-muted fw-italic"><i class="fa fa-info-circle"></i> Dapat Dipilih Lebih Dari Satu:</div>';
+                        }
+                        ?>
+                        <div class="mb-3"></div>
+                        <?php
+                        foreach($answers as $answer){
+                            if($answer->soal_id == $question->id){
+                                //check if selected on old answer
+                                $isChecked = false;
+                                foreach($old_answers as $old_answer){
+                                    if($old_answer->soal_pilihan_id == $answer->id && $old_answer->soal_id == $question->id){
+                                        $isChecked = true;
+                                        break;
+                                    }
+                                }
+
+                                $checkedValue = $isChecked ? 'checked' : '';
+
+                                if($question->question_type == PILIHAN_GANDA){
+                                    echo '<div class="row">';
+                                    echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
+                                    echo '<label class="labl">';
+                                    echo '<input class="answer" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="radio" value="'.$answer->id.'" '.$checkedValue.'/>';
+                                    echo '<div>'.$answer->label.'</div>';
+                                    echo '</label>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                }else if($question->question_type == PILIHAN_GANDA_KOMPLEKS){
+                                    echo '<div class="row">';
+                                    echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
+                                    echo '<label class="labl">';
+                                    echo '<input class="answer" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="checkbox" value="'.$answer->id.'" '.$checkedValue.'/>';
+                                    echo '<div>'.$answer->label.'</div>';
+                                    echo '</label>';
+                                    echo '</div>';
+                                    echo '</div>';
                                 }
                             }
-
-                            $checkedValue = $isChecked ? 'checked' : '';
-
-                            if($question->question_type == PILIHAN_GANDA){
-                                echo '<div class="row">';
-                                echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
-                                echo '<label class="labl">';
-                                echo '<input class="answer" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="radio" value="'.$answer->id.'" '.$checkedValue.'/>';
-                                echo '<div>'.$answer->label.'</div>';
-                                echo '</label>';
-                                echo '</div>';
-                                echo '</div>';
-                            }else if($question->question_type == PILIHAN_GANDA_KOMPLEKS){
-                                echo '<div class="row">';
-                                echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
-                                echo '<label class="labl">';
-                                echo '<input class="answer" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="checkbox" value="'.$answer->id.'" '.$checkedValue.'/>';
-                                echo '<div>'.$answer->label.'</div>';
-                                echo '</label>';
-                                echo '</div>';
-                                echo '</div>';
-                            }
                         }
-                    }
-                    ?>
+                        ?>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-default"><i class="fa fa-check"></i>&nbsp;SELESAI UJIAN</button>
+            </div>
+        </form>
+    </div>
+    <div id="loading_container" style="display:none;">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="display-6">
+                        Menyelesaikan Ujian, Harap Tunggu...
+                    </div>
                 </div>
-                <?php
-            }
-            ?>
+            </div>
         </div>
-        <div class="text-center">
-            <button class="btn btn-default"><i class="fa fa-check"></i>&nbsp;SELESAI UJIAN</button>
-        </div>
-    </form>
+    </div>
 </div>
 <?php }
 }else{ ?>
 <div class="container mb-5">
     <div class="row mb-2">
         <div class="col-12">
-            <a href="#" class="out_quiz link-dark ms-2"><h4><i class="fa fa-arrow-left"></i></h4></a>
+            <a href="<?php echo get_site_url().'/sekolahku-dashboard'; ?>" class="out_quiz link-dark ms-2"><h4><i class="fa fa-arrow-left"></i></h4></a>
         </div>
     </div>
     <h4 class="fw-light mb-4">
-        Ujian Tidak Ditemukan
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-4 offset-md-3 offset-lg-4">
+                <div class="text-center display-5">
+                    Ujian Tidak Ditemukan
+                </div>
+                <img src="<?php echo $my_plugin.'/assets/img/empty.png'; ?>" alt="" class="img-fluid"/>
+                <div class="text-center">
+                    <a href="<?php echo get_site_url().'/sekolahku-dashboard'; ?>" class="btn btn-default btn-sm"><i class="fa fa-home"></i>&nbsp;Kembali ke Beranda</a>
+                </div>
+            </div>
+        </div>
     </h4>
 </div>
 <?php } ?>

@@ -39,6 +39,7 @@ $sekolahku_pages = array(
 	'dashboard' => 'sekolahku-dashboard',
 	'setting' => 'sekolahku-pengaturan',
 	'quiz' => 'sekolahku-quiz',
+	'history' => 'sekolahku-riwayat',
 );
 
 /* 
@@ -89,6 +90,7 @@ function front_page_redirect_handler(){
 		'dashboard' => __DIR__ . '/pages/front/dashboard.php',
 		'setting' => __DIR__ . '/pages/front/setting.php',
 		'quiz' => __DIR__ . '/pages/front/quiz.php',
+		'history' => __DIR__ . '/pages/front/history.php',
 	);
 
 	if (is_page()) {
@@ -131,6 +133,14 @@ function front_page_redirect_handler(){
 		
 			//render page
 			$page =  $pages_dir['quiz'];
+		}
+		else if($post->post_name == $sekolahku_pages['history']){
+			is_authorize();
+
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir['history'];
 		}
 	}
 
@@ -430,6 +440,7 @@ function create_pages(){
 		'dashboard' => 'sekolahku-dashboard',
 		'setting' => 'sekolahku-pengaturan',
 		'quiz' => 'sekolahku-quiz',
+		'history' => 'sekolahku-riwayat',
 	);
 
 	/* CREATE FRONT END PAGE POST */
@@ -491,6 +502,19 @@ function create_pages(){
 			'post_type' => 'page',
 			'post_title' => 'Sekolahku - Ujian',
 			'post_name' => '"'.$sekolahku_pages['quiz'].'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$history_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'.$sekolahku_pages['history'].'"');
+	if($history_page == null){
+		$history_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Sekolahku - Riwayat',
+			'post_name' => '"'.$sekolahku_pages['history'].'"',
 			'post_content' => '',
 			'post_status' => 'publish',
 			'comment_status' => 'closed',   // if you prefer

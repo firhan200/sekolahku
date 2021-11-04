@@ -43,6 +43,7 @@ Default Color: #6C63FF
     left: 50%;
     transform: translateX(-50%);
     box-shadow: 1px -1px 12px #ced4da;
+    background-color: #fff;
 }
 
 .menu{
@@ -93,6 +94,11 @@ Default Color: #6C63FF
     display : block;
     width:100%;
 }
+.labl-explain {
+    display : inline-block;
+    width:100%;
+    padding-left:25px;
+}
 .labl > input{ /* HIDE RADIO */
     visibility: hidden; /* Makes input not-clickable */
     position: absolute; /* Remove input from document flow */
@@ -109,6 +115,11 @@ Default Color: #6C63FF
     border: 1px solid #6C63FF;
     background-color: #dfddff;
     font-weight: bold;
+}
+
+.correct{
+    position: absolute;
+    margin-top:15px;
 }
 
 .quiz_timer{

@@ -27,7 +27,7 @@ $link = get_site_url();
                         </a>
                     </div>
                     <div class="col-3 text-center">
-                        <a href="#" class="menu">
+                        <a href="<?php echo $link.'/sekolahku-riwayat' ?>" class="menu <?php echo isset($menu_history) ? 'active' : '' ?>">
                             <i class="fa fa-book"></i>
                         </a>
                     </div>

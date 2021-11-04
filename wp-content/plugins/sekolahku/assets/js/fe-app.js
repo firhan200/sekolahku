@@ -130,15 +130,15 @@ $(document).ready(function(){
         return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
     }
 
-    if($(".quiz_timer").length){
+    if($(".quiz_timer_state").length){
         //create function timer countdown from start date and end date
-        var startDate = $(".quiz_timer").data('start-date');
-        var endDate = $(".quiz_timer").data('end-date');
+        var startDate = $(".quiz_timer_state").data('start-date');
+        var endDate = $(".quiz_timer_state").data('end-date');
         
         var startDateTime = new Date(startDate);
 
         setInterval(function(){
-            renderTimer(startDateTime, endDate, $(".quiz_timer"));
+            renderTimer(startDateTime, endDate, $(".quiz_timer_state"));
 
             startDateTime = new Date(startDateTime.getTime() + 1000);
         }, 1000);
@@ -204,9 +204,19 @@ $(document).ready(function(){
                 'answers' : answers
             }),
             beforeSend: function(){
+                if(is_finish){
+                    $("#quiz_container").hide();
+                    $("#loading_container").show();
+                }
             },
             success: function(res){
-                console.log(res);
+                if(res.is_success){
+                    if(is_finish){
+                        window.location.href = hostUrl + "/sekolahku-dashboard";
+                    }
+                }else{
+                    alert(res.errors);
+                }
             }
         });
     }
@@ -218,6 +228,9 @@ $(document).ready(function(){
     $("#quiz_form").submit(function(e){
         e.preventDefault();
 
-        save_ujian(true);
+        var confirm = window.confirm("Apakah anda yakin akan menyelesaikan ujian?");
+        if(confirm){
+            save_ujian(true);
+        }
     })
 })

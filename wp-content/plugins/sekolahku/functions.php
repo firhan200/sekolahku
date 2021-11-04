@@ -17,6 +17,9 @@ add_action('wp_ajax_logout_user', 'logout_user');
 add_action('wp_ajax_nopriv_submit_quiz', 'submit_quiz');
 add_action('wp_ajax_submit_quiz', 'submit_quiz');
 
+add_action('wp_ajax_nopriv_history', 'history');
+add_action('wp_ajax_history', 'history');
+
 global $wpdb;
 
 //get table name
@@ -236,10 +239,12 @@ function logout_user(){
 LOGOUT USER 
 */
 
-/* Submit Quiz */
+/* 
+Submit Quiz 
+*/
 function submit_quiz(){
-     //to set session
-     if ( ! session_id() ) {
+    //to set session
+    if ( ! session_id() ) {
         session_start();
     }
 
@@ -263,7 +268,7 @@ function submit_quiz(){
         }
     }
 
-    //wp_send_json($response);
+    wp_send_json($response);
 
     exit;
 }
@@ -438,5 +443,40 @@ function save_quiz_answer($data = null){
         }
     }
 }
-/* Submit Quiz */
+/* 
+Submit Quiz 
+*/
+
+/*
+History Quiz
+*/
+function history(){
+    //to set session
+    if ( ! session_id() ) {
+        session_start();
+    }
+
+    //init return response
+    $response = array(
+        'is_success' => true,
+        'errors' => [],
+        'data' => null
+    );
+
+    //get data
+    $data = file_get_contents("php://input");
+    $data = json_decode($data, true);
+
+    //check data
+    if($data != null){
+
+    }
+
+    wp_send_json($response);
+
+    exit;
+}
+/*
+History Quiz
+*/
 ?>
