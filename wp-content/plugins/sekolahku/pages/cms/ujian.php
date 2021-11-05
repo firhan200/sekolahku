@@ -75,6 +75,7 @@ if($action_type != null){
 $modul_name = 'ujian';
 $list_url = admin_url('/admin.php?page='.$modul_name);
 $paket_soal_url = admin_url('/admin.php?page=paket_soal&paket_id=');
+$ujian_pengguna_url = admin_url('/admin.php?page=ujian_pengguna&ujian_id=');
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -395,24 +396,44 @@ $current_time = $wpdb->get_row('SELECT NOW() AS data')->data;
                     <?php echo '<a href="'.$paket_soal_url.$data->paket_id.'">'.$data->paket_name.'</a>'; ?>
 
                     <div class="row-actions action_container">
-                        <?php if($status != UJIAN_SEDANG_BERLANGSUNG && $status != UJIAN_SUDAH_BERAKHIR){ ?>
                         <span class="edit">
-                            <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
-                                Edit
+                            <a href="<?php echo $ujian_pengguna_url.$data->id ?>" aria-label="Edit">
+                                Hasil Ujian
                             </a> 
                             | 
                         </span>
-                        <?php } ?>
-                        <?php if(!$data->is_lock){ ?>
-                        <span class="delete">
-                            <a href="<?php echo $delete_url.$data->id ?>" onclick="return confirm('Hapus <?php echo $data->name; ?>?')" aria-label="Delete">
-                                Delete
-                            </a>
-                        </span>
-                        <?php }else{ ?>
+                        <?php if($status == UJIAN_BELUM_DIMULAI){ ?>
+                            <span class="edit">
+                                <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
+                                    Edit
+                                </a> 
+                                | 
+                            </span>
+                            <?php if(!$data->is_lock){ ?>
                             <span class="delete">
-                            Paket Terkunci
-                        </span>
+                                <a href="<?php echo $delete_url.$data->id ?>" onclick="return confirm('Hapus <?php echo $data->name; ?>?')" aria-label="Delete">
+                                    Delete
+                                </a>
+                            </span>
+                            <?php } ?>
+                        <?php }else if($status == UJIAN_SEDANG_BERLANGSUNG){ ?>
+                            <span class="edit">
+                                <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
+                                    Edit
+                                </a> 
+                                | 
+                            </span>
+                            <span class="delete">
+                                <a href="<?php echo $delete_url.$data->id ?>" onclick="return confirm('Hapus <?php echo $data->name; ?>?')" aria-label="Delete">
+                                    Delete
+                                </a>
+                            </span>
+                        <?php }else if($status == UJIAN_SUDAH_BERAKHIR){ ?>
+                            <span class="delete">
+                                <a href="<?php echo $delete_url.$data->id ?>" onclick="return confirm('Hapus <?php echo $data->name; ?>?')" aria-label="Delete">
+                                    Delete
+                                </a>
+                            </span>
                         <?php } ?>
                     </div>
                 </td>

@@ -575,6 +575,9 @@ function add_plugin_cms_menu(){
 
 	/* Ujian */
     add_submenu_page("sekolahku", "Ujian", "Ujian", "manage_options", "ujian", "ujian_page");
+
+	/* Ujian Pengguna */
+    add_submenu_page(null, "Hasil Ujian", "Hasil Ujian", "manage_options", "ujian_pengguna", "ujian_pengguna_page");
 }
 
 /* create administrator menu */
@@ -642,6 +645,10 @@ function paket_soal_page(){
 
 function ujian_page(){
     include_once( __DIR__ . '/pages/cms/ujian.php' );
+}
+
+function ujian_pengguna_page(){
+    include_once( __DIR__ . '/pages/cms/ujian_pengguna.php' );
 }
 
 /* Main Page */

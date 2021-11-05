@@ -486,7 +486,7 @@ function history(){
         $response['page'] = $page;
 
         //init query
-        $query = 'SELECT u.*, p.name AS paket_name, k.name AS kelas_name, m.name AS matapelajaran_name, up.status AS ujian_status, up.score AS score, up.end_date AS ujian_end_date, up.start_date AS ujian_start_date FROM '.$table_ujian.' AS u LEFT JOIN '.$table_paket.' AS p ON u.paket_id=p.id LEFT JOIN '.$table_kelas.' AS k ON u.kelas_id=k.id LEFT JOIN '.$table_mata_pelajaran.' AS m ON p.matapelajaran_id=m.id LEFT JOIN '.$table_ujian_pengguna.' AS up ON up.ujian_id=u.id WHERE u.kelas_id IN (28) AND up.status='.QUIZ_FINISHED;
+        $query = 'SELECT u.*, p.name AS paket_name, k.name AS kelas_name, m.name AS matapelajaran_name, up.status AS ujian_status, up.score AS score, up.end_date AS ujian_end_date, up.start_date AS ujian_start_date FROM '.$table_ujian.' AS u LEFT JOIN '.$table_paket.' AS p ON u.paket_id=p.id LEFT JOIN '.$table_kelas.' AS k ON u.kelas_id=k.id LEFT JOIN '.$table_mata_pelajaran.' AS m ON p.matapelajaran_id=m.id LEFT JOIN '.$table_ujian_pengguna.' AS up ON up.ujian_id=u.id WHERE u.kelas_id IN (28) AND up.status='.QUIZ_FINISHED.' AND up.pengguna_id='.$_SESSION[SESSION_ID];
 
         //ordering
         $query .= ' ORDER BY u.id DESC';
