@@ -188,8 +188,10 @@ $(document).ready(function(){
         for(var i =0; i < answersElement.length; i++){
             if(answersElement[i].checked){
                 var soalId = $(answersElement[i]).data('soal-id');
+                var label = $(answersElement[i]).data('label');
                 answers.push({
                     'soal_id' : soalId,
+                    'label' : label,
                     'soal_pilihan_id' : answersElement[i].value
                 });
             }

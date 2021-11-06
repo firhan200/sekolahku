@@ -274,6 +274,9 @@ if($_POST['keyword']){
     $query .= " WHERE p.name LIKE '%".$keyword."%'";
 }
 
+//group by query
+$query .= " GROUP BY u.id";
+
 //order by query
 $query .= " ORDER BY u.id DESC";
 

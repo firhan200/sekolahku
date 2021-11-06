@@ -398,6 +398,8 @@ function pluginprefix_activate() {
 		score double(5,2) NULL,
 		start_date datetime NOT NULL,
 		end_date datetime NULL,
+		total_question mediumint(9) DEFAULT 0 NOT NULL,
+		total_correct_question mediumint(9) DEFAULT 0 NOT NULL,
 		status smallint(1) DEFAULT 0 NOT NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
@@ -417,6 +419,7 @@ function pluginprefix_activate() {
 		ujian_pengguna_id mediumint(9) NOT NULL,
 		soal_id mediumint(9) NOT NULL,
 		soal_pilihan_id mediumint(9) NOT NULL,
+		label text NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
 		PRIMARY KEY  (id)

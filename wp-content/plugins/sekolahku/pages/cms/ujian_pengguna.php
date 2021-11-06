@@ -438,7 +438,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tr>
                 <th><?php echo ($number + 1).'.'; ?></th>
                 <td>
-                    <?php echo $question->question; ?>
+                    <?php echo wpautop(stripslashes($question->question)); ?>
                     <br/>
                     <b>Jawaban:</b>
                     <br/>
@@ -453,7 +453,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                             }
 
                             echo '<div class="question_option">';
-                            echo '<span class="per_answer '.($option->score > 0 ? 'correct' : '').'"><input type="radio" value="'.$option->id.'" '.($isUserAnswer ? 'checked' : '').' disabled> '.$option->label.'</span>';
+                            echo '<span class="per_answer '.($option->score > 0 ? 'correct' : '').'"><input type="checkbox" value="'.$option->id.'" '.($isUserAnswer ? 'checked' : '').' disabled> '.$option->label.'</span>';
                             echo '</div>';
                         }
                     }

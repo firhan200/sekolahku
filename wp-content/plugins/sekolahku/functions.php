@@ -384,6 +384,8 @@ function calculate_score($data = null){
             array(
                 'score' => (($total_correct_answer / $total_questions) * 100),
                 'end_date' => $wpdb->get_var("SELECT NOW()"),
+                'total_question' => $total_questions,
+                'total_correct_question' => $total_correct_answer,
                 'status' => QUIZ_FINISHED
             ),
             array(
@@ -433,12 +435,14 @@ function save_quiz_answer($data = null){
                 array(
                     'ujian_pengguna_id' => $ujian_pengguna_id,
                     'soal_id' => $answer['soal_id'],
-                    'soal_pilihan_id' => $answer['soal_pilihan_id']
+                    'soal_pilihan_id' => $answer['soal_pilihan_id'],
+                    'label' => $answer['label']
                 ),
                 array(
                     '%d',
                     '%d',
-                    '%d'
+                    '%d',
+                    '%s'
                 )
             );
         }

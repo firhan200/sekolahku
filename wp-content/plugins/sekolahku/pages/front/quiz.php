@@ -130,7 +130,7 @@ if($is_valid){
                     $question_number = $index + 1;
                     ?>
                     <div class="questions mb-5">
-                        <?php echo $question_number.'. '.$question->question; ?>
+                        <?php echo '<div style="display:inline-block">'.$question_number.'</div>. <div style="display:inline-block">'.wpautop(stripslashes($question->question)).'</div>'; ?>
                         <div class="fw-bold mt-3">Jawaban:</div>
                         <?php
                         if($question->question_type == PILIHAN_GANDA_KOMPLEKS){
@@ -236,7 +236,7 @@ if($is_valid){
                     $question_number = $index + 1;
                     ?>
                     <div class="questions mb-4">
-                        <?php echo $question_number.'. '.$question->question; ?>
+                        <?php echo '<div style="display:inline-block">'.$question_number.'</div>. <div style="display:inline-block">'.wpautop(stripslashes($question->question)).'</div>'; ?>
                         <div class="fw-bold mt-3">Jawaban:</div>
                         <?php
                         if($question->question_type == PILIHAN_GANDA_KOMPLEKS){
@@ -262,7 +262,7 @@ if($is_valid){
                                     echo '<div class="row">';
                                     echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
                                     echo '<label class="labl">';
-                                    echo '<input class="answer" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="radio" value="'.$answer->id.'" '.$checkedValue.'/>';
+                                    echo '<input class="answer" data-label="'.$answer->label.'" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="radio" value="'.$answer->id.'" '.$checkedValue.'/>';
                                     echo '<div>'.$answer->label.'</div>';
                                     echo '</label>';
                                     echo '</div>';
@@ -271,7 +271,7 @@ if($is_valid){
                                     echo '<div class="row">';
                                     echo '<div class="col-12 col-sm-12 col-md-10 col-lg-4">';
                                     echo '<label class="labl">';
-                                    echo '<input class="answer" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="checkbox" value="'.$answer->id.'" '.$checkedValue.'/>';
+                                    echo '<input class="answer" data-label="'.$answer->label.'" data-soal-id="'.$question->id.'" name="answer['.$question->id.']" type="checkbox" value="'.$answer->id.'" '.$checkedValue.'/>';
                                     echo '<div>'.$answer->label.'</div>';
                                     echo '</label>';
                                     echo '</div>';
