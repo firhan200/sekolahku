@@ -41,9 +41,7 @@ if($_POST['action_type_val'] != null){
 
 //set label
 $action_label = "Paket Soal";
-if(count($errors) < 1){
-    $action_label .= " (".$paket->name.")";
-}
+$action_label .= " (".$paket->name.")";
 if($action_type != null){
     $soal_id = null;
     $is_active = 1;

@@ -552,7 +552,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         $wp_editor_setting['tinymce']['readonly'] = true;
                     }
 
-                    wp_editor( $question, 'soal_wysiwyg', $wp_editor_setting); 
+                    wp_editor( wpautop(stripslashes($question)), 'soal_wysiwyg', $wp_editor_setting); 
                     ?>
                 </td>
             </tr>
@@ -613,7 +613,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         $wp_editor_expla_setting['tinymce']['readonly'] = true;
                     }
 
-                    wp_editor( $explanation, 'explanation_wysiwyg', $wp_editor_expla_setting); 
+                    wp_editor( wpautop(stripslashes($explanation)), 'explanation_wysiwyg', $wp_editor_expla_setting); 
                     ?>
                 </td>
             </tr>

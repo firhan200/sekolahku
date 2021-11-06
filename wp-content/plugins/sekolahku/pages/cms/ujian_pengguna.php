@@ -458,6 +458,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         }
                     }
                     ?>
+                    <br/>
+                    <b>Pembahasan:</b>
+                    <br/>
+                    <?php echo wpautop(stripslashes($question->explanation)); ?>
                 </td>
             </tr>
             <?php } ?>

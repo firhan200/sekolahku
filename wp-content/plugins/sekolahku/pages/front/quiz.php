@@ -129,7 +129,7 @@ if($is_valid){
                 foreach($questions as $index => $question){
                     $question_number = $index + 1;
                     ?>
-                    <div class="questions mb-4">
+                    <div class="questions mb-5">
                         <?php echo $question_number.'. '.$question->question; ?>
                         <div class="fw-bold mt-3">Jawaban:</div>
                         <?php
@@ -185,8 +185,13 @@ if($is_valid){
                                 }
                             }
                         }
-                    ?>
-                </div>
+                        ?>
+                        <div class="box">
+                            <b>Pembahasan Soal:</b>
+                            <br/>
+                            <?php echo wpautop(stripslashes($question->explanation)); ?>
+                        </div>
+                    </div>
                 <?php
             }
             ?>
