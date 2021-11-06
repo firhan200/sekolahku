@@ -1,3 +1,16 @@
 .question_option{
     margin-bottom:10px;
 }
+
+.correct{
+    background-color: rgb(197, 241, 200);
+    border-radius: 10px;
+}
+
+.question_option{
+    margin-top:10px;
+}
+
+.per_answer{
+    padding:5px 15px;
+}

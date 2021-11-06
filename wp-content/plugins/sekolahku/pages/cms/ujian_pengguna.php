@@ -4,7 +4,11 @@ $table_pengguna = $wpdb->prefix . 'sekolahku_pengguna';
 $table_paket = $wpdb->prefix . 'sekolahku_paket';
 $table_ujian = $wpdb->prefix . 'sekolahku_ujian';
 $table_kelas = $wpdb->prefix . 'sekolahku_kelas';
+$table_paket_soal = $wpdb->prefix . 'sekolahku_paket_soal';
+$table_soal = $wpdb->prefix . 'sekolahku_soal';
+$table_soal_pilihan = $wpdb->prefix . 'sekolahku_soal_pilihan';
 $table_name = $wpdb->prefix . 'sekolahku_ujian_pengguna';
+$table_ujian_pengguna_jawaban = $wpdb->prefix . 'sekolahku_ujian_pengguna_jawaban';
 
 //var
 $is_add = false;
@@ -80,7 +84,7 @@ if($action_type != null){
 
 //get urls
 $modul_name = 'ujian_pengguna';
-$list_url = admin_url('/admin.php?page='.$modul_name.'&ujian_id='.$paket->id);
+$list_url = admin_url('/admin.php?page='.$modul_name.'&ujian_id='.$ujian->id);
 $pengguna_url = admin_url('/admin.php?page=pengguna&action_type=edit&id=');
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
@@ -284,6 +288,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         <span>Waktu Selesai</span>
                     </a>
                 </th>
+                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Lama Pengerjaan</span>
+                    </a>
+                </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Status</span>
@@ -312,13 +321,20 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <td class="column-status" data-colname="status">
                     <?php 
-                       echo date("H:i, d-m-Y", strtotime($data->start_date));
+                       echo date("H:i:s, d-m-Y", strtotime($data->start_date));
                     ?>
                 </td>
                 <td class="column-status" data-colname="status">
                     <?php 
                         if($data->end_date != null){
-                            echo date("H:i, d-m-Y", strtotime($data->end_date));
+                            echo date("H:i:s, d-m-Y", strtotime($data->end_date));
+                        }
+                    ?>
+                </td>
+                <td class="column-status" data-colname="status">
+                    <?php 
+                        if($data->end_date != null){
+                            echo '<div class="duration" data-from="'.date("Y-m-d H:i:s", strtotime($data->start_date)).'" data-to="'.date("Y-m-d H:i:s", strtotime($data->end_date)).'"></div>';
                         }
                     ?>
                 </td>
@@ -358,6 +374,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Lama Pengerjaan</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>Status</span>
                     </a>
                 </th>
@@ -371,54 +392,80 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
-    $selected_soal_ids = $wpdb->get_results('SELECT * FROM '.$table_name.' WHERE paket_id = '.$paket->id);
-    $current_soal_ids = "";
-    foreach($selected_soal_ids as $selected_soal_id){
-        if($is_edit && $selected_soal_id->soal_id != $soal_id){
-            $current_soal_ids .= $selected_soal_id->soal_id.",";
-        }
+    $questions = $wpdb->get_results("SELECT s.* FROM $table_paket_soal AS ps LEFT JOIN $table_soal AS s ON ps.soal_id=s.id WHERE ps.paket_id=$ujian->paket_id");
+
+    //get all question ids
+    $question_ids = '';
+    foreach($questions as $question){
+        $question_ids .= $question->id.',';
+    }
+    if($question_ids != ''){
+        $question_ids = substr($question_ids, 0, -1);
     }
 
-    $selected_soal_ids_query = 'SELECT * FROM '.$table_soal.' WHERE is_active = 1';
+    //get question options
+    $options = $wpdb->get_results("SELECT * FROM $table_soal_pilihan WHERE soal_id IN ($question_ids)");
 
-    if($current_soal_ids != ""){
-        //remove last comma
-        $current_soal_ids = substr($current_soal_ids, 0, -1);
+    //get user answer
+    $answers = $wpdb->get_results("SELECT * FROM $table_ujian_pengguna_jawaban AS upj LEFT JOIN $table_name AS up ON upj.ujian_pengguna_id=up.id WHERE up.id=$id");
 
-        $selected_soal_ids_query .= ' AND id NOT IN ('.$current_soal_ids.')';
-    }
-
-    $list_soal = $wpdb->get_results($selected_soal_ids_query);
+    $user = $wpdb->get_row("SELECT up.*, p.full_name as pengguna_name FROM $table_name AS up LEFT JOIN $table_pengguna AS p ON up.pengguna_id=p.id WHERE up.id=$id");
 ?>
 <form method="post">
-    <input type="hidden" name="submit" value="true"/>
-    <input type="hidden" name="paket_id" value="<?php echo $paket->id; ?>"/>
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="name">Soal</label></th>
+                <th></th>
                 <td>
-                    <select name="soal_id" required>
-                        <option value="">-- Pilih Soal --</option>
-                        <?php 
-                        foreach($list_soal as $soal){
-                            $isSelected = $soal->id == $soal_id ? 'selected' : '';
-                            echo '<option value="'.$soal->id.'" '.$isSelected.'>#'.$soal->id.' '.$soal->title.'</option>';
+                    <?php echo '<a href="'.$pengguna_url.$user->pengguna_id.'">'.$user->pengguna_name.'</a>'; ?>
+                    <br/>
+                    Nilai: <b><?php echo $user->score; ?></b>
+                    <br/>
+                    Mulai Mengerjakan : <b><?php echo date("H:i:s, d-m-Y", strtotime($user->start_date)); ?></b> 
+                    <br/>
+                    Selesai Mengerjakan : <b><?php echo date("H:i:s, d-m-Y", strtotime($user->end_date)); ?></b> 
+                    <br/>
+                    <?php 
+                        if($data->end_date != null){
+                            echo '<span>Lama Pengerjaan :</span>&nbsp;<span class="duration" data-from="'.date("Y-m-d H:i:s", strtotime($data->start_date)).'" data-to="'.date("Y-m-d H:i:s", strtotime($data->end_date)).'"></span>';
                         }
-                        ?>
-                    </select>
+                    ?>
                 </td>
             </tr>
+            <?php
+            foreach($questions as $number => $question){
+            ?>
             <tr>
-                <th scope="row"><label for="is_active">Status</label></th>
-                <td><input class="form-control" name="is_active" type="checkbox" <?php echo $is_active==1 ? 'checked' : ''; ?>/>&nbsp;Is Active</td>
+                <th><?php echo ($number + 1).'.'; ?></th>
+                <td>
+                    <?php echo $question->question; ?>
+                    <br/>
+                    <b>Jawaban:</b>
+                    <br/>
+                    <?php 
+                    foreach($options as $option){ 
+                        if($option->soal_id == $question->id){
+                            $isUserAnswer = false;
+                            foreach($answers as $answer){
+                                if($answer->soal_pilihan_id == $option->id){
+                                    $isUserAnswer = true;
+                                }
+                            }
+
+                            echo '<div class="question_option">';
+                            echo '<span class="per_answer '.($option->score > 0 ? 'correct' : '').'"><input type="radio" value="'.$option->id.'" '.($isUserAnswer ? 'checked' : '').' disabled> '.$option->label.'</span>';
+                            echo '</div>';
+                        }
+                    }
+                    ?>
+                </td>
             </tr>
+            <?php } ?>
             <tr>
                 <td>
                 </td>
                 <td>
                     <a href="<?php echo $list_url; ?>" class="button button-secondary">Back</a>
-                    <button type="submit" class="button button-primary">Submit</button>
                 </td>
             </tr>
         </tbody>

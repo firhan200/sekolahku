@@ -4,6 +4,7 @@ $table_name = $wpdb->prefix . 'sekolahku_ujian';
 $table_paket = $wpdb->prefix . 'sekolahku_paket';
 $table_mapel = $wpdb->prefix . 'sekolahku_matapelajaran';
 $table_kelas = $wpdb->prefix . 'sekolahku_kelas';
+$table_ujian_pengguna = $wpdb->prefix . 'sekolahku_ujian_pengguna';
 
 //var
 $is_add = false;
@@ -264,7 +265,7 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT u.*, p.name AS paket_name, k.name AS kelas_name FROM ".$table_name." AS u LEFT JOIN ".$table_paket." AS p ON u.paket_id=p.id LEFT JOIN ".$table_kelas." AS k ON u.kelas_id=k.id";
+$query = "SELECT u.*, p.name AS paket_name, k.name AS kelas_name, (SELECT COUNT(*) FROM $table_ujian_pengguna WHERE $table_ujian_pengguna.ujian_id=u.id) AS total_submit FROM ".$table_name." AS u LEFT JOIN ".$table_paket." AS p ON u.paket_id=p.id LEFT JOIN ".$table_kelas." AS k ON u.kelas_id=k.id";
 $keyword = '';
 
 //filter
@@ -356,6 +357,11 @@ $current_time = $wpdb->get_row('SELECT NOW() AS data')->data;
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Acak Soal</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Jumlah Siswa Mengerjakan</span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
@@ -456,6 +462,11 @@ $current_time = $wpdb->get_row('SELECT NOW() AS data')->data;
                 </td>
                 <td class="column-status" data-colname="status">
                     <?php 
+                       echo $data->total_submit;
+                    ?>
+                </td>
+                <td class="column-status" data-colname="status">
+                    <?php 
                        echo $status;
                     ?>
                 </td>
@@ -486,6 +497,11 @@ $current_time = $wpdb->get_row('SELECT NOW() AS data')->data;
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Acak Soal</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Jumlah Siswa Mengerjakan</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">

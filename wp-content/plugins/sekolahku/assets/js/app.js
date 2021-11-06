@@ -90,4 +90,23 @@ $(document).ready(function(){
         }
     });
     /* UJIAN */
+
+    if($(".duration").length){
+        $(".duration").each(function(){
+            var from = moment($(this).data('from'));
+            var to = moment($(this).data('to'));
+
+            var seconds = to.diff(from, 'seconds');
+
+            if(seconds < 60){
+                $(this).text(to.diff(from, 'seconds')+" detik");
+            }else if(seconds >= 60 && seconds < 3600){
+                var leftTime = seconds % 60;
+                $(this).text(to.diff(from, 'minutes')+" menit" + (leftTime > 0 ? " "+leftTime+" detik" : ""));
+            }else{
+                var leftTime = seconds % 3600;
+                $(this).text(to.diff(from, 'hours')+" jam" + (leftTime > 0 ? " "+leftTime+" detik" : ""));
+            }
+        })
+    }
 });
