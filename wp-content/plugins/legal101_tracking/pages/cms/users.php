@@ -87,6 +87,9 @@ $modul_name = 'users';
 $list_url = admin_url('/admin.php?page='.$modul_name);
 $perizinan_url = admin_url('/admin.php?page=perizinan&user_id=');
 $hki_url = admin_url('/admin.php?page=hki&user_id=');
+$faktur_url = admin_url('/admin.php?page=faktur&user_id=');
+$ppn_url = admin_url('/admin.php?page=ppn&user_id=');
+$spt_url = admin_url('/admin.php?page=spt&user_id=');
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -297,7 +300,7 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT u.*, (SELECT COUNT(*) FROM "._tbl_perizinan." WHERE user_id=u.id) AS total_perizinan, (SELECT COUNT(*) FROM "._tbl_hki." WHERE user_id=u.id) AS total_hki FROM ".$table_name." AS u";
+$query = "SELECT u.*, (SELECT COUNT(*) FROM "._tbl_perizinan." WHERE user_id=u.id) AS total_perizinan, (SELECT COUNT(*) FROM "._tbl_hki." WHERE user_id=u.id) AS total_hki, (SELECT COUNT(*) FROM "._tbl_faktur." WHERE user_id=u.id) AS total_faktur, (SELECT COUNT(*) FROM "._tbl_ppn." WHERE user_id=u.id) AS total_ppn, (SELECT COUNT(*) FROM "._tbl_spt_tahunan." WHERE user_id=u.id) AS total_spt FROM ".$table_name." AS u";
 $keyword = '';
 
 //filter
@@ -386,6 +389,21 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Total Faktur</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Total PPN</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Total SPT Tahunan</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>Status</span>
                     </a>
                 </th>
@@ -423,8 +441,20 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                             | 
                         </span>
                         <span class="edit">
-                            <a href="<?php echo $pajak_url.$data->id ?>" aria-label="Edit">
-                                Pajak
+                            <a href="<?php echo $faktur_url.$data->id ?>" aria-label="Edit">
+                                Faktur
+                            </a> 
+                            | 
+                        </span>
+                        <span class="edit">
+                            <a href="<?php echo $ppn_url.$data->id ?>" aria-label="Edit">
+                                PPN
+                            </a> 
+                            | 
+                        </span>
+                        <span class="edit">
+                            <a href="<?php echo $spt_url.$data->id ?>" aria-label="Edit">
+                                SPT
                             </a> 
                             | 
                         </span>
@@ -452,6 +482,27 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <a href="<?php echo $hki_url.$data->id ?>" aria-label="Edit">
                         <?php 
                         echo $data->total_hki;
+                        ?>
+                    </a>
+                </td>
+                <td class="column-status" data-colname="status">
+                    <a href="<?php echo $faktur_url.$data->id ?>" aria-label="Edit">
+                        <?php 
+                        echo $data->total_faktur;
+                        ?>
+                    </a>
+                </td>
+                <td class="column-status" data-colname="status">
+                    <a href="<?php echo $ppn_url.$data->id ?>" aria-label="Edit">
+                        <?php 
+                        echo $data->total_ppn;
+                        ?>
+                    </a>
+                </td>
+                <td class="column-status" data-colname="status">
+                    <a href="<?php echo $spt_url.$data->id ?>" aria-label="Edit">
+                        <?php 
+                        echo $data->total_spt;
                         ?>
                     </a>
                 </td>
@@ -490,6 +541,21 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Total Faktur</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Total PPN</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Total SPT Tahunan</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>Status</span>
                     </a>
                 </th>
@@ -509,7 +575,9 @@ if($is_edit){
     //kelola dokumen
     echo '<a href="'.$perizinan_url.$id.'" class="button button-primary">Kelola Perizinan</a>&nbsp;';
     echo '<a href="'.$hki_url.$id.'" class="button button-primary">Kelola HKI</a>&nbsp;';
-    echo '<a href="'.$pajak_url.$id.'" class="button button-primary">Kelola Pajak</a>';
+    echo '<a href="'.$faktur_url.$id.'" class="button button-primary">Kelola Faktur</a>&nbsp;';
+    echo '<a href="'.$ppn_url.$id.'" class="button button-primary">Kelola PPN</a>&nbsp;';
+    echo '<a href="'.$spt_url.$id.'" class="button button-primary">Kelola SPT Tahunan</a>&nbsp;';
 }
 ?>
 

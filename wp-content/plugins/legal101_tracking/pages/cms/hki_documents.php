@@ -36,7 +36,7 @@ if($_POST['action_type_val'] != null){
 //set label
 $action_label = "Dokumen HKI";
 if(count($errors) < 1){
-    $action_label .= " (".$hki->pemohon.': '.$hki->pekerjaan.")";
+    $action_label .= " (<a href='".admin_url('/admin.php?page=users&action_type=edit&id='.$hki->user_id)."'>".$hki->pemohon.'</a>: <a href="'.admin_url('/admin.php?page=hki&user_id='.$hki->user_id).'">'.$hki->pekerjaan."</a>)";
 }
 if($action_type != null){
     $attachment_id = null;
@@ -295,7 +295,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <div class="locked-indicator">
                         <span class="locked-indicator-icon" aria-hidden="true"></span>
                         <span class="screen-reader-text">
-                            “<?php echo $data->name; ?>” terkunci
+                            “<?php echo $data->attachment_id; ?>” terkunci
                         </span>
                     </div>
                 </th>
@@ -367,7 +367,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         <br/>
                         <?php } ?>
                     </div>
-                    <input type='hidden' name='attachment_id' id='attachment_id' value='<?php echo get_option( 'media_selector_attachment_id' ); ?>'>
+                    <input type='hidden' name='attachment_id' id='attachment_id' value='<?php echo $attachment_id == null ? get_option( 'media_selector_attachment_id' ) : $attachment_id; ?>'>
                     <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Browse File' ); ?>" />
                 </td>
             </tr>

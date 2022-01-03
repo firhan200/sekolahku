@@ -22,7 +22,9 @@ define('_tbl_users', $wpdb->prefix._plugin_name.'_users');
 define('_tbl_perizinan', $wpdb->prefix._plugin_name.'_perizinan');
 define('_tbl_hki', $wpdb->prefix._plugin_name.'_hki');
 define('_tbl_hki_documents', $wpdb->prefix._plugin_name.'_hki_documents');
-define('_tbl_pajak', $wpdb->prefix._plugin_name.'_pajak');
+define('_tbl_faktur', $wpdb->prefix._plugin_name.'_faktur');
+define('_tbl_ppn', $wpdb->prefix._plugin_name.'_ppn');
+define('_tbl_spt_tahunan', $wpdb->prefix._plugin_name.'_spt_tahunan');
 
 //pages
 define('_pages_login', $wpdb->prefix._plugin_name.'_login');
@@ -126,6 +128,9 @@ function legal101_activated() {
 	$tbl_perizinan = _tbl_perizinan; 
 	$tbl_hki = _tbl_hki; 
 	$tbl_hki_documents = _tbl_hki_documents; 
+	$tbl_faktur = _tbl_faktur; 
+	$tbl_ppn = _tbl_ppn; 
+	$tbl_spt_tahunan = _tbl_spt_tahunan; 
 
     //check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$tbl_users'") != $tbl_users) {
@@ -215,6 +220,63 @@ function legal101_activated() {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
     }
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$tbl_faktur'") != $tbl_faktur) {
+        //table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $tbl_faktur (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		user_id mediumint(9) NOT NULL,
+		tanggal_faktur date NULL,
+		nomor_faktur varchar(255) NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+    }
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$tbl_ppn'") != $tbl_ppn) {
+        //table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $tbl_ppn (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		user_id mediumint(9) NOT NULL,
+		bulan_pajak int NOT NULL,
+		tahun_pajak varchar(4) NOT NULL,
+		status smallint(1) DEFAULT 0 NOT NULL,
+		attachment_id mediumint(9) NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+    }
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$tbl_spt_tahunan'") != $tbl_spt_tahunan) {
+        //table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $tbl_spt_tahunan (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		user_id mediumint(9) NOT NULL,
+		tahun varchar(4) NOT NULL,
+		status smallint(1) DEFAULT 0 NOT NULL,
+		attachment_id mediumint(9) NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+    }
 }
 
 register_activation_hook( __FILE__, 'legal101_activated' );
@@ -267,8 +329,17 @@ function add_legal101_plugin_cms_menu(){
 	/* HKI */
     add_submenu_page(null, "HKI", "HKI", "manage_options", "hki", "hki_page");
 
-	/* HKI */
+	/* HKI Dokumen */
     add_submenu_page(null, "HKI Dokumen", "HKI Dokumen", "manage_options", "hki_documents", "hki_documents_page");
+
+	/* Faktur */
+    add_submenu_page(null, "Faktur", "Faktur", "manage_options", "faktur", "faktur_page");
+
+	/* PPN */
+    add_submenu_page(null, "PPN", "PPN", "manage_options", "ppn", "ppn_page");
+
+	/* SPT */
+    add_submenu_page(null, "SPT Tahunan", "SPT Tahunan", "manage_options", "spt", "spt_page");
 }
 
 /**
@@ -290,4 +361,16 @@ function hki_page(){
 
 function hki_documents_page(){
     include_once( __DIR__ . '/pages/cms/hki_documents.php' );
+}
+
+function faktur_page(){
+    include_once( __DIR__ . '/pages/cms/faktur.php' );
+}
+
+function ppn_page(){
+    include_once( __DIR__ . '/pages/cms/ppn.php' );
+}
+
+function spt_page(){
+    include_once( __DIR__ . '/pages/cms/spt.php' );
 }

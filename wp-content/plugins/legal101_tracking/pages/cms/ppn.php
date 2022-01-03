@@ -1,7 +1,7 @@
 <?php
 global $wpdb;
 $table_users_name = _tbl_users;
-$table_name = _tbl_hki;
+$table_name = _tbl_ppn;
 
 //var
 $is_add = false;
@@ -34,18 +34,15 @@ if($_POST['action_type_val'] != null){
 }
 
 //set label
-$action_label = "HKI";
+$action_label = "PPN";
 if(count($errors) < 1){
     $action_label .= " (<a href='".admin_url('/admin.php?page=users&action_type=edit&id='.$user->id)."'>".$user->company_name."</a>)";
 }
 if($action_type != null){
-    $pemohon = '';
-    $pekerjaan = '';
-    $no_agenda = '';
-    $class = '';
-    $tanggal_penerimaan = null;
-    $status = '';
-    $deadline = null;
+    $bulan_pajak = date('m');
+    $tahun_pajak = date('Y');
+    $attachment_id = null;
+    $status = PERIZINAN_PENDING;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -58,13 +55,10 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
-            $pemohon = $data->pemohon;
-            $pekerjaan = $data->pekerjaan;
-            $no_agenda = $data->no_agenda;
-            $class = $data->class;
-            $tanggal_penerimaan = $data->tanggal_penerimaan;
+            $bulan_pajak = $data->bulan_pajak;
+            $tahun_pajak = $data->tahun_pajak;
+            $attachment_id = $data->attachment_id;
             $status = $data->status;
-            $deadline = $data->deadline;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -85,9 +79,8 @@ if($action_type != null){
 }
 
 //get urls
-$modul_name = 'hki';
+$modul_name = 'ppn';
 $list_url = admin_url('/admin.php?page='.$modul_name.'&user_id='.$user->id);
-$hki_documents_url = admin_url('/admin.php?page=hki_documents&hki_id=');
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -96,14 +89,19 @@ $delete_url = $list_url.'&action_type=delete&id=';
 if(count($errors) < 1){
     if($_POST['submit']){
         $user_id = $_POST['user_id'];
-        $pemohon = $_POST['pemohon'];
-        $pekerjaan = $_POST['pekerjaan'];
-        $no_agenda = $_POST['no_agenda'];
-        $class = $_POST['class'];
-        $tanggal_penerimaan = $_POST['tanggal_penerimaan'];
+        $bulan_pajak = $_POST['bulan_pajak'];
+        $tahun_pajak = $_POST['tahun_pajak'];
+        $attachment_id = $_POST['attachment_id'];
         $status = $_POST['status'];
-        $deadline = $_POST['deadline'];
 
+        //validation
+        if(empty($bulan_pajak)){
+            $errors[] = '<b>Bulan</b> Tidak Boleh Kosong';
+        }
+
+        if(empty($tahun_pajak)){
+            $errors[] = '<b>Tahun</b> Tidak Boleh Kosong';
+        }
 
         if(count($errors) == 0){
             //all input valid
@@ -115,23 +113,17 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'user_id' => $user_id,
-                        'pemohon' => $pemohon,
-                        'pekerjaan' => $pekerjaan,
-                        'no_agenda' => $no_agenda,
-                        'class' => $class,
-                        'tanggal_penerimaan' => $tanggal_penerimaan,
-                        'status' => $status,
-                        'deadline' => $deadline
+                        'bulan_pajak' => $bulan_pajak,
+                        'tahun_pajak' => $tahun_pajak,
+                        'attachment_id' => $attachment_id,
+                        'status' => $status
                     ),
                     array(
                         '%d',
                         '%s',
                         '%s',
                         '%s',
-                        '%s',
-                        '%s',
-                        '%s',
-                        '%s'
+                        '%d',
                     )
                 );
 
@@ -143,13 +135,10 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
-                        'pemohon' => $pemohon,
-                        'pekerjaan' => $pekerjaan,
-                        'no_agenda' => $no_agenda,
-                        'class' => $class,
-                        'tanggal_penerimaan' => $tanggal_penerimaan,
-                        'status' => $status,
-                        'deadline' => $deadline
+                        'bulan_pajak' => $bulan_pajak,
+                        'tahun_pajak' => $tahun_pajak,
+                        'attachment_id' => $attachment_id,
+                        'status' => $status
                     ),
                     array('id' => $id)
                 );
@@ -209,6 +198,50 @@ if(count($errors) < 1){
         }
     }
 }
+
+//extra function
+function intToMonth($int){
+    $month = null;
+    switch($int){
+        case 1:
+            $month = 'Januari';
+            break;
+        case 2:
+            $month = 'Februari';
+            break;
+        case 3:
+            $month = 'Maret';
+            break;
+        case 4:
+            $month = 'April';
+            break;
+        case 5:
+            $month = 'Mei';
+            break;
+        case 6:
+            $month = 'Juni';
+            break;
+        case 7:
+            $month = 'Juli';
+            break;
+        case 8:
+            $month = 'Agustus';
+            break;
+        case 9:
+            $month = 'September';
+            break;
+        case 10:
+            $month = 'Oktober';
+            break;
+        case 11:
+            $month = 'November';
+            break;
+        case 12:
+            $month = 'Desember';
+            break;
+    }
+    return $month;
+}
 ?>
 
 <div class="wrap">
@@ -237,17 +270,17 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT h.*, (SELECT COUNT(*) FROM "._tbl_hki_documents." WHERE hki_id=h.id) AS total_dokumen FROM ".$table_name.' AS h WHERE h.user_id='.$user->id;
+$query = "SELECT * FROM ".$table_name.' WHERE user_id='.$user->id;
 $keyword = '';
 
 //filter
 if($_POST['keyword']){
     $keyword = $_POST['keyword'];
-    $query .= " AND h.pemohon LIKE '%".$keyword."%'";
+    $query .= " AND name LIKE '%".$keyword."%'";
 }
 
 //order by query
-$query .= " ORDER BY h.id DESC";
+$query .= " ORDER BY id DESC";
 
 $list_of_data_total = $wpdb->get_results($query);
 
@@ -311,37 +344,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Pemohon</span>
+                        <span>Tanggal Pajak</span>
                     </a>
                 </th>
                 <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Pekerjaan</span>
-                    </a>
-                </th>
-                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total Dokumen</span>
-                    </a>
-                </th>
-                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>No. Agenda</span>
-                    </a>
-                </th>
-                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Class</span>
-                    </a>
-                </th>
-                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Tanggal Penerimaan</span>
-                    </a>
-                </th>
-                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Deadline</span>
+                        <span>Link Dokumen</span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
@@ -356,26 +364,20 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tr id="post-<?php echo $key+1; ?>" class="type-post">
                 <th scope="row" class="check-column">
                     <label class="screen-reader-text" for="cb-select-1">
-                        Pilih <?php echo $data->name; ?>
+                        Pilih <?php echo intToMonth($data->bulan_pajak).' '.$data->tahun_pajak; ?>
                     </label>
                     <input id="cb-select-1" type="checkbox" name="post[]" value="<?php echo $data->id; ?>">
                     <div class="locked-indicator">
                         <span class="locked-indicator-icon" aria-hidden="true"></span>
                         <span class="screen-reader-text">
-                            “<?php echo $data->name; ?>” terkunci
+                            “<?php echo intToMonth($data->bulan_pajak).' '.$data->tahun_pajak; ?>” terkunci
                         </span>
                     </div>
                 </th>
                 <td class="title column-title has-row-actions column-primary page-name">
-                    <?php echo $data->pemohon; ?>
+                    <?php echo intToMonth($data->bulan_pajak).' '.$data->tahun_pajak; ?>
 
                     <div class="row-actions action_container">
-                        <span class="edit">
-                            <a href="<?php echo $hki_documents_url.$data->id ?>" aria-label="Edit">
-                                Kelola Dokumen
-                            </a> 
-                            | 
-                        </span>
                         <span class="edit">
                             <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
                                 Edit
@@ -390,40 +392,19 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </td>
                 <td class="column-target-date" data-colname="target_date">
-                    <?php 
-                        echo htmlspecialchars($data->pekerjaan);
-                    ?>
+                    <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
                 </td>
-                <td class="column-target-date" data-colname="target_date">
-                    <a href="<?php echo $hki_documents_url.$data->id ?>" aria-label="Edit">
-                        <?php 
-                            echo $data->total_dokumen;
-                        ?>
-                    </a>
-                </td>
-                <td class="column-target-date" data-colname="target_date">
+                <td class="column-status" data-colname="status">
                     <?php 
-                        echo htmlspecialchars($data->no_agenda);
-                    ?>
-                </td>
-                <td class="column-target-date" data-colname="target_date">
-                    <?php 
-                        echo htmlspecialchars($data->class);
-                    ?>
-                </td>
-                <td class="column-target-date" data-colname="target_date">
-                    <?php 
-                        echo date('d M Y', strtotime($data->tanggal_penerimaan));
-                    ?>
-                </td>
-                <td class="column-target-date" data-colname="target_date">
-                    <?php 
-                        echo date('d M Y', strtotime($data->deadline));
-                    ?>
-                </td>
-                <td class="column-target-date" data-colname="target_date">
-                    <?php 
-                        echo htmlspecialchars($data->status);
+                        if($data->status == PERIZINAN_PENDING){ 
+                            echo '<span class="badge bg-success">Pending</span>';
+                        }else if($data->status == PERIZINAN_ON_PROGRESS){
+                            echo '<span class="badge bg-danger">On-Progress</span>';
+                        }else if($data->status == PERIZINAN_DONE){
+                            echo '<span class="badge bg-danger">Done</span>';
+                        }else if($data->status == PERIZINAN_CANCELLED){
+                            echo '<span class="badge bg-danger">Cancelled</span>';
+                        }
                     ?>
                 </td>
             </tr>
@@ -437,37 +418,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Pemohon</span>
+                        <span>Tanggal Pajak</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Pekerjaan</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total Dokumen</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>No. Agenda</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Class</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Tanggal Penerimaan</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Deadline</span>
+                        <span>Link Dokumen</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
@@ -485,47 +441,70 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
+    wp_enqueue_media();
 ?>
-
-<?php
-if($is_edit){
-    //kelola dokumen
-    echo '<a href="'.$hki_documents_url.$id.'" class="button button-primary">Kelola Dokumen</a>';
-}
-?>
-
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="name">Pemohon</label></th>
-                <td><input type="text" class="regular-text" name="pemohon" value="<?php echo $pemohon; ?>" maxlength="250"></td>
+                <th scope="row"><label for="bulan_pajak">Bulan Pajak</label></th>
+                <td>
+                    <select name="bulan_pajak" required>
+                        <option value="1" <?php echo $bulan_pajak == 1 ? 'selected' : '' ?>>Januari</option>
+                        <option value="2" <?php echo $bulan_pajak == 2 ? 'selected' : '' ?>>Februari</option>
+                        <option value="3" <?php echo $bulan_pajak == 3 ? 'selected' : '' ?>>Maret</option>
+                        <option value="4" <?php echo $bulan_pajak == 4 ? 'selected' : '' ?>>April</option>
+                        <option value="5" <?php echo $bulan_pajak == 5 ? 'selected' : '' ?>>Mei</option>
+                        <option value="6" <?php echo $bulan_pajak == 6 ? 'selected' : '' ?>>Juni</option>
+                        <option value="7" <?php echo $bulan_pajak == 7 ? 'selected' : '' ?>>Juli</option>
+                        <option value="8" <?php echo $bulan_pajak == 8 ? 'selected' : '' ?>>Agustus</option>
+                        <option value="9" <?php echo $bulan_pajak == 9 ? 'selected' : '' ?>>September</option>
+                        <option value="10" <?php echo $bulan_pajak == 10 ? 'selected' : '' ?>>Oktober</option>
+                        <option value="11" <?php echo $bulan_pajak == 11 ? 'selected' : '' ?>>November</option>
+                        <option value="12" <?php echo $bulan_pajak == 12 ? 'selected' : '' ?>>Desember</option>
+                    </select>
+                </td>
             </tr>
             <tr>
-                <th scope="row"><label for="name">Pekerjaan</label></th>
-                <td><input type="text" class="regular-text" name="pekerjaan" value="<?php echo $pekerjaan; ?>" maxlength="250"></td>
+                <th scope="row"><label for="tahun_pajak">Tahun Pajak</label></th>
+                <td>
+                    <select name="tahun_pajak" required>
+                        <?php
+                        for($year = 1960; $year <= 2030; $year++){
+                            $isSelected = $tahun_pajak == $year ? 'selected' : '';
+                            echo '<option value="'.$year.'" '.$isSelected.'>'.$year.'</option>';
+                        }
+                        ?>
+                    </select>
+                </td>
             </tr>
             <tr>
-                <th scope="row"><label for="name">No. Agenda</label></th>
-                <td><input type="text" class="regular-text" name="no_agenda" value="<?php echo $no_agenda; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Class</label></th>
-                <td><input type="text" class="regular-text" name="class" value="<?php echo $class; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Tanggal Penerimaan</label></th>
-                <td><input type="text" class="regular-text custom_date" name="tanggal_penerimaan" value="<?php echo $tanggal_penerimaan; ?>" maxlength="50"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Deadline</label></th>
-                <td><input type="text" class="regular-text custom_date" name="deadline" value="<?php echo $deadline; ?>" maxlength="50"></td>
+                <th scope="row"><label for="name">File</label></th>
+                <td>
+                    <div id='link-preview'>
+                        <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                        <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
+                        <br/>
+                        <br/>
+                        <?php } ?>
+                    </div>
+                    <input type='hidden' name='attachment_id' id='attachment_id' value='<?php echo $attachment_id == null ? get_option( 'media_selector_attachment_id' ) : $attachment_id; ?>'>
+                    <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Browse File' ); ?>" />
+                </td>
             </tr>
             <tr>
                 <th scope="row"><label for="name">Status</label></th>
-                <td><textarea rows="5" cols="100" name="status" maxlength="250"><?php echo $status; ?></textarea></td>
+                <td>
+                    <select name="status" required>
+                        <option value="">-- Pilih Status --</option>
+                        <option value="<?php echo PERIZINAN_PENDING ?>" <?php echo $status == PERIZINAN_PENDING ? 'selected' : '' ?>><?php echo 'Pending'; ?></option>
+                        <option value="<?php echo PERIZINAN_ON_PROGRESS ?>" <?php echo $status == PERIZINAN_ON_PROGRESS ? 'selected' : '' ?>><?php echo 'On-Progress'; ?></option>
+                        <option value="<?php echo PERIZINAN_DONE ?>" <?php echo $status == PERIZINAN_DONE ? 'selected' : '' ?>><?php echo 'Done'; ?></option>
+                        <option value="<?php echo PERIZINAN_CANCELLED ?>" <?php echo $status == PERIZINAN_CANCELLED ? 'selected' : '' ?>><?php echo 'Cancelled'; ?></option>
+                    </select>
+                </td>
             </tr>
             <tr>
                 <td>
@@ -543,3 +522,58 @@ if($is_edit){
 ?>
 
 </div>
+
+
+<?php
+$my_saved_attachment_post_id = get_option( 'media_selector_attachment_id', 0 );
+?>
+<script type='text/javascript'>
+    jQuery( document ).ready( function( $ ) {
+        // Uploading files
+        var file_frame;
+        var wp_media_post_id = wp.media.model.settings.post.id; // Store the old id
+        var set_to_post_id = <?php echo $my_saved_attachment_post_id; ?>; // Set this
+        jQuery('#upload_image_button').on('click', function( event ){
+            event.preventDefault();
+            // If the media frame already exists, reopen it.
+            if ( file_frame ) {
+                // Set the post ID to what we want
+                file_frame.uploader.uploader.param( 'post_id', set_to_post_id );
+                // Open frame
+                file_frame.open();
+                return;
+            } else {
+                // Set the wp.media post id so the uploader grabs the ID we want when initialised
+                wp.media.model.settings.post.id = set_to_post_id;
+            }
+            // Create the media frame.
+            file_frame = wp.media.frames.file_frame = wp.media({
+                title: 'Select a image to upload',
+                button: {
+                    text: 'Use this image',
+                },
+                multiple: false // Set to true to allow multiple files to be selected
+            });
+            // When an image is selected, run a callback.
+            file_frame.on( 'select', function() {
+                // We set multiple to false so only get one image from the uploader
+                attachment = file_frame.state().get('selection').first().toJSON();
+
+                console.log(attachment);
+                // Do something with attachment.id and/or attachment.url here
+                //$( '#image-preview' ).attr( 'src', attachment.url ).css( 'width', 'auto' );
+                $( '#attachment_id' ).val( attachment.id );
+
+                $('#link-preview').html('<a href="'+attachment.url+'" target="_blank">'+attachment.url+'</a><br/><br/>');
+                // Restore the main post ID
+                wp.media.model.settings.post.id = wp_media_post_id;
+            });
+                // Finally, open the modal
+                file_frame.open();
+        });
+        // Restore the main ID when the add media button is pressed
+        jQuery( 'a.add_media' ).on( 'click', function() {
+            wp.media.model.settings.post.id = wp_media_post_id;
+        });
+    });
+</script>
