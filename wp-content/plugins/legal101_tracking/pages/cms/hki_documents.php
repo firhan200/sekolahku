@@ -300,7 +300,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </th>
                 <td class="title column-title has-row-actions column-primary page-name">
-                    <?php echo $data->attachment_id; ?>
+                    <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
 
                     <div class="row-actions action_container">
                         <span class="edit">
@@ -318,7 +318,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <td class="column-target-date" data-colname="target_date">
                     <?php 
-                        echo date('d M Y', strtotime($data->created_at));
+                        echo date('d M Y', strtotime($data->created_on));
                     ?>
                 </td>
             </tr>
@@ -354,17 +354,21 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 ?>
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
-    <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
+    <input type="hidden" name="hki_id" value="<?php echo $hki->id; ?>"/>
     <table class="form-table">
         <tbody>
             <tr>
                 <th scope="row"><label for="name">File</label></th>
                 <td>
-                    <div class='image-preview-wrapper'>
-                        <img id='image-preview' src='<?php echo wp_get_attachment_url( get_option( 'media_selector_attachment_id' ) ); ?>' width='200'>
+                    <div id='link-preview'>
+                        <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                        <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
+                        <br/>
+                        <br/>
+                        <?php } ?>
                     </div>
                     <input type='hidden' name='attachment_id' id='attachment_id' value='<?php echo get_option( 'media_selector_attachment_id' ); ?>'>
-                    <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Upload File' ); ?>" />
+                    <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Browse File' ); ?>" />
                 </td>
             </tr>
             <tr>
@@ -419,9 +423,13 @@ $my_saved_attachment_post_id = get_option( 'media_selector_attachment_id', 0 );
             file_frame.on( 'select', function() {
                 // We set multiple to false so only get one image from the uploader
                 attachment = file_frame.state().get('selection').first().toJSON();
+
+                console.log(attachment);
                 // Do something with attachment.id and/or attachment.url here
-                $( '#image-preview' ).attr( 'src', attachment.url ).css( 'width', 'auto' );
+                //$( '#image-preview' ).attr( 'src', attachment.url ).css( 'width', 'auto' );
                 $( '#attachment_id' ).val( attachment.id );
+
+                $('#link-preview').html('<a href="'+attachment.url+'" target="_blank">'+attachment.url+'</a><br/><br/>');
                 // Restore the main post ID
                 wp.media.model.settings.post.id = wp_media_post_id;
             });

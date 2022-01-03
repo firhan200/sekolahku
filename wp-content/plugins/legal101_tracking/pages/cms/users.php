@@ -442,14 +442,18 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </td>
                 <td class="column-status" data-colname="status">
-                    <?php 
-                       echo $data->total_perizinan;
-                    ?>
+                    <a href="<?php echo $perizinan_url.$data->id ?>" aria-label="Edit">
+                        <?php 
+                        echo $data->total_perizinan;
+                        ?>
+                    </a>
                 </td>
                 <td class="column-status" data-colname="status">
-                    <?php 
-                       echo $data->total_hki;
-                    ?>
+                    <a href="<?php echo $hki_url.$data->id ?>" aria-label="Edit">
+                        <?php 
+                        echo $data->total_hki;
+                        ?>
+                    </a>
                 </td>
                 <td class="column-status" data-colname="status">
                     <?php 
@@ -500,6 +504,15 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <?php 
 }else if($is_add || $is_edit){
 ?>
+<?php
+if($is_edit){
+    //kelola dokumen
+    echo '<a href="'.$perizinan_url.$id.'" class="button button-primary">Kelola Perizinan</a>&nbsp;';
+    echo '<a href="'.$hki_url.$id.'" class="button button-primary">Kelola HKI</a>&nbsp;';
+    echo '<a href="'.$pajak_url.$id.'" class="button button-primary">Kelola Pajak</a>';
+}
+?>
+
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
     <table class="form-table">

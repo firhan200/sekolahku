@@ -237,17 +237,17 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT * FROM ".$table_name.' WHERE user_id='.$user->id;
+$query = "SELECT h.*, (SELECT COUNT(*) FROM "._tbl_hki_documents." WHERE hki_id=h.id) AS total_dokumen FROM ".$table_name.' AS h WHERE h.user_id='.$user->id;
 $keyword = '';
 
 //filter
 if($_POST['keyword']){
     $keyword = $_POST['keyword'];
-    $query .= " AND name LIKE '%".$keyword."%'";
+    $query .= " AND h.pemohon LIKE '%".$keyword."%'";
 }
 
 //order by query
-$query .= " ORDER BY id DESC";
+$query .= " ORDER BY h.id DESC";
 
 $list_of_data_total = $wpdb->get_results($query);
 
@@ -321,6 +321,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Total Dokumen</span>
+                    </a>
+                </th>
+                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>No. Agenda</span>
                     </a>
                 </th>
@@ -390,6 +395,13 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     ?>
                 </td>
                 <td class="column-target-date" data-colname="target_date">
+                    <a href="<?php echo $hki_documents_url.$data->id ?>" aria-label="Edit">
+                        <?php 
+                            echo $data->total_dokumen;
+                        ?>
+                    </a>
+                </td>
+                <td class="column-target-date" data-colname="target_date">
                     <?php 
                         echo htmlspecialchars($data->no_agenda);
                     ?>
@@ -435,6 +447,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Total Dokumen</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>No. Agenda</span>
                     </a>
                 </th>
@@ -469,6 +486,14 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <?php 
 }else if($is_add || $is_edit){
 ?>
+
+<?php
+if($is_edit){
+    //kelola dokumen
+    echo '<a href="'.$hki_documents_url.$id.'" class="button button-primary">Kelola Dokumen</a>';
+}
+?>
+
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
