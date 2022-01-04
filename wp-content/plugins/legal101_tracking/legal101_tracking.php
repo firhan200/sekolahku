@@ -13,6 +13,8 @@ if(!defined('ABSPATH')){
 	exit;
 }
 
+include_once( __DIR__ . '/functions.php' );
+
 //GLOBALS
 global $wpdb;
 
@@ -27,8 +29,11 @@ define('_tbl_ppn', $wpdb->prefix._plugin_name.'_ppn');
 define('_tbl_spt_tahunan', $wpdb->prefix._plugin_name.'_spt_tahunan');
 
 //pages
-define('_pages_login', $wpdb->prefix._plugin_name.'_login');
-define('_pages_home', $wpdb->prefix._plugin_name.'_home');
+define('_pages_login', _plugin_name.'_login');
+define('_pages_home', _plugin_name.'_home');
+define('_pages_perizinan', _plugin_name.'_perizinan');
+define('_pages_hki', _plugin_name.'_hki');
+define('_pages_pajak', _plugin_name.'_pajak');
 
 //session
 define('SESSION_ID', 'legal101_user_id');
@@ -44,8 +49,6 @@ define('PERIZINAN_DONE', 2);
 * Front-End Page Handler
 */
 function is_legal101_authorize(){
-	global $sekolahku_pages;
-
 	if ( ! session_id() ) {
         session_start();
     }
@@ -60,8 +63,6 @@ function is_legal101_authorize(){
 }
 
 function is_legal101_guest(){
-	global $sekolahku_pages;
-
 	if ( ! session_id() ) {
         session_start();
     }
@@ -84,6 +85,9 @@ function legal101_front_page_redirect_handler(){
 	$pages_dir = array(
 		_pages_login => __DIR__ . '/pages/front/login.php',
 		_pages_home => __DIR__ . '/pages/front/home.php',
+		_pages_perizinan => __DIR__ . '/pages/front/perizinan.php',
+		_pages_hki => __DIR__ . '/pages/front/hki.php',
+		_pages_pajak => __DIR__ . '/pages/front/pajak.php',
 	);
 
 	if (is_page()) {
@@ -102,6 +106,30 @@ function legal101_front_page_redirect_handler(){
 		
 			//render page
 			$page =  $pages_dir[_pages_home];
+		}
+		else if($post->post_name == _pages_perizinan){
+			is_legal101_authorize();
+
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_pages_perizinan];
+		}
+		else if($post->post_name == _pages_hki){
+			is_legal101_authorize();
+
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_pages_hki];
+		}
+		else if($post->post_name == _pages_pajak){
+			is_legal101_authorize();
+
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_pages_pajak];
 		}
 	}
 
@@ -277,6 +305,81 @@ function legal101_activated() {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
     }
+
+	create_legal101_front_pages();
+}
+
+
+function create_legal101_front_pages(){
+    global $wpdb;
+
+	/* CREATE FRONT END PAGE POST */
+	$login_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._pages_login.'"');
+	if($login_page == null){
+		$login_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Legal101 - Masuk',
+			'post_name' => '"'._pages_login.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$home_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._pages_home.'"');
+	if($home_page == null){
+		$home_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Legal101 - Beranda',
+			'post_name' => '"'._pages_home.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$perizinan_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._pages_perizinan.'"');
+	if($perizinan_page == null){
+		$perizinan_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Legal101 - Perizinan',
+			'post_name' => '"'._pages_perizinan.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$hki_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._pages_hki.'"');
+	if($hki_page == null){
+		$hki_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Legal101 - HKI',
+			'post_name' => '"'._pages_hki.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$pajak_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._pages_pajak.'"');
+	if($pajak_page == null){
+		$pajak_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Legal101 - Pajak',
+			'post_name' => '"'._pages_pajak.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	/* CREATE FRONT END PAGE POST */
 }
 
 register_activation_hook( __FILE__, 'legal101_activated' );
@@ -294,16 +397,16 @@ add_action("admin_enqueue_scripts", 'legal101_addScripts');
 
 /* add Style */
 function legal101_addStyle(){
-	wp_enqueue_style("sekolahku-style-daterangepicker", plugins_url("/assets/css/daterangepicker.css", __FILE__));
-	wp_enqueue_style("sekolahku-style", plugins_url("/assets/css/style.css", __FILE__));
+	wp_enqueue_style("legal101-style-daterangepicker", plugins_url("/assets/css/daterangepicker.css", __FILE__));
+	wp_enqueue_style("legal101-style", plugins_url("/assets/css/style.css", __FILE__));
 }
 
 /* add Scripts */
 function legal101_addScripts(){
-	wp_enqueue_script("sekolahku-script-jquery", plugins_url("/assets/js/jquery-3.6.0.min.js", __FILE__), array("jquery"));
-	wp_enqueue_script("sekolahku-script-moment", plugins_url("/assets/js/moment.min.js", __FILE__), array("jquery"));
-	wp_enqueue_script("sekolahku-script-daterangepicker", plugins_url("/assets/js/daterangepicker.min.js", __FILE__));
-	wp_enqueue_script("sekolahku-script", plugins_url("/assets/js/app.js", __FILE__), array("jquery"));
+	wp_enqueue_script("legal101-script-jquery", plugins_url("/assets/js/jquery-3.6.0.min.js", __FILE__), array("jquery"));
+	wp_enqueue_script("legal101-script-moment", plugins_url("/assets/js/moment.min.js", __FILE__), array("jquery"));
+	wp_enqueue_script("legal101-script-daterangepicker", plugins_url("/assets/js/daterangepicker.min.js", __FILE__));
+	wp_enqueue_script("legal101-script", plugins_url("/assets/js/app.js", __FILE__), array("jquery"));
 }
 
 /* Add Assets */
@@ -318,10 +421,10 @@ add_action("admin_menu", 'add_legal101_plugin_cms_menu');
 
 //init function
 function add_legal101_plugin_cms_menu(){
-    add_menu_page("Legal 101", "Legal 101", "manage_options", "legal101", "legal101u_page", "dashicons-welcome-learn-more", 6);
+    add_menu_page("Legal 101", "Legal 101", "manage_options", "legal101", "legal101_page", "dashicons-welcome-learn-more", 6);
 
     /* Users */
-    add_submenu_page("legal101", "Users", "Users", "manage_options", "users", "users_page");
+    add_submenu_page("legal101", "Perusahaan", "Perusahaan", "manage_options", "users", "users_page");
 
 	/* Perizinan */
     add_submenu_page(null, "Perizinan", "Perizinan", "manage_options", "perizinan", "perizinan_page");
@@ -346,6 +449,9 @@ function add_legal101_plugin_cms_menu(){
  * create administrator menu 
  */
 
+function legal101_page(){
+    include_once( __DIR__ . '/pages/cms/dashboard.php' );
+}
 
 function users_page(){
     include_once( __DIR__ . '/pages/cms/users.php' );

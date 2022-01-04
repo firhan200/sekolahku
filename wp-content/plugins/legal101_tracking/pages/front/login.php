@@ -1,6 +1,5 @@
 <?php
-$my_plugin = plugin_dir_url('').'sekolahku';
-$register_link = get_site_url().'/sekolahku-daftar';
+$my_plugin = plugin_dir_url('')._plugin_name;
 ?>
 
 <div class="container mt-5 mb-5">
@@ -24,10 +23,10 @@ $register_link = get_site_url().'/sekolahku-daftar';
                     </div>
                 </div>
             </div>
-            <form id="sekolahku_login_form" method="post">
+            <form id="legal101_login_form" method="post">
                 <div class="input-group mb-4">
                     <span class="input-group-text" id="basic-addon1"><i class="fa fa-envelope"></i></span>
-                    <input type="email" name="email_address" class="form-control" placeholder="Alamat Email" aria-label="Alamat Email" aria-describedby="basic-addon1" required>
+                    <input type="email" autocomplete="off" name="email_address" class="form-control" placeholder="Alamat Email" aria-label="Alamat Email" aria-describedby="basic-addon1" required>
                 </div>
                 <div class="input-group mb-4">
                     <span class="input-group-text" id="basic-addon1"><i class="fa fa-lock"></i></span>

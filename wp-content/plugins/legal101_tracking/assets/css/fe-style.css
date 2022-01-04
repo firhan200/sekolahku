@@ -72,75 +72,16 @@ Default Color: #6C63FF
     font-size:8pt !important;
 }
 
-.setting-list{
-    list-style: none;
-    padding:0;
+.info-detail{
+    margin-bottom:20px;
 }
 
-.setting-list > li > a{
-    padding:10px;
-    color:#1c1c1c;
-    text-decoration: none;
-    border: 1px solid #ced4da;
-    display: block;
-    border-radius: 10px;
+.info-detail label{
+    font-weight:bold;
 }
 
-.setting-list > li > a:hover{
-    background-color: #fafafa;
-}
-
-.labl {
-    display : block;
-    width:100%;
-}
-.labl-explain {
-    display : inline-block;
-    width:100%;
-    padding-left:25px;
-}
-.labl > input{ /* HIDE RADIO */
-    visibility: hidden; /* Makes input not-clickable */
-    position: absolute; /* Remove input from document flow */
-}
-.labl > input + div{ /* DIV STYLES */
-    cursor:pointer;
-    border:2px solid transparent;
-    border:1px solid #ced4da;
-    padding:10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-.labl > input:checked + div{ /* (RADIO CHECKED) DIV STYLES */
-    border: 1px solid #6C63FF;
-    background-color: #dfddff;
-    font-weight: bold;
-}
-
-.correct{
-    position: absolute;
-    margin-top:15px;
-}
-
-.quiz_timer{
-    font-size: 14pt;
-}
-
-.quiz_timer_container{
-    margin-top:30px;
-}
-
-.quiz_timer > .digits{
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    padding:5px 10px;
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-.quiz_header{
-    background-color: #fff;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    padding-bottom: 20px;
+.main-container{
+    margin-top:100px;
 }
 
 /* Large desktops and laptops */

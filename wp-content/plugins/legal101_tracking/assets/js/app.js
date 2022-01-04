@@ -13,7 +13,7 @@ $(document).ready(function(){
         icon.removeClass();
 
         //check type
-        if(isVisible){
+        if(!isVisible){
             newType = 'password';
             newText = 'Tampilkan';
 
