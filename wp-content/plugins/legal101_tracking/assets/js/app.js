@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    $('.multiple_select2').select2();
+    //$('.multiple_select2').select2();
 
     $(".btn-password-show").click(function(){
         var input = $(this).parents('.wp-pwd').find('input');
@@ -13,7 +13,7 @@ $(document).ready(function(){
         icon.removeClass();
 
         //check type
-        if(!isVisible){
+        if(isVisible){
             newType = 'password';
             newText = 'Tampilkan';
 

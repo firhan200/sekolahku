@@ -39,8 +39,7 @@ if(count($errors) < 1){
     $action_label .= " (<a href='".admin_url('/admin.php?page=users&action_type=edit&id='.$user->id)."'>".$user->company_name."</a>)";
 }
 if($action_type != null){
-    $bulan_pajak = date('m');
-    $tahun_pajak = date('Y');
+    $tahun = date('Y');
     $attachment_id = null;
     $status = PERIZINAN_PENDING;
 
@@ -55,8 +54,7 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
-            $bulan_pajak = $data->bulan_pajak;
-            $tahun_pajak = $data->tahun_pajak;
+            $tahun = $data->tahun;
             $attachment_id = $data->attachment_id;
             $status = $data->status;
         }else{
@@ -94,12 +92,8 @@ if(count($errors) < 1){
         $status = $_POST['status'];
 
         //validation
-        if(empty($bulan_pajak)){
+        if(empty($tahun)){
             $errors[] = '<b>Bulan</b> Tidak Boleh Kosong';
-        }
-
-        if(empty($tahun_pajak)){
-            $errors[] = '<b>Tahun</b> Tidak Boleh Kosong';
         }
 
         if(count($errors) == 0){
@@ -406,7 +400,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <select name="tahun" required>
                         <?php
                         for($year = 1960; $year <= 2030; $year++){
-                            $isSelected = $tahun_pajak == $year ? 'selected' : '';
+                            $isSelected = $tahun == $year ? 'selected' : '';
                             echo '<option value="'.$year.'" '.$isSelected.'>'.$year.'</option>';
                         }
                         ?>
