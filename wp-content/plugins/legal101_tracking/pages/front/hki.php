@@ -10,7 +10,7 @@ $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." 
 <div class="container main-container">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center mb-3">Project Status HKI</h2>
+            <h2 class="text-center mb-3 section-heading">Project Status HKI</h2>
             <table class="table table-hover table-bordered mb-3">
                 <thead>
                     <tr>

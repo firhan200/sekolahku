@@ -1,6 +1,31 @@
 /*
 Default Color: #6C63FF
 */
+body{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.navbar{
+    height:70px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    background-color: #fff;
+}
+
+.nav-item{
+    margin-right:20px;
+    font-size:11pt;
+}
+
+.nav-item > .active{
+    color:#25b15f !important;
+}
+
+.section-heading{
+    font-size:48px;
+    font-weight:bold;
+    margin-top:20px;
+    margin-bottom:40px !important;
+}
 
 .form-control{
     height:45px;

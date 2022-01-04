@@ -9,7 +9,7 @@ $list_perizinan = $wpdb->get_results("SELECT p.*, u.company_name AS company_name
 <div class="container main-container">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center mb-3">Project Status Perizinan</h2>
+            <h2 class="text-center mb-3 section-heading">Project Status Perizinan</h2>
             <table class="table table-hover table-bordered mb-3">
                 <thead>
                     <tr>

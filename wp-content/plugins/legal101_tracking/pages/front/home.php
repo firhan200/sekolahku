@@ -9,7 +9,7 @@ $profil = $wpdb->get_row("SELECT * FROM "._tbl_users." WHERE id = '".$_SESSION[S
 <div class="container main-container">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center">Profil</h2>
+            <h1 class="text-center section-heading">Profil</h1>
             <div class="row mt-5">
                 <div class="col-md-6">
                     <div class="row info-detail">

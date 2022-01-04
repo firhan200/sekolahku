@@ -11,8 +11,8 @@ $my_plugin = plugin_dir_url('').'/'._plugin_name;
         ?>
         <!-- logged in footer -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Legal101 Tracking System</a>
+            <div class="container bg-light">
+                <a class="navbar-brand" href="#"><b style="font-weight:700">LEGAL 101</b> <i>Tracking System</i></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>

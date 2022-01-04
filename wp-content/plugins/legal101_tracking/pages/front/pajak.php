@@ -1,6 +1,6 @@
 <?php
 global $wpdb;
-$menu_faktur = true;
+$menu_pajak = true;
 
 //get profile
 $list_faktur = $wpdb->get_results("SELECT * FROM "._tbl_faktur." WHERE user_id = '".$_SESSION[SESSION_ID]."'");
@@ -56,7 +56,7 @@ function intToMonth($int){
 <div class="container main-container">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center mb-3">Perpajakan</h2>
+            <h2 class="text-center mb-3 section-heading">Perpajakan</h2>
             <table class="table table-hover table-bordered mb-3">
                 <thead>
                     <tr>
