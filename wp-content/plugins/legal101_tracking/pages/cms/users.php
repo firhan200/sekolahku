@@ -179,6 +179,7 @@ if(count($errors) < 1){
                 );
 
                 $object_id = $wpdb->insert_id;
+                $id = $object_id;
             }else if($is_edit){
                 $object_id = $id;
 
@@ -217,6 +218,7 @@ if(count($errors) < 1){
 
             //show list
             $is_list = false;
+            $is_edit = true;
 
             echo "<script>window.history.pushState('page2', 'Title', '".$edit_url.$object_id."');</script>";
         }
