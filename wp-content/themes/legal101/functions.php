@@ -33,6 +33,8 @@ function special_nav_class ($classes, $item) {
 function legal101_register_styles(){
     wp_enqueue_style('legal101-style', get_template_directory_uri() . '/style.css', array(), '1.0', 'all');
     wp_enqueue_style('legal101-bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css', array(), '5.1.3', 'all');
+
+    wp_enqueue_script('legal101-jquery', 'https://code.jquery.com/jquery-3.6.0.min.js');
 }
 
 add_action('wp_enqueue_scripts', 'legal101_register_styles');
