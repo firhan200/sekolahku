@@ -21,6 +21,7 @@ global $wpdb;
 define('_plugin_name', 'legal101_tracking');
 //tables
 define('_tbl_users', $wpdb->prefix._plugin_name.'_users');
+define('_tbl_administrators', $wpdb->prefix._plugin_name.'_administrators');
 define('_tbl_perizinan', $wpdb->prefix._plugin_name.'_perizinan');
 define('_tbl_hki', $wpdb->prefix._plugin_name.'_hki');
 define('_tbl_hki_documents', $wpdb->prefix._plugin_name.'_hki_documents');
@@ -159,6 +160,7 @@ function legal101_activated() {
 	$tbl_faktur = _tbl_faktur; 
 	$tbl_ppn = _tbl_ppn; 
 	$tbl_spt_tahunan = _tbl_spt_tahunan; 
+	$tbl_administrators = _tbl_administrators; 
 
     //check if table exists
 	if($wpdb->get_var("SHOW TABLES LIKE '$tbl_users'") != $tbl_users) {
@@ -166,6 +168,7 @@ function legal101_activated() {
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql = "CREATE TABLE $tbl_users (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		administrator_id mediumint(9) NULL,
 		company_name varchar(255) NOT NULL,
 		email_address varchar(255) NOT NULL,
 		password varchar(100) NOT NULL,
@@ -179,6 +182,25 @@ function legal101_activated() {
 		identity_number varchar(150) NULL,
 		website varchar(150) NULL,
 		npwp varchar(150) NULL,
+		is_active smallint(1) DEFAULT 1 NOT NULL,
+		created_on timestamp DEFAULT current_timestamp,
+		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+		PRIMARY KEY  (id)
+		) $charset_collate;";
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+    }
+
+	//check if table exists
+	if($wpdb->get_var("SHOW TABLES LIKE '$tbl_administrators'") != $tbl_administrators) {
+        //table not in database. Create new table
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql = "CREATE TABLE $tbl_administrators (
+		id mediumint(9) NOT NULL AUTO_INCREMENT,
+		full_name varchar(255) NOT NULL,
+		email_address varchar(255) NOT NULL,
+		password varchar(100) NOT NULL,
 		is_active smallint(1) DEFAULT 1 NOT NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
@@ -426,6 +448,9 @@ function add_legal101_plugin_cms_menu(){
     /* Users */
     add_submenu_page("legal101", "Perusahaan", "Perusahaan", "manage_options", "users", "users_page");
 
+	/* Admin */
+    add_submenu_page("legal101", "Administrators", "Administrators", "manage_options", "administrators", "administrators_page");
+
 	/* Perizinan */
     add_submenu_page(null, "Perizinan", "Perizinan", "manage_options", "perizinan", "perizinan_page");
 
@@ -451,6 +476,10 @@ function add_legal101_plugin_cms_menu(){
 
 function legal101_page(){
     include_once( __DIR__ . '/pages/cms/dashboard.php' );
+}
+
+function administrators_page(){
+    include_once( __DIR__ . '/pages/cms/administrators.php' );
 }
 
 function users_page(){

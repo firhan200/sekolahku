@@ -1,6 +1,6 @@
 <?php
 global $wpdb;
-$table_name = _tbl_users;
+$table_name = _tbl_administrators;
 
 //var
 $is_add = false;
@@ -24,20 +24,9 @@ if($_POST['action_type_val'] != null){
 //set label
 $action_label = get_admin_page_title();
 if($action_type != null){
-    $administrator_id = null;
     $email_address = '';
     $password = null;
-    $company_name = '';
-    $pic_name = '';
-    $company_address = '';
-    $phone = '';
-    $fax = '';
-    $company_npwp = '';
-    $main_director = '';
-    $nib = '';
-    $identity_number = '';
-    $website = '';
-    $npwp = '';
+    $full_name = '';
     $is_active = 1;
 
     if($action_type == 'add'){
@@ -51,19 +40,8 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
-            $administrator_id = $data->administrator_id;
             $email_address = $data->email_address;
-            $company_name = $data->company_name;
-            $pic_name = $data->pic_name;
-            $company_address = $data->company_address;
-            $phone = $data->phone;
-            $fax = $data->fax;
-            $company_npwp = $data->company_npwp;
-            $main_director = $data->main_director;
-            $nib = $data->nib;
-            $identity_number = $data->identity_number;
-            $website = $data->website;
-            $npwp = $data->npwp;
+            $full_name = $data->full_name;
             $is_active = $data->is_active;
         }else{
             $errors[] = 'Data tidak ditemukan';
@@ -85,13 +63,8 @@ if($action_type != null){
 }
 
 //get urls
-$modul_name = 'users';
+$modul_name = 'administrators';
 $list_url = admin_url('/admin.php?page='.$modul_name);
-$perizinan_url = admin_url('/admin.php?page=perizinan&user_id=');
-$hki_url = admin_url('/admin.php?page=hki&user_id=');
-$faktur_url = admin_url('/admin.php?page=faktur&user_id=');
-$ppn_url = admin_url('/admin.php?page=ppn&user_id=');
-$spt_url = admin_url('/admin.php?page=spt&user_id=');
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -99,25 +72,14 @@ $delete_url = $list_url.'&action_type=delete&id=';
 //check if submit
 if(count($errors) < 1){
     if($_POST['submit']){
-        $administrator_id = $_POST['administrator_id'];
-        $company_name = $_POST['company_name'];
+        $full_name = $_POST['full_name'];
         $email_address = $_POST['email_address'];
         $password = $_POST['password'];
-        $pic_name = $_POST['pic_name'];
-        $company_address = $_POST['company_address'];
-        $phone = $_POST['phone'];
-        $fax = $_POST['fax'];
-        $company_npwp = $_POST['company_npwp'];
-        $main_director = $_POST['main_director'];
-        $nib = $_POST['nib'];
-        $identity_number = $_POST['identity_number'];
-        $website = $_POST['website'];
-        $npwp = $_POST['npwp'];
         $is_active = $_POST['is_active'] == 'on' ? 1 : 0;
 
         //validation
-        if(empty($company_name)){
-            $errors[] = '<b>Nama Perusahaan</b> Tidak Boleh Kosong';
+        if(empty($full_name)){
+            $errors[] = '<b>Nama</b> Tidak Boleh Kosong';
         }
 
         if(empty($email_address)){
@@ -148,24 +110,12 @@ if(count($errors) < 1){
                 $wpdb->insert(
                     $table_name,
                     array(
-                        'administrator_id' => $administrator_id,
-                        'company_name' => $company_name,
+                        'full_name' => $full_name,
                         'email_address' => $email_address,
                         'password' => $encrypted_password,
-                        'pic_name' => $pic_name,
-                        'company_address' => $company_address,
-                        'phone' => $phone,
-                        'fax' => $fax,
-                        'company_npwp' => $company_npwp,
-                        'main_director' => $main_director,
-                        'nib' => $nib,
-                        'identity_number' => $identity_number,
-                        'website' => $website,
-                        'npwp' => $npwp,
                         'is_active' => $is_active
                     ),
                     array(
-                        '%d',
                         '%s',
                         '%s',
                         '%s',
@@ -189,19 +139,8 @@ if(count($errors) < 1){
                 $object_id = $id;
 
                 $updatedArr = array(
-                    'administrator_id' => $administrator_id,
-                    'company_name' => $company_name,
+                    'full_name' => $full_name,
                     'email_address' => $email_address,
-                    'pic_name' => $pic_name,
-                    'company_address' => $company_address,
-                    'phone' => $phone,
-                    'fax' => $fax,
-                    'company_npwp' => $company_npwp,
-                    'main_director' => $main_director,
-                    'nib' => $nib,
-                    'identity_number' => $identity_number,
-                    'website' => $website,
-                    'npwp' => $npwp,
                     'is_active' => $is_active
                 );
 
@@ -307,13 +246,13 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT u.*, (SELECT COUNT(*) FROM "._tbl_perizinan." WHERE user_id=u.id) AS total_perizinan, (SELECT COUNT(*) FROM "._tbl_hki." WHERE user_id=u.id) AS total_hki, (SELECT COUNT(*) FROM "._tbl_faktur." WHERE user_id=u.id) AS total_faktur, (SELECT COUNT(*) FROM "._tbl_ppn." WHERE user_id=u.id) AS total_ppn, (SELECT COUNT(*) FROM "._tbl_spt_tahunan." WHERE user_id=u.id) AS total_spt FROM ".$table_name." AS u";
+$query = "SELECT u.* FROM ".$table_name." AS u";
 $keyword = '';
 
 //filter
 if($_POST['keyword']){
     $keyword = $_POST['keyword'];
-    $query .= " WHERE u.company_name LIKE '%".$keyword."%'";
+    $query .= " WHERE u.full_name LIKE '%".$keyword."%'";
 }
 
 //order by query
@@ -381,32 +320,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Nama Perusahaan</span>
+                        <span>Nama</span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Total Perizinan</span>
-                    </a>
-                </th>
-                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total HKI</span>
-                    </a>
-                </th>
-                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total Faktur</span>
-                    </a>
-                </th>
-                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total PPN</span>
-                    </a>
-                </th>
-                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total SPT Tahunan</span>
+                        <span>Email</span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
@@ -421,50 +340,20 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tr id="post-<?php echo $key+1; ?>" class="type-post">
                 <th scope="row" class="check-column">
                     <label class="screen-reader-text" for="cb-select-1">
-                        Pilih <?php echo $data->name; ?>
+                        Pilih <?php echo $data->full_name; ?>
                     </label>
                     <input id="cb-select-1" type="checkbox" name="post[]" value="<?php echo $data->id; ?>">
                     <div class="locked-indicator">
                         <span class="locked-indicator-icon" aria-hidden="true"></span>
                         <span class="screen-reader-text">
-                            “<?php echo $data->company_name; ?>” terkunci
+                            “<?php echo $data->full_name; ?>” terkunci
                         </span>
                     </div>
                 </th>
                 <td class="title column-title has-row-actions column-primary page-name">
-                    <?php echo $data->company_name; ?>
+                    <?php echo $data->full_name; ?>
 
                     <div class="row-actions action_container">
-                        <span class="edit">
-                            <a href="<?php echo $perizinan_url.$data->id ?>" aria-label="Edit">
-                                Perizinan
-                            </a> 
-                            | 
-                        </span>
-                        <span class="edit">
-                            <a href="<?php echo $hki_url.$data->id ?>" aria-label="Edit">
-                                HKI
-                            </a> 
-                            | 
-                        </span>
-                        <span class="edit">
-                            <a href="<?php echo $faktur_url.$data->id ?>" aria-label="Edit">
-                                Faktur
-                            </a> 
-                            | 
-                        </span>
-                        <span class="edit">
-                            <a href="<?php echo $ppn_url.$data->id ?>" aria-label="Edit">
-                                PPN
-                            </a> 
-                            | 
-                        </span>
-                        <span class="edit">
-                            <a href="<?php echo $spt_url.$data->id ?>" aria-label="Edit">
-                                SPT
-                            </a> 
-                            | 
-                        </span>
                         <span class="edit">
                             <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
                                 Edit
@@ -479,39 +368,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </td>
                 <td class="column-status" data-colname="status">
-                    <a href="<?php echo $perizinan_url.$data->id ?>" aria-label="Edit">
-                        <?php 
-                        echo $data->total_perizinan;
-                        ?>
-                    </a>
-                </td>
-                <td class="column-status" data-colname="status">
-                    <a href="<?php echo $hki_url.$data->id ?>" aria-label="Edit">
-                        <?php 
-                        echo $data->total_hki;
-                        ?>
-                    </a>
-                </td>
-                <td class="column-status" data-colname="status">
-                    <a href="<?php echo $faktur_url.$data->id ?>" aria-label="Edit">
-                        <?php 
-                        echo $data->total_faktur;
-                        ?>
-                    </a>
-                </td>
-                <td class="column-status" data-colname="status">
-                    <a href="<?php echo $ppn_url.$data->id ?>" aria-label="Edit">
-                        <?php 
-                        echo $data->total_ppn;
-                        ?>
-                    </a>
-                </td>
-                <td class="column-status" data-colname="status">
-                    <a href="<?php echo $spt_url.$data->id ?>" aria-label="Edit">
-                        <?php 
-                        echo $data->total_spt;
-                        ?>
-                    </a>
+                    <?php 
+                    echo $data->email_address;
+                    ?>
                 </td>
                 <td class="column-status" data-colname="status">
                     <?php 
@@ -533,32 +392,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Nama Perusahaan</span>
+                        <span>Nama</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
-                        <span>Total Perizinan</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total HKI</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total Faktur</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total PPN</span>
-                    </a>
-                </th>
-                <th scope="col" class="manage-column column-title column-primary sortable desc">
-                    <a href="#">
-                        <span>Total SPT Tahunan</span>
+                        <span>Email</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
@@ -576,38 +415,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
-
-$list_admin = $wpdb->get_results("SELECT * FROM "._tbl_administrators." ORDER BY full_name ASC");
-?>
-<?php
-if($is_edit){
-    //kelola dokumen
-    echo '<a href="'.$perizinan_url.$id.'" class="button button-primary">Kelola Perizinan</a>&nbsp;';
-    echo '<a href="'.$hki_url.$id.'" class="button button-primary">Kelola HKI</a>&nbsp;';
-    echo '<a href="'.$faktur_url.$id.'" class="button button-primary">Kelola Faktur</a>&nbsp;';
-    echo '<a href="'.$ppn_url.$id.'" class="button button-primary">Kelola PPN</a>&nbsp;';
-    echo '<a href="'.$spt_url.$id.'" class="button button-primary">Kelola SPT Tahunan</a>&nbsp;';
-}
 ?>
 
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
     <table class="form-table">
         <tbody>
-            <tr>
-                <th scope="row"><label for="administrator_id">Administrator</label></th>
-                <td>
-                    <select name="administrator_id">
-                        <option value="<?php echo null; ?>">Pilih Administrator</option>
-                        <?php
-                        foreach($list_admin as $admin){
-                            $isSelected = $administrator_id == $admin->id ? 'selected' : '';
-                            echo '<option value="'.$admin->id.'" '.$isSelected.'>'.$admin->full_name.'</option>';
-                        }
-                        ?>
-                    </select>
-                </td>
-            </tr>
             <tr>
                 <th scope="row"><label for="name">Email Address</label></th>
                 <td><input type="email" class="regular-text" name="email_address" value="<?php echo $email_address; ?>" maxlength="150" required></td>
@@ -630,48 +443,8 @@ if($is_edit){
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="name">Nama Perusahaan</label></th>
-                <td><input type="text" class="regular-text" name="company_name" value="<?php echo $company_name; ?>" maxlength="250" required></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Nama PIC</label></th>
-                <td><input type="text" class="regular-text" name="pic_name" value="<?php echo $pic_name; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Alamat Perusahaan</label></th>
-                <td><input type="text" class="regular-text" name="company_address" value="<?php echo $company_address; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Telephone</label></th>
-                <td><input type="text" class="regular-text" name="phone" value="<?php echo $phone; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Fax</label></th>
-                <td><input type="text" class="regular-text" name="fax" value="<?php echo $fax; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">No. NPWP Perusahaan</label></th>
-                <td><input type="text" class="regular-text" name="company_npwp" value="<?php echo $company_npwp; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Direktur Utama</label></th>
-                <td><input type="text" class="regular-text" name="main_director" value="<?php echo $main_director; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">NIB</label></th>
-                <td><input type="text" class="regular-text" name="nib" value="<?php echo $nib; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Nomor Identitas</label></th>
-                <td><input type="text" class="regular-text" name="identity_number" value="<?php echo $identity_number; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Website</label></th>
-                <td><input type="text" class="regular-text" name="website" value="<?php echo $website; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">NPWP</label></th>
-                <td><input type="text" class="regular-text" name="npwp" value="<?php echo $npwp; ?>" maxlength="150"></td>
+                <th scope="row"><label for="name">Nama</label></th>
+                <td><input type="text" class="regular-text" name="full_name" value="<?php echo $full_name; ?>" maxlength="250" required></td>
             </tr>
             <tr>
                 <th scope="row"><label for="is_active">Status</label></th>
