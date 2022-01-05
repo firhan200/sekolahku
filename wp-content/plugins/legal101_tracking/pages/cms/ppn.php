@@ -397,11 +397,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <td class="column-status" data-colname="status">
                     <?php 
                         if($data->status == PERIZINAN_PENDING){ 
-                            echo '<span class="badge bg-success">Pending</span>';
+                            echo '<span class="badge bg-secondary">Pending</span>';
                         }else if($data->status == PERIZINAN_ON_PROGRESS){
-                            echo '<span class="badge bg-danger">On-Progress</span>';
+                            echo '<span class="badge bg-warning">On-Progress</span>';
                         }else if($data->status == PERIZINAN_DONE){
-                            echo '<span class="badge bg-danger">Done</span>';
+                            echo '<span class="badge bg-success">Done</span>';
                         }else if($data->status == PERIZINAN_CANCELLED){
                             echo '<span class="badge bg-danger">Cancelled</span>';
                         }
