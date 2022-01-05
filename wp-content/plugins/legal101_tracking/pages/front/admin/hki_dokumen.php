@@ -1,13 +1,12 @@
 <div class="container main-container">
 
 <?php
-$menu_perizinan = true;
+$menu_hki = true;
 $menu_client = true;
-$selected_user_id = $_GET['user_id'];
 
 global $wpdb;
-$table_users_name = _tbl_users;
-$table_name = _tbl_perizinan;
+$table_hki_name = _tbl_hki;
+$table_name = _tbl_hki_documents;
 
 //var
 $is_add = false;
@@ -19,15 +18,17 @@ $success = [];
 $errors = [];
 
 //get parent id
-$parent_id = $_GET['user_id'];
+$parent_id = $_GET['hki_id'];
 if($parent_id == null){
-    $errors[] = 'User tidak ditemukan';
+    $errors[] = 'HKI tidak ditemukan';
 }else{
-    $user = $wpdb->get_row("SELECT * FROM $table_users_name WHERE id = $parent_id");
-    if($user == null){
-        $errors[] = 'User tidak ditemukan';
+    $hki = $wpdb->get_row("SELECT * FROM $table_hki_name WHERE id = $parent_id");
+    if($hki == null){
+        $errors[] = 'HKI tidak ditemukan';
     }
 }
+
+$selected_user_id = $hki->user_id;
 
 //get page to show
 $action_type = $_GET['action_type'];
@@ -40,15 +41,12 @@ if($_POST['action_type_val'] != null){
 }
 
 //set label
-$action_label = "Perizinan";
+$action_label = "Dokumen HKI";
 if(count($errors) < 1){
-    $action_label .= " (<a href='".site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id."'>".$user->company_name."</a>)";
+    $action_label .= " (<a href='".site_url('/')._admin_pages_home.'?action_type=edit&id='.$hki->user_id."'>".$hki->pemohon.'</a>: <a href="'.site_url('/')._admin_pages_hki.'?user_id='.$hki->user_id.'">'.$hki->pekerjaan."</a>)";
 }
 if($action_type != null){
-    $description = '';
-    $progress_message = '';
-    $target_date = null;
-    $status = PERIZINAN_PENDING;
+    $attachment_id = null;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -61,10 +59,7 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
-            $description = $data->description;
-            $progress_message = $data->progress_message;
-            $target_date = $data->target_date;
-            $status = $data->status;
+            $attachment_id = $data->attachment_id;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -85,8 +80,8 @@ if($action_type != null){
 }
 
 //get urls
-$modul_name = 'perizinan';
-$list_url = $list_url = site_url('/')._admin_pages_perizinan.'?user_id='.$user->id;
+$modul_name = 'hki_dokumen';
+$list_url = site_url('/')._admin_pages_hki_dokumen.'?hki_id='.$hki->id;
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -94,16 +89,8 @@ $delete_url = $list_url.'&action_type=delete&id=';
 //check if submit
 if(count($errors) < 1){
     if($_POST['submit']){
-        $user_id = $_POST['user_id'];
-        $description = $_POST['description'];
-        $progress_message = $_POST['progress_message'];
-        $target_date = $_POST['target_date'];
-        $status = $_POST['status'];
-
-        //validation
-        if(empty($description)){
-            $errors[] = '<b>Deskripsi</b> Tidak Boleh Kosong';
-        }
+        $hki_id = $_POST['hki_id'];
+        $attachment_id = $_POST['custom_attachment_id'];
 
         if(count($errors) == 0){
             //all input valid
@@ -114,18 +101,12 @@ if(count($errors) < 1){
                 $wpdb->insert(
                     $table_name,
                     array(
-                        'user_id' => $user_id,
-                        'description' => $description,
-                        'progress_message' => $progress_message,
-                        'target_date' => $target_date,
-                        'status' => $status
+                        'hki_id' => $hki_id,
+                        'attachment_id' => $attachment_id,
                     ),
                     array(
                         '%d',
-                        '%s',
-                        '%s',
-                        '%s',
-                        '%d',
+                        '%d'
                     )
                 );
 
@@ -137,10 +118,7 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
-                        'description' => $description,
-                        'progress_message' => $progress_message,
-                        'target_date' => $target_date,
-                        'status' => $status
+                        'attachment_id' => $attachment_id,
                     ),
                     array('id' => $id)
                 );
@@ -228,7 +206,7 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT * FROM ".$table_name.' WHERE user_id='.$user->id;
+$query = "SELECT * FROM ".$table_name.' WHERE hki_id='.$hki->id;
 $keyword = '';
 
 //filter
@@ -281,13 +259,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <thead>
                 <tr>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                            <span>Deskripsi</span>
-                    </th>
-                    <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                            <span>Target Date</span>
+                            <span>Link</span>
                     </th>
                     <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                            <span>Status</span>
+                            <span>Tanggal</span>
                     </th>
                 </tr>
             </thead>
@@ -295,7 +270,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <?php foreach($list_of_data as $key => $data){ ?>
                 <tr id="post-<?php echo $key+1; ?>" class="type-post">
                     <td class="title column-title has-row-actions column-primary page-name">
-                        <?php echo $data->description; ?>
+                        <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
 
                         <div class="row-actions action_container">
                             <span class="edit">
@@ -313,20 +288,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </td>
                     <td class="column-target-date" data-colname="target_date">
                         <?php 
-                            echo date('d M Y', strtotime($data->target_date));
-                        ?>
-                    </td>
-                    <td class="column-status" data-colname="status">
-                        <?php 
-                            if($data->status == PERIZINAN_PENDING){ 
-                                echo '<span class="badge bg-success">Pending</span>';
-                            }else if($data->status == PERIZINAN_ON_PROGRESS){
-                                echo '<span class="badge bg-danger">On-Progress</span>';
-                            }else if($data->status == PERIZINAN_DONE){
-                                echo '<span class="badge bg-danger">Done</span>';
-                            }else if($data->status == PERIZINAN_CANCELLED){
-                                echo '<span class="badge bg-danger">Cancelled</span>';
-                            }
+                            echo date('d M Y', strtotime($data->created_on));
                         ?>
                     </td>
                 </tr>
@@ -335,13 +297,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tfoot>
                 <tr>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Deskripsi</span>
+                            <span>Link</span>
                     </th>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Target Date</span>
-                    </th>
-                    <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Status</span>
+                            <span>Tanggal</span>
                     </th>
                 </tr>
             </tfoot>
@@ -354,35 +313,26 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
+    wp_enqueue_media();
 ?>
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
-    <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
+    <input type="hidden" name="hki_id" value="<?php echo $hki->id; ?>"/>
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="name">Deskripsi</label></th>
-                <td><textarea rows="5" cols="100" name="description" maxlength="250"><?php echo $description; ?></textarea></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Progress Message</label></th>
-                <td><textarea rows="5" cols="100" name="progress_message" maxlength="250"><?php echo $progress_message; ?></textarea></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Status</label></th>
+                <th scope="row"><label for="name">File</label></th>
                 <td>
-                    <select name="status" required>
-                        <option value="">-- Pilih Status --</option>
-                        <option value="<?php echo PERIZINAN_PENDING ?>" <?php echo $status == PERIZINAN_PENDING ? 'selected' : '' ?>><?php echo 'Pending'; ?></option>
-                        <option value="<?php echo PERIZINAN_ON_PROGRESS ?>" <?php echo $status == PERIZINAN_ON_PROGRESS ? 'selected' : '' ?>><?php echo 'On-Progress'; ?></option>
-                        <option value="<?php echo PERIZINAN_DONE ?>" <?php echo $status == PERIZINAN_DONE ? 'selected' : '' ?>><?php echo 'Done'; ?></option>
-                        <option value="<?php echo PERIZINAN_CANCELLED ?>" <?php echo $status == PERIZINAN_CANCELLED ? 'selected' : '' ?>><?php echo 'Cancelled'; ?></option>
-                    </select>
+                    <div id='link-preview'>
+                        <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                        <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
+                        <br/>
+                        <br/>
+                        <?php } ?>
+                    </div>
+                    <input type='hidden' name='custom_attachment_id' id='attachment_id' value='<?php echo $attachment_id == null ? get_option( 'media_selector_attachment_id' ) : $attachment_id; ?>'>
+                    <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Browse File' ); ?>" />
                 </td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Target Date</label></th>
-                <td><input type="text" class="regular-text custom_date" name="target_date" value="<?php echo $target_date; ?>" maxlength="50"></td>
             </tr>
             <tr>
                 <td>
@@ -392,6 +342,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <button type="submit" class="button button-primary">Submit</button>
                 </td>
             </tr>
+           
         </tbody>
     </table>
 </form>
@@ -401,3 +352,57 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 
 </div>
 </div>
+
+<?php
+$my_saved_attachment_post_id = get_option( 'media_selector_attachment_id', 0 );
+?>
+<script type="text/javascript" src="<?php echo $my_plugin ?>/assets/js/jquery-3.6.0.min.js"></script>
+<script type='text/javascript'>
+    $( document ).ready( function( $ ) {
+        // Uploading files
+        var file_frame;
+        var wp_media_post_id = wp.media.model.settings.post.id; // Store the old id
+        var set_to_post_id = <?php echo $my_saved_attachment_post_id; ?>; // Set this
+        $('#upload_image_button').on('click', function( event ){
+            event.preventDefault();
+            // If the media frame already exists, reopen it.
+            if ( file_frame ) {
+                // Set the post ID to what we want
+                file_frame.uploader.uploader.param( 'post_id', set_to_post_id );
+                // Open frame
+                file_frame.open();
+                return;
+            } else {
+                // Set the wp.media post id so the uploader grabs the ID we want when initialised
+                wp.media.model.settings.post.id = set_to_post_id;
+            }
+            // Create the media frame.
+            file_frame = wp.media.frames.file_frame = wp.media({
+                title: 'Select a image to upload',
+                button: {
+                    text: 'Use this image',
+                },
+                multiple: false // Set to true to allow multiple files to be selected
+            });
+            // When an image is selected, run a callback.
+            file_frame.on( 'select', function() {
+                // We set multiple to false so only get one image from the uploader
+                attachment = file_frame.state().get('selection').first().toJSON();
+
+                // Do something with attachment.id and/or attachment.url here
+                //$( '#image-preview' ).attr( 'src', attachment.url ).css( 'width', 'auto' );
+                $( '#attachment_id' ).val( attachment.id );
+
+                $('#link-preview').html('<a href="'+attachment.url+'" target="_blank">'+attachment.url+'</a><br/><br/>');
+                // Restore the main post ID
+                wp.media.model.settings.post.id = wp_media_post_id;
+            });
+                // Finally, open the modal
+                file_frame.open();
+        });
+        // Restore the main ID when the add media button is pressed
+        $( 'a.add_media' ).on( 'click', function() {
+            wp.media.model.settings.post.id = wp_media_post_id;
+        });
+    });
+</script>

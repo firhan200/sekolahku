@@ -161,4 +161,19 @@ $(document).ready(function(){
         text.text(newText);
         icon.addClass(newIcon);
     });
+
+    $('.custom_daterange').daterangepicker({
+        timePicker: true,
+        timePicker24Hour: true,
+        locale: {
+            format: 'DD/MM/YYYY, HH:mm'
+        }
+    });
+
+    $('.custom_date').daterangepicker({
+        singleDatePicker: true,
+        locale: {
+            format: 'YYYY-MM-DD'
+        }
+    });
 })

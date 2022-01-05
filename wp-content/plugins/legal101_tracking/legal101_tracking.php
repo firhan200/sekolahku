@@ -41,7 +41,10 @@ define('_admin_pages_login', 'admin_'._plugin_name.'_login');
 define('_admin_pages_home', 'admin_'._plugin_name.'_home');
 define('_admin_pages_perizinan', 'admin_'._plugin_name.'_perizinan');
 define('_admin_pages_hki', 'admin_'._plugin_name.'_hki');
-define('_admin_pages_pajak', 'admin_'._plugin_name.'_pajak');
+define('_admin_pages_hki_dokumen', 'admin_'._plugin_name.'_hki_dokumen');
+define('_admin_pages_faktur', 'admin_'._plugin_name.'_faktur');
+define('_admin_pages_ppn', 'admin_'._plugin_name.'_ppn');
+define('_admin_pages_spt', 'admin_'._plugin_name.'_spt');
 
 //session
 define('SESSION_ID', 'legal101_user_id');
@@ -132,6 +135,10 @@ function legal101_front_page_redirect_handler(){
 		_admin_pages_home => __DIR__ . '/pages/front/admin/client.php',
 		_admin_pages_perizinan => __DIR__ . '/pages/front/admin/perizinan.php',
 		_admin_pages_hki => __DIR__ . '/pages/front/admin/hki.php',
+		_admin_pages_hki_dokumen => __DIR__ . '/pages/front/admin/hki_dokumen.php',
+		_admin_pages_faktur => __DIR__ . '/pages/front/admin/faktur.php',
+		_admin_pages_ppn => __DIR__ . '/pages/front/admin/ppn.php',
+		_admin_pages_spt => __DIR__ . '/pages/front/admin/spt.php',
 	);
 
 	if (is_page()) {
@@ -213,6 +220,42 @@ function legal101_front_page_redirect_handler(){
 			//render page
 			$page =  $pages_dir[_admin_pages_hki];
 		}
+		else if($post->post_name == _admin_pages_hki_dokumen){
+			is_admin_legal101_authorize();
+
+			$is_admin = true;
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_admin_pages_hki_dokumen];
+		}
+		else if($post->post_name == _admin_pages_faktur){
+			is_admin_legal101_authorize();
+
+			$is_admin = true;
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_admin_pages_faktur];
+		}
+		else if($post->post_name == _admin_pages_ppn){
+			is_admin_legal101_authorize();
+
+			$is_admin = true;
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_admin_pages_ppn];
+		}
+		else if($post->post_name == _admin_pages_spt){
+			is_admin_legal101_authorize();
+
+			$is_admin = true;
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_admin_pages_spt];
+		}
 	}
 
 	if ($is_found) {
@@ -225,6 +268,7 @@ function legal101_front_page_redirect_handler(){
 		include_once($page);
 
 		if($is_admin){	
+			include_once(__DIR__ . '/pages/front/admin/footer_original.php');
 			include_once(__DIR__ . '/pages/front/admin/footer.php');
 		}else{
 			include_once(__DIR__ . '/pages/front/footer.php');
@@ -539,6 +583,58 @@ function create_legal101_front_pages(){
 			'post_type' => 'page',
 			'post_title' => 'Admin - Legal101 - HKI',
 			'post_name' => '"'._admin_pages_hki.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$admin_hki_dokumen_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._admin_pages_hki_dokumen.'"');
+	if($admin_hki_dokumen_page == null){
+		$admin_hki_dokumen_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Admin - Legal101 - HKI Dokumen',
+			'post_name' => '"'._admin_pages_hki_dokumen.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$admin_faktur_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._admin_pages_faktur.'"');
+	if($admin_faktur_page == null){
+		$admin_faktur_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Admin - Legal101 - Faktur',
+			'post_name' => '"'._admin_pages_faktur.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$admin_ppn_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._admin_pages_ppn.'"');
+	if($admin_ppn_page == null){
+		$admin_ppn_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Admin - Legal101 - PPN',
+			'post_name' => '"'._admin_pages_ppn.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$admin_spt_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._admin_pages_spt.'"');
+	if($admin_spt_page == null){
+		$admin_spt_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Admin - Legal101 - SPT',
+			'post_name' => '"'._admin_pages_spt.'"',
 			'post_content' => '',
 			'post_status' => 'publish',
 			'comment_status' => 'closed',   // if you prefer

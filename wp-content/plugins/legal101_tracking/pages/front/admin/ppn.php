@@ -1,13 +1,13 @@
 <div class="container main-container">
 
 <?php
-$menu_perizinan = true;
+$menu_ppn = true;
 $menu_client = true;
 $selected_user_id = $_GET['user_id'];
 
 global $wpdb;
 $table_users_name = _tbl_users;
-$table_name = _tbl_perizinan;
+$table_name = _tbl_ppn;
 
 //var
 $is_add = false;
@@ -40,14 +40,14 @@ if($_POST['action_type_val'] != null){
 }
 
 //set label
-$action_label = "Perizinan";
+$action_label = "PPN";
 if(count($errors) < 1){
-    $action_label .= " (<a href='".site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id."'>".$user->company_name."</a>)";
+    $action_label .= " (<a href='".site_url('/')._admin_pages_home.'?action_type=edit&id='.$user->id."'>".$user->company_name."</a>)";
 }
 if($action_type != null){
-    $description = '';
-    $progress_message = '';
-    $target_date = null;
+    $bulan_pajak = date('m');
+    $tahun_pajak = date('Y');
+    $attachment_id = null;
     $status = PERIZINAN_PENDING;
 
     if($action_type == 'add'){
@@ -61,9 +61,9 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
-            $description = $data->description;
-            $progress_message = $data->progress_message;
-            $target_date = $data->target_date;
+            $bulan_pajak = $data->bulan_pajak;
+            $tahun_pajak = $data->tahun_pajak;
+            $attachment_id = $data->attachment_id;
             $status = $data->status;
         }else{
             $errors[] = 'Data tidak ditemukan';
@@ -85,8 +85,8 @@ if($action_type != null){
 }
 
 //get urls
-$modul_name = 'perizinan';
-$list_url = $list_url = site_url('/')._admin_pages_perizinan.'?user_id='.$user->id;
+$modul_name = 'ppn';
+$list_url = site_url('/')._admin_pages_ppn.'?user_id='.$user->id;
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -95,14 +95,18 @@ $delete_url = $list_url.'&action_type=delete&id=';
 if(count($errors) < 1){
     if($_POST['submit']){
         $user_id = $_POST['user_id'];
-        $description = $_POST['description'];
-        $progress_message = $_POST['progress_message'];
-        $target_date = $_POST['target_date'];
+        $bulan_pajak = $_POST['bulan_pajak'];
+        $tahun_pajak = $_POST['tahun_pajak'];
+        $attachment_id = $_POST['custom_attachment_id'];
         $status = $_POST['status'];
 
         //validation
-        if(empty($description)){
-            $errors[] = '<b>Deskripsi</b> Tidak Boleh Kosong';
+        if(empty($bulan_pajak)){
+            $errors[] = '<b>Bulan</b> Tidak Boleh Kosong';
+        }
+
+        if(empty($tahun_pajak)){
+            $errors[] = '<b>Tahun</b> Tidak Boleh Kosong';
         }
 
         if(count($errors) == 0){
@@ -115,9 +119,9 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'user_id' => $user_id,
-                        'description' => $description,
-                        'progress_message' => $progress_message,
-                        'target_date' => $target_date,
+                        'bulan_pajak' => $bulan_pajak,
+                        'tahun_pajak' => $tahun_pajak,
+                        'attachment_id' => $attachment_id,
                         'status' => $status
                     ),
                     array(
@@ -137,9 +141,9 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
-                        'description' => $description,
-                        'progress_message' => $progress_message,
-                        'target_date' => $target_date,
+                        'bulan_pajak' => $bulan_pajak,
+                        'tahun_pajak' => $tahun_pajak,
+                        'attachment_id' => $attachment_id,
                         'status' => $status
                     ),
                     array('id' => $id)
@@ -199,6 +203,50 @@ if(count($errors) < 1){
             echo "<script>window.history.pushState('page2', 'Title', '".$list_url."');</script>";
         }
     }
+}
+
+//extra function
+function intToMonth($int){
+    $month = null;
+    switch($int){
+        case 1:
+            $month = 'Januari';
+            break;
+        case 2:
+            $month = 'Februari';
+            break;
+        case 3:
+            $month = 'Maret';
+            break;
+        case 4:
+            $month = 'April';
+            break;
+        case 5:
+            $month = 'Mei';
+            break;
+        case 6:
+            $month = 'Juni';
+            break;
+        case 7:
+            $month = 'Juli';
+            break;
+        case 8:
+            $month = 'Agustus';
+            break;
+        case 9:
+            $month = 'September';
+            break;
+        case 10:
+            $month = 'Oktober';
+            break;
+        case 11:
+            $month = 'November';
+            break;
+        case 12:
+            $month = 'Desember';
+            break;
+    }
+    return $month;
 }
 ?>
 
@@ -281,10 +329,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <thead>
                 <tr>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                            <span>Deskripsi</span>
+                            <span>Tanggal Pajak</span>
                     </th>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                            <span>Target Date</span>
+                            <span>Link Dokumen</span>
                     </th>
                     <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                             <span>Status</span>
@@ -295,7 +343,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <?php foreach($list_of_data as $key => $data){ ?>
                 <tr id="post-<?php echo $key+1; ?>" class="type-post">
                     <td class="title column-title has-row-actions column-primary page-name">
-                        <?php echo $data->description; ?>
+                        <?php echo intToMonth($data->bulan_pajak).' '.$data->tahun_pajak; ?>
 
                         <div class="row-actions action_container">
                             <span class="edit">
@@ -312,9 +360,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         </div>
                     </td>
                     <td class="column-target-date" data-colname="target_date">
-                        <?php 
-                            echo date('d M Y', strtotime($data->target_date));
-                        ?>
+                        <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
                     </td>
                     <td class="column-status" data-colname="status">
                         <?php 
@@ -335,10 +381,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tfoot>
                 <tr>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Deskripsi</span>
+                            <span>Tanggal Pajak</span>
                     </th>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Target Date</span>
+                            <span>Link Dokumen</span>
                     </th>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
                             <span>Status</span>
@@ -354,6 +400,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     ?>
 <?php 
 }else if($is_add || $is_edit){
+    wp_enqueue_media();
 ?>
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
@@ -361,12 +408,50 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="name">Deskripsi</label></th>
-                <td><textarea rows="5" cols="100" name="description" maxlength="250"><?php echo $description; ?></textarea></td>
+                <th scope="row"><label for="bulan_pajak">Bulan Pajak</label></th>
+                <td>
+                    <select name="bulan_pajak" required>
+                        <option value="1" <?php echo $bulan_pajak == 1 ? 'selected' : '' ?>>Januari</option>
+                        <option value="2" <?php echo $bulan_pajak == 2 ? 'selected' : '' ?>>Februari</option>
+                        <option value="3" <?php echo $bulan_pajak == 3 ? 'selected' : '' ?>>Maret</option>
+                        <option value="4" <?php echo $bulan_pajak == 4 ? 'selected' : '' ?>>April</option>
+                        <option value="5" <?php echo $bulan_pajak == 5 ? 'selected' : '' ?>>Mei</option>
+                        <option value="6" <?php echo $bulan_pajak == 6 ? 'selected' : '' ?>>Juni</option>
+                        <option value="7" <?php echo $bulan_pajak == 7 ? 'selected' : '' ?>>Juli</option>
+                        <option value="8" <?php echo $bulan_pajak == 8 ? 'selected' : '' ?>>Agustus</option>
+                        <option value="9" <?php echo $bulan_pajak == 9 ? 'selected' : '' ?>>September</option>
+                        <option value="10" <?php echo $bulan_pajak == 10 ? 'selected' : '' ?>>Oktober</option>
+                        <option value="11" <?php echo $bulan_pajak == 11 ? 'selected' : '' ?>>November</option>
+                        <option value="12" <?php echo $bulan_pajak == 12 ? 'selected' : '' ?>>Desember</option>
+                    </select>
+                </td>
             </tr>
             <tr>
-                <th scope="row"><label for="name">Progress Message</label></th>
-                <td><textarea rows="5" cols="100" name="progress_message" maxlength="250"><?php echo $progress_message; ?></textarea></td>
+                <th scope="row"><label for="tahun_pajak">Tahun Pajak</label></th>
+                <td>
+                    <select name="tahun_pajak" required>
+                        <?php
+                        for($year = 1960; $year <= 2030; $year++){
+                            $isSelected = $tahun_pajak == $year ? 'selected' : '';
+                            echo '<option value="'.$year.'" '.$isSelected.'>'.$year.'</option>';
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">File</label></th>
+                <td>
+                    <div id='link-preview'>
+                        <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                        <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
+                        <br/>
+                        <br/>
+                        <?php } ?>
+                    </div>
+                    <input type='hidden' name='custom_attachment_id' id='attachment_id' value='<?php echo $attachment_id == null ? get_option( 'media_selector_attachment_id' ) : $attachment_id; ?>'>
+                    <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Browse File' ); ?>" />
+                </td>
             </tr>
             <tr>
                 <th scope="row"><label for="name">Status</label></th>
@@ -379,10 +464,6 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         <option value="<?php echo PERIZINAN_CANCELLED ?>" <?php echo $status == PERIZINAN_CANCELLED ? 'selected' : '' ?>><?php echo 'Cancelled'; ?></option>
                     </select>
                 </td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Target Date</label></th>
-                <td><input type="text" class="regular-text custom_date" name="target_date" value="<?php echo $target_date; ?>" maxlength="50"></td>
             </tr>
             <tr>
                 <td>
@@ -401,3 +482,59 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 
 </div>
 </div>
+
+
+<?php
+$my_saved_attachment_post_id = get_option( 'media_selector_attachment_id', 0 );
+?>
+<script type="text/javascript" src="<?php echo $my_plugin ?>/assets/js/jquery-3.6.0.min.js"></script>
+<script type='text/javascript'>
+    jQuery( document ).ready( function( $ ) {
+        // Uploading files
+        var file_frame;
+        var wp_media_post_id = wp.media.model.settings.post.id; // Store the old id
+        var set_to_post_id = <?php echo $my_saved_attachment_post_id; ?>; // Set this
+        jQuery('#upload_image_button').on('click', function( event ){
+            event.preventDefault();
+            // If the media frame already exists, reopen it.
+            if ( file_frame ) {
+                // Set the post ID to what we want
+                file_frame.uploader.uploader.param( 'post_id', set_to_post_id );
+                // Open frame
+                file_frame.open();
+                return;
+            } else {
+                // Set the wp.media post id so the uploader grabs the ID we want when initialised
+                wp.media.model.settings.post.id = set_to_post_id;
+            }
+            // Create the media frame.
+            file_frame = wp.media.frames.file_frame = wp.media({
+                title: 'Select a image to upload',
+                button: {
+                    text: 'Use this image',
+                },
+                multiple: false // Set to true to allow multiple files to be selected
+            });
+            // When an image is selected, run a callback.
+            file_frame.on( 'select', function() {
+                // We set multiple to false so only get one image from the uploader
+                attachment = file_frame.state().get('selection').first().toJSON();
+
+                console.log(attachment);
+                // Do something with attachment.id and/or attachment.url here
+                //$( '#image-preview' ).attr( 'src', attachment.url ).css( 'width', 'auto' );
+                $( '#attachment_id' ).val( attachment.id );
+
+                $('#link-preview').html('<a href="'+attachment.url+'" target="_blank">'+attachment.url+'</a><br/><br/>');
+                // Restore the main post ID
+                wp.media.model.settings.post.id = wp_media_post_id;
+            });
+                // Finally, open the modal
+                file_frame.open();
+        });
+        // Restore the main ID when the add media button is pressed
+        jQuery( 'a.add_media' ).on( 'click', function() {
+            wp.media.model.settings.post.id = wp_media_post_id;
+        });
+    });
+</script>

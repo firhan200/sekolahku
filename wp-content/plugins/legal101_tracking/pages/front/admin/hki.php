@@ -1,13 +1,13 @@
 <div class="container main-container">
 
 <?php
-$menu_perizinan = true;
+$menu_hki = true;
 $menu_client = true;
 $selected_user_id = $_GET['user_id'];
 
 global $wpdb;
 $table_users_name = _tbl_users;
-$table_name = _tbl_perizinan;
+$table_name = _tbl_hki;
 
 //var
 $is_add = false;
@@ -40,15 +40,18 @@ if($_POST['action_type_val'] != null){
 }
 
 //set label
-$action_label = "Perizinan";
+$action_label = "HKI";
 if(count($errors) < 1){
     $action_label .= " (<a href='".site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id."'>".$user->company_name."</a>)";
 }
 if($action_type != null){
-    $description = '';
-    $progress_message = '';
-    $target_date = null;
-    $status = PERIZINAN_PENDING;
+    $pemohon = '';
+    $pekerjaan = '';
+    $no_agenda = '';
+    $class = '';
+    $tanggal_penerimaan = null;
+    $status = '';
+    $deadline = null;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -61,10 +64,13 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
-            $description = $data->description;
-            $progress_message = $data->progress_message;
-            $target_date = $data->target_date;
+            $pemohon = $data->pemohon;
+            $pekerjaan = $data->pekerjaan;
+            $no_agenda = $data->no_agenda;
+            $class = $data->class;
+            $tanggal_penerimaan = $data->tanggal_penerimaan;
             $status = $data->status;
+            $deadline = $data->deadline;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -85,8 +91,9 @@ if($action_type != null){
 }
 
 //get urls
-$modul_name = 'perizinan';
-$list_url = $list_url = site_url('/')._admin_pages_perizinan.'?user_id='.$user->id;
+$modul_name = 'hki';
+$list_url = site_url('/')._admin_pages_hki.'?user_id='.$user->id;
+$hki_documents_url = site_url('/')._admin_pages_hki_dokumen.'?hki_id=';
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -95,15 +102,14 @@ $delete_url = $list_url.'&action_type=delete&id=';
 if(count($errors) < 1){
     if($_POST['submit']){
         $user_id = $_POST['user_id'];
-        $description = $_POST['description'];
-        $progress_message = $_POST['progress_message'];
-        $target_date = $_POST['target_date'];
+        $pemohon = $_POST['pemohon'];
+        $pekerjaan = $_POST['pekerjaan'];
+        $no_agenda = $_POST['no_agenda'];
+        $class = $_POST['class'];
+        $tanggal_penerimaan = $_POST['tanggal_penerimaan'];
         $status = $_POST['status'];
+        $deadline = $_POST['deadline'];
 
-        //validation
-        if(empty($description)){
-            $errors[] = '<b>Deskripsi</b> Tidak Boleh Kosong';
-        }
 
         if(count($errors) == 0){
             //all input valid
@@ -115,17 +121,23 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'user_id' => $user_id,
-                        'description' => $description,
-                        'progress_message' => $progress_message,
-                        'target_date' => $target_date,
-                        'status' => $status
+                        'pemohon' => $pemohon,
+                        'pekerjaan' => $pekerjaan,
+                        'no_agenda' => $no_agenda,
+                        'class' => $class,
+                        'tanggal_penerimaan' => $tanggal_penerimaan,
+                        'status' => $status,
+                        'deadline' => $deadline
                     ),
                     array(
                         '%d',
                         '%s',
                         '%s',
                         '%s',
-                        '%d',
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%s'
                     )
                 );
 
@@ -137,10 +149,13 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
-                        'description' => $description,
-                        'progress_message' => $progress_message,
-                        'target_date' => $target_date,
-                        'status' => $status
+                        'pemohon' => $pemohon,
+                        'pekerjaan' => $pekerjaan,
+                        'no_agenda' => $no_agenda,
+                        'class' => $class,
+                        'tanggal_penerimaan' => $tanggal_penerimaan,
+                        'status' => $status,
+                        'deadline' => $deadline
                     ),
                     array('id' => $id)
                 );
@@ -228,17 +243,17 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT * FROM ".$table_name.' WHERE user_id='.$user->id;
+$query = "SELECT h.*, (SELECT COUNT(*) FROM "._tbl_hki_documents." WHERE hki_id=h.id) AS total_dokumen FROM ".$table_name.' AS h WHERE h.user_id='.$user->id;
 $keyword = '';
 
 //filter
 if($_POST['keyword']){
     $keyword = $_POST['keyword'];
-    $query .= " AND name LIKE '%".$keyword."%'";
+    $query .= " AND h.pemohon LIKE '%".$keyword."%'";
 }
 
 //order by query
-$query .= " ORDER BY id DESC";
+$query .= " ORDER BY h.id DESC";
 
 $list_of_data_total = $wpdb->get_results($query);
 
@@ -281,10 +296,25 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <thead>
                 <tr>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                            <span>Deskripsi</span>
+                            <span>Pemohon</span>
                     </th>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                            <span>Target Date</span>
+                            <span>Pekerjaan</span>
+                    </th>
+                    <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                            <span>Total Dokumen</span>
+                    </th>
+                    <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                            <span>No. Agenda</span>
+                    </th>
+                    <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                            <span>Class</span>
+                    </th>
+                    <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                            <span>Tanggal Penerimaan</span>
+                    </th>
+                    <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                            <span>Deadline</span>
                     </th>
                     <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                             <span>Status</span>
@@ -295,9 +325,15 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <?php foreach($list_of_data as $key => $data){ ?>
                 <tr id="post-<?php echo $key+1; ?>" class="type-post">
                     <td class="title column-title has-row-actions column-primary page-name">
-                        <?php echo $data->description; ?>
+                        <?php echo $data->pemohon; ?>
 
                         <div class="row-actions action_container">
+                            <span class="edit">
+                                <a href="<?php echo $hki_documents_url.$data->id ?>" aria-label="Edit">
+                                    Kelola Dokumen
+                                </a> 
+                                | 
+                            </span>
                             <span class="edit">
                                 <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
                                     Edit
@@ -313,20 +349,39 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </td>
                     <td class="column-target-date" data-colname="target_date">
                         <?php 
-                            echo date('d M Y', strtotime($data->target_date));
+                            echo htmlspecialchars($data->pekerjaan);
                         ?>
                     </td>
-                    <td class="column-status" data-colname="status">
+                    <td class="column-target-date" data-colname="target_date">
+                        <a href="<?php echo $hki_documents_url.$data->id ?>" aria-label="Edit">
+                            <?php 
+                                echo $data->total_dokumen;
+                            ?>
+                        </a>
+                    </td>
+                    <td class="column-target-date" data-colname="target_date">
                         <?php 
-                            if($data->status == PERIZINAN_PENDING){ 
-                                echo '<span class="badge bg-success">Pending</span>';
-                            }else if($data->status == PERIZINAN_ON_PROGRESS){
-                                echo '<span class="badge bg-danger">On-Progress</span>';
-                            }else if($data->status == PERIZINAN_DONE){
-                                echo '<span class="badge bg-danger">Done</span>';
-                            }else if($data->status == PERIZINAN_CANCELLED){
-                                echo '<span class="badge bg-danger">Cancelled</span>';
-                            }
+                            echo htmlspecialchars($data->no_agenda);
+                        ?>
+                    </td>
+                    <td class="column-target-date" data-colname="target_date">
+                        <?php 
+                            echo htmlspecialchars($data->class);
+                        ?>
+                    </td>
+                    <td class="column-target-date" data-colname="target_date">
+                        <?php 
+                            echo date('d M Y', strtotime($data->tanggal_penerimaan));
+                        ?>
+                    </td>
+                    <td class="column-target-date" data-colname="target_date">
+                        <?php 
+                            echo date('d M Y', strtotime($data->deadline));
+                        ?>
+                    </td>
+                    <td class="column-target-date" data-colname="target_date">
+                        <?php 
+                            echo htmlspecialchars($data->status);
                         ?>
                     </td>
                 </tr>
@@ -335,10 +390,25 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tfoot>
                 <tr>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Deskripsi</span>
+                            <span>Pemohon</span>
                     </th>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Target Date</span>
+                            <span>Pekerjaan</span>
+                    </th>
+                    <th scope="col" class="manage-column column-title column-primary sortable desc">
+                            <span>Total Dokumen</span>
+                    </th>
+                    <th scope="col" class="manage-column column-title column-primary sortable desc">
+                            <span>No. Agenda</span>
+                    </th>
+                    <th scope="col" class="manage-column column-title column-primary sortable desc">
+                            <span>Class</span>
+                    </th>
+                    <th scope="col" class="manage-column column-title column-primary sortable desc">
+                            <span>Tanggal Penerimaan</span>
+                    </th>
+                    <th scope="col" class="manage-column column-title column-primary sortable desc">
+                            <span>Deadline</span>
                     </th>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
                             <span>Status</span>
@@ -355,34 +425,46 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <?php 
 }else if($is_add || $is_edit){
 ?>
+
+<?php
+if($is_edit){
+    //kelola dokumen
+    echo '<a href="'.$hki_documents_url.$id.'" class="button button-primary">Kelola Dokumen</a>';
+}
+?>
+
 <form method="post">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="name">Deskripsi</label></th>
-                <td><textarea rows="5" cols="100" name="description" maxlength="250"><?php echo $description; ?></textarea></td>
+                <th scope="row"><label for="name">Pemohon</label></th>
+                <td><input type="text" class="regular-text" name="pemohon" value="<?php echo $pemohon; ?>" maxlength="250"></td>
             </tr>
             <tr>
-                <th scope="row"><label for="name">Progress Message</label></th>
-                <td><textarea rows="5" cols="100" name="progress_message" maxlength="250"><?php echo $progress_message; ?></textarea></td>
+                <th scope="row"><label for="name">Pekerjaan</label></th>
+                <td><input type="text" class="regular-text" name="pekerjaan" value="<?php echo $pekerjaan; ?>" maxlength="250"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">No. Agenda</label></th>
+                <td><input type="text" class="regular-text" name="no_agenda" value="<?php echo $no_agenda; ?>" maxlength="250"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Class</label></th>
+                <td><input type="text" class="regular-text" name="class" value="<?php echo $class; ?>" maxlength="250"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Tanggal Penerimaan</label></th>
+                <td><input type="text" class="regular-text custom_date" name="tanggal_penerimaan" value="<?php echo $tanggal_penerimaan; ?>" maxlength="50"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Deadline</label></th>
+                <td><input type="text" class="regular-text custom_date" name="deadline" value="<?php echo $deadline; ?>" maxlength="50"></td>
             </tr>
             <tr>
                 <th scope="row"><label for="name">Status</label></th>
-                <td>
-                    <select name="status" required>
-                        <option value="">-- Pilih Status --</option>
-                        <option value="<?php echo PERIZINAN_PENDING ?>" <?php echo $status == PERIZINAN_PENDING ? 'selected' : '' ?>><?php echo 'Pending'; ?></option>
-                        <option value="<?php echo PERIZINAN_ON_PROGRESS ?>" <?php echo $status == PERIZINAN_ON_PROGRESS ? 'selected' : '' ?>><?php echo 'On-Progress'; ?></option>
-                        <option value="<?php echo PERIZINAN_DONE ?>" <?php echo $status == PERIZINAN_DONE ? 'selected' : '' ?>><?php echo 'Done'; ?></option>
-                        <option value="<?php echo PERIZINAN_CANCELLED ?>" <?php echo $status == PERIZINAN_CANCELLED ? 'selected' : '' ?>><?php echo 'Cancelled'; ?></option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Target Date</label></th>
-                <td><input type="text" class="regular-text custom_date" name="target_date" value="<?php echo $target_date; ?>" maxlength="50"></td>
+                <td><textarea rows="5" cols="100" name="status" maxlength="250"><?php echo $status; ?></textarea></td>
             </tr>
             <tr>
                 <td>

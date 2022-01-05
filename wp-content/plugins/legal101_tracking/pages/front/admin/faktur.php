@@ -1,13 +1,13 @@
 <div class="container main-container">
 
 <?php
-$menu_perizinan = true;
+$menu_faktur = true;
 $menu_client = true;
 $selected_user_id = $_GET['user_id'];
 
 global $wpdb;
 $table_users_name = _tbl_users;
-$table_name = _tbl_perizinan;
+$table_name = _tbl_faktur;
 
 //var
 $is_add = false;
@@ -40,15 +40,13 @@ if($_POST['action_type_val'] != null){
 }
 
 //set label
-$action_label = "Perizinan";
+$action_label = "Faktur";
 if(count($errors) < 1){
-    $action_label .= " (<a href='".site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id."'>".$user->company_name."</a>)";
+    $action_label .= " (<a href='".site_url('/')._admin_pages_home.'?action_type=edit&id='.$user->id."'>".$user->company_name."</a>)";
 }
 if($action_type != null){
-    $description = '';
-    $progress_message = '';
-    $target_date = null;
-    $status = PERIZINAN_PENDING;
+    $nomor_faktur = '';
+    $tanggal_faktur = null;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -61,10 +59,8 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
-            $description = $data->description;
-            $progress_message = $data->progress_message;
-            $target_date = $data->target_date;
-            $status = $data->status;
+            $nomor_faktur = $data->nomor_faktur;
+            $tanggal_faktur = $data->tanggal_faktur;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -85,8 +81,8 @@ if($action_type != null){
 }
 
 //get urls
-$modul_name = 'perizinan';
-$list_url = $list_url = site_url('/')._admin_pages_perizinan.'?user_id='.$user->id;
+$modul_name = 'faktur';
+$list_url = site_url('/')._admin_pages_faktur.'?user_id='.$user->id;
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
@@ -95,14 +91,16 @@ $delete_url = $list_url.'&action_type=delete&id=';
 if(count($errors) < 1){
     if($_POST['submit']){
         $user_id = $_POST['user_id'];
-        $description = $_POST['description'];
-        $progress_message = $_POST['progress_message'];
-        $target_date = $_POST['target_date'];
-        $status = $_POST['status'];
+        $nomor_faktur = $_POST['nomor_faktur'];
+        $tanggal_faktur = $_POST['tanggal_faktur'];
 
         //validation
-        if(empty($description)){
-            $errors[] = '<b>Deskripsi</b> Tidak Boleh Kosong';
+        if(empty($nomor_faktur)){
+            $errors[] = '<b>Nomor Faktur</b> Tidak Boleh Kosong';
+        }
+
+        if(empty($tanggal_faktur)){
+            $errors[] = '<b>Tanggal Faktur</b> Tidak Boleh Kosong';
         }
 
         if(count($errors) == 0){
@@ -115,17 +113,13 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'user_id' => $user_id,
-                        'description' => $description,
-                        'progress_message' => $progress_message,
-                        'target_date' => $target_date,
-                        'status' => $status
+                        'nomor_faktur' => $nomor_faktur,
+                        'tanggal_faktur' => $tanggal_faktur,
                     ),
                     array(
                         '%d',
                         '%s',
                         '%s',
-                        '%s',
-                        '%d',
                     )
                 );
 
@@ -137,10 +131,8 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
-                        'description' => $description,
-                        'progress_message' => $progress_message,
-                        'target_date' => $target_date,
-                        'status' => $status
+                        'nomor_faktur' => $nomor_faktur,
+                        'tanggal_faktur' => $tanggal_faktur,
                     ),
                     array('id' => $id)
                 );
@@ -281,13 +273,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <thead>
                 <tr>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                            <span>Deskripsi</span>
+                            <span>Nomor Faktur</span>
                     </th>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
-                            <span>Target Date</span>
-                    </th>
-                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                            <span>Status</span>
+                            <span>Tanggal</span>
                     </th>
                 </tr>
             </thead>
@@ -295,7 +284,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <?php foreach($list_of_data as $key => $data){ ?>
                 <tr id="post-<?php echo $key+1; ?>" class="type-post">
                     <td class="title column-title has-row-actions column-primary page-name">
-                        <?php echo $data->description; ?>
+                        <?php echo $data->nomor_faktur; ?>
 
                         <div class="row-actions action_container">
                             <span class="edit">
@@ -313,20 +302,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </td>
                     <td class="column-target-date" data-colname="target_date">
                         <?php 
-                            echo date('d M Y', strtotime($data->target_date));
-                        ?>
-                    </td>
-                    <td class="column-status" data-colname="status">
-                        <?php 
-                            if($data->status == PERIZINAN_PENDING){ 
-                                echo '<span class="badge bg-success">Pending</span>';
-                            }else if($data->status == PERIZINAN_ON_PROGRESS){
-                                echo '<span class="badge bg-danger">On-Progress</span>';
-                            }else if($data->status == PERIZINAN_DONE){
-                                echo '<span class="badge bg-danger">Done</span>';
-                            }else if($data->status == PERIZINAN_CANCELLED){
-                                echo '<span class="badge bg-danger">Cancelled</span>';
-                            }
+                            echo date('d M Y', strtotime($data->tanggal_faktur));
                         ?>
                     </td>
                 </tr>
@@ -335,13 +311,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tfoot>
                 <tr>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Deskripsi</span>
+                            <span>Nomor Faktur</span>
                     </th>
                     <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Target Date</span>
-                    </th>
-                    <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Status</span>
+                            <span>Tanggal</span>
                     </th>
                 </tr>
             </tfoot>
@@ -361,28 +334,12 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="name">Deskripsi</label></th>
-                <td><textarea rows="5" cols="100" name="description" maxlength="250"><?php echo $description; ?></textarea></td>
+                <th scope="row"><label for="name">Nomor Faktur</label></th>
+                <td><textarea rows="5" cols="100" name="nomor_faktur" maxlength="250"><?php echo $nomor_faktur; ?></textarea></td>
             </tr>
             <tr>
-                <th scope="row"><label for="name">Progress Message</label></th>
-                <td><textarea rows="5" cols="100" name="progress_message" maxlength="250"><?php echo $progress_message; ?></textarea></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Status</label></th>
-                <td>
-                    <select name="status" required>
-                        <option value="">-- Pilih Status --</option>
-                        <option value="<?php echo PERIZINAN_PENDING ?>" <?php echo $status == PERIZINAN_PENDING ? 'selected' : '' ?>><?php echo 'Pending'; ?></option>
-                        <option value="<?php echo PERIZINAN_ON_PROGRESS ?>" <?php echo $status == PERIZINAN_ON_PROGRESS ? 'selected' : '' ?>><?php echo 'On-Progress'; ?></option>
-                        <option value="<?php echo PERIZINAN_DONE ?>" <?php echo $status == PERIZINAN_DONE ? 'selected' : '' ?>><?php echo 'Done'; ?></option>
-                        <option value="<?php echo PERIZINAN_CANCELLED ?>" <?php echo $status == PERIZINAN_CANCELLED ? 'selected' : '' ?>><?php echo 'Cancelled'; ?></option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Target Date</label></th>
-                <td><input type="text" class="regular-text custom_date" name="target_date" value="<?php echo $target_date; ?>" maxlength="50"></td>
+                <th scope="row"><label for="name">Tanggal</label></th>
+                <td><input type="text" class="regular-text custom_date" name="tanggal_faktur" value="<?php echo $tanggal_faktur; ?>" maxlength="50"></td>
             </tr>
             <tr>
                 <td>

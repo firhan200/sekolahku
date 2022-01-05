@@ -1,5 +1,6 @@
 <div class="container main-container">
 <?php
+$menu_dashboard = true;
 global $wpdb;
 $table_name = _tbl_users;
 
@@ -89,10 +90,10 @@ if($action_type != null){
 $modul_name = 'users';
 $list_url = site_url('/')._admin_pages_home.'?';
 $perizinan_url = site_url('/')._admin_pages_perizinan.'?user_id=';
-$hki_url = admin_url('/admin.php?page=hki&user_id=');
-$faktur_url = admin_url('/admin.php?page=faktur&user_id=');
-$ppn_url = admin_url('/admin.php?page=ppn&user_id=');
-$spt_url = admin_url('/admin.php?page=spt&user_id=');
+$hki_url = site_url('/')._admin_pages_hki.'?user_id=';
+$faktur_url = site_url('/')._admin_pages_faktur.'?user_id=';
+$ppn_url = site_url('/')._admin_pages_ppn.'?user_id=';
+$spt_url = site_url('/')._admin_pages_spt.'?user_id=';
 $add_url = $list_url.'&action_type=add';
 $edit_url = $list_url.'&action_type=edit&id=';
 $delete_url = $list_url.'&action_type=delete&id=';
