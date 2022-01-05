@@ -36,8 +36,16 @@ define('_pages_perizinan', _plugin_name.'_perizinan');
 define('_pages_hki', _plugin_name.'_hki');
 define('_pages_pajak', _plugin_name.'_pajak');
 
+//admin pages
+define('_admin_pages_login', 'admin_'._plugin_name.'_login');
+define('_admin_pages_home', 'admin_'._plugin_name.'_home');
+define('_admin_pages_perizinan', 'admin_'._plugin_name.'_perizinan');
+define('_admin_pages_hki', 'admin_'._plugin_name.'_hki');
+define('_admin_pages_pajak', 'admin_'._plugin_name.'_pajak');
+
 //session
 define('SESSION_ID', 'legal101_user_id');
+define('SESSION_ADMIN_ID', 'legal101_admin_id');
 
 //perizinan
 define('PERIZINAN_CANCELLED', -1);
@@ -77,11 +85,40 @@ function is_legal101_guest(){
 	}
 }
 
+function is_admin_legal101_authorize(){
+	if ( ! session_id() ) {
+        session_start();
+    }
+
+	//get site url
+	$host_url = get_site_url();
+
+	if(!isset($_SESSION[SESSION_ADMIN_ID])){
+		echo '<script type="text/javascript">window.location.href = "'.$host_url.'/'._admin_pages_login.'"</script>';
+		die();
+	}
+}
+
+function is_admin_legal101_guest(){
+	if ( ! session_id() ) {
+        session_start();
+    }
+
+	//get site url
+	$host_url = get_site_url();
+
+	if(isset($_SESSION[SESSION_ADMIN_ID])){
+		echo '<script type="text/javascript">window.location.href = "'.$host_url.'/'._admin_pages_home.'";</script>';
+		die();
+	}
+}
+
 add_action('template_redirect','legal101_front_page_redirect_handler');
 function legal101_front_page_redirect_handler(){
 	global $post;
 
 	$is_found = false;
+	$is_admin = false;
 
 	$pages_dir = array(
 		_pages_login => __DIR__ . '/pages/front/login.php',
@@ -89,6 +126,12 @@ function legal101_front_page_redirect_handler(){
 		_pages_perizinan => __DIR__ . '/pages/front/perizinan.php',
 		_pages_hki => __DIR__ . '/pages/front/hki.php',
 		_pages_pajak => __DIR__ . '/pages/front/pajak.php',
+
+		//admin
+		_admin_pages_login => __DIR__ . '/pages/front/admin/login.php',
+		_admin_pages_home => __DIR__ . '/pages/front/admin/client.php',
+		_admin_pages_perizinan => __DIR__ . '/pages/front/admin/perizinan.php',
+		_admin_pages_hki => __DIR__ . '/pages/front/admin/hki.php',
 	);
 
 	if (is_page()) {
@@ -132,12 +175,60 @@ function legal101_front_page_redirect_handler(){
 			//render page
 			$page =  $pages_dir[_pages_pajak];
 		}
+
+		//administrator
+		else if($post->post_name == _admin_pages_login){
+			is_admin_legal101_guest();
+
+			$is_admin = true;
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_admin_pages_login];
+		}
+		else if($post->post_name == _admin_pages_home){
+			is_admin_legal101_authorize();
+
+			$is_admin = true;
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_admin_pages_home];
+		}
+		else if($post->post_name == _admin_pages_perizinan){
+			is_admin_legal101_authorize();
+
+			$is_admin = true;
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_admin_pages_perizinan];
+		}
+		else if($post->post_name == _admin_pages_hki){
+			is_admin_legal101_authorize();
+
+			$is_admin = true;
+			$is_found = true;
+		
+			//render page
+			$page =  $pages_dir[_admin_pages_hki];
+		}
 	}
 
 	if ($is_found) {
-		include_once(__DIR__ . '/pages/front/header.php');
+		if($is_admin){
+			include_once(__DIR__ . '/pages/front/admin/header.php');
+		}else{
+			include_once(__DIR__ . '/pages/front/header.php');
+		}
+
 		include_once($page);
-		include_once(__DIR__ . '/pages/front/footer.php');
+
+		if($is_admin){	
+			include_once(__DIR__ . '/pages/front/admin/footer.php');
+		}else{
+			include_once(__DIR__ . '/pages/front/footer.php');
+		}
 
 		exit;
 	}
@@ -400,8 +491,61 @@ function create_legal101_front_pages(){
 			'ping_status' => 'closed',      // if you prefer
 		));
 	}
-
 	/* CREATE FRONT END PAGE POST */
+
+	/* CREATE FRONT END ADMIN PAGE POST */
+	$admin_login_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._admin_pages_login.'"');
+	if($admin_login_page == null){
+		$admin_login_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Admin - Legal101 - Masuk',
+			'post_name' => '"'._admin_pages_login.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$admin_home_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._admin_pages_home.'"');
+	if($admin_home_page == null){
+		$admin_home_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Admin - Legal101 - Beranda',
+			'post_name' => '"'._admin_pages_home.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$admin_perizinan_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._admin_pages_perizinan.'"');
+	if($admin_perizinan_page == null){
+		$admin_perizinan_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Admin - Legal101 - Perizinan',
+			'post_name' => '"'._admin_pages_perizinan.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+
+	$admin_hki_page = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'posts WHERE post_name="'._admin_pages_hki.'"');
+	if($admin_hki_page == null){
+		$admin_hki_post_id = wp_insert_post(array (
+			'post_type' => 'page',
+			'post_title' => 'Admin - Legal101 - HKI',
+			'post_name' => '"'._admin_pages_hki.'"',
+			'post_content' => '',
+			'post_status' => 'publish',
+			'comment_status' => 'closed',   // if you prefer
+			'ping_status' => 'closed',      // if you prefer
+		));
+	}
+	/* CREATE FRONT END ADMIN PAGE POST */
 }
 
 register_activation_hook( __FILE__, 'legal101_activated' );

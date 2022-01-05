@@ -7,7 +7,7 @@ $my_plugin = plugin_dir_url('').'/'._plugin_name;
     }
 
     //check if login
-    if(isset($_SESSION[SESSION_ID]) && !isset($hide_menu)){
+    if(isset($_SESSION[SESSION_ADMIN_ID]) && !isset($hide_menu)){
         ?>
         <!-- logged in footer -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
@@ -19,21 +19,21 @@ $my_plugin = plugin_dir_url('').'/'._plugin_name;
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav m-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link <?php echo isset($menu_dashboard) ? 'active' : '' ?>" aria-current="page" href="<?php echo $link._pages_home ?>">Client</a>
+                            <a class="nav-link <?php echo isset($menu_dashboard) ? 'active' : '' ?>" aria-current="page" href="<?php echo $link._admin_pages_home ?>">Client</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link <?php echo isset($menu_perizinan) ? 'active' : '' ?>" href="<?php echo $link._pages_perizinan ?>">Perijinan</a>
+                            <a class="nav-link <?php echo isset($menu_perizinan) ? 'active' : '' ?>" href="<?php echo $link._admin_pages_perizinan ?>">Perijinan</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link <?php echo isset($menu_hki) ? 'active' : '' ?>" href="<?php echo $link._pages_hki ?>">HKI</a>
+                            <a class="nav-link <?php echo isset($menu_hki) ? 'active' : '' ?>" href="<?php echo $link._admin_pages_hki ?>">HKI</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link <?php echo isset($menu_pajak) ? 'active' : '' ?>" href="<?php echo $link._pages_pajak ?>">Pajak</a>
+                            <a class="nav-link <?php echo isset($menu_pajak) ? 'active' : '' ?>" href="<?php echo $link._admin_pages_pajak ?>">Pajak</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link btn legal101_logout_btn" href="#">Logout</a>
+                            <a class="nav-link btn legal101_admin_logout_btn" href="#">Logout</a>
                         </li>
                     </ul>
                 </div>

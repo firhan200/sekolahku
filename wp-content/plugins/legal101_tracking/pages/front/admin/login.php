@@ -10,7 +10,7 @@ $my_plugin = plugin_dir_url('')._plugin_name;
     </div>
     <div class="row">
         <div class="col-sm-12 text-center">
-            <h1 class="display-6">Selamat Datang</h1>
+            <h1 class="display-6">Selamat Datang, Administrator</h1>
             <div class="text-muted">Masuk ke dalam akun anda dengan kombinasi alamat <strong>Email</strong> dan <strong>Password</strong></div>
         </div>
     </div>
@@ -23,7 +23,7 @@ $my_plugin = plugin_dir_url('')._plugin_name;
                     </div>
                 </div>
             </div>
-            <form id="legal101_login_form" method="post">
+            <form id="legal101_admin_login_form" method="post">
                 <div class="input-group mb-4">
                     <span class="input-group-text" id="basic-addon1"><i class="fa fa-envelope"></i></span>
                     <input type="email" autocomplete="off" name="email_address" class="form-control" placeholder="Alamat Email" aria-label="Alamat Email" aria-describedby="basic-addon1" required>
