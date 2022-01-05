@@ -97,6 +97,23 @@ if(count($errors) < 1){
         $attachment_id = $_POST['custom_attachment_id'];
         $status = $_POST['status'];
 
+        $post_id = $attachment_id;
+        if ( isset( $_POST['html-upload'] ) && ! empty( $_FILES ) ) {
+            require_once( ABSPATH . 'wp-admin/includes/admin.php' );
+            $id = media_handle_upload( 'async-upload', $post_id ); //post id of Client Files page
+            unset( $_FILES );
+            if( is_wp_error( $id ) ) {
+                $errors['upload_error'] = $id;
+                $id = false;
+            }
+
+            if( $errors ) {
+                echo "<p>There was an error uploading your file.</p>";
+            }
+        }
+
+        $attachment_id = $id;
+
         //validation
         if(empty($tahun)){
             $errors[] = '<b>Tahun</b> Tidak Boleh Kosong';
@@ -348,7 +365,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 }else if($is_add || $is_edit){
     wp_enqueue_media();
 ?>
-<form class="box p-5" method="post">
+<form class="box p-5" method="post" enctype="multipart/form-data">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
     <table class="form-table">
@@ -369,15 +386,17 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tr>
                 <th scope="row"><label for="name">File</label></th>
                 <td>
-                    <div id='link-preview'>
-                        <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                    <?php if($attachment_id != null && $attachment_id != ''){ ?>
                         <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
                         <br/>
                         <br/>
-                        <?php } ?>
-                    </div>
-                    <input type='hidden' name='custom_attachment_id' id='attachment_id' value='<?php echo $attachment_id == null ? get_option( 'media_selector_attachment_id' ) : $attachment_id; ?>'>
-                    <input id="upload_image_button" type="button" class="button btn btn-primary" value="<?php _e( 'Browse File' ); ?>" />
+                    <?php } ?>
+                    <p id="async-upload-wrap"><label for="async-upload">File Upload:</label>
+                    <input type="file" id="async-upload" name="async-upload"> </p>
+
+                    <p><input type="hidden" name="post_id" id="post_id" value="<?php echo $post_id ?>" />
+                    <?php wp_nonce_field( 'client-file-upload' ); ?>
+                    <input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>" /></p>
                 </td>
             </tr>
             <tr>
@@ -397,7 +416,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <td>
                     <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <input type="submit" class="btn btn-primary" value="Submit" name="html-upload">
                 </td>
             </tr>
         </tbody>

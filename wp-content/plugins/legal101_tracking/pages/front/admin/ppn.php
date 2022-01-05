@@ -100,6 +100,23 @@ if(count($errors) < 1){
         $attachment_id = $_POST['custom_attachment_id'];
         $status = $_POST['status'];
 
+        $post_id = $attachment_id;
+        if ( isset( $_POST['html-upload'] ) && ! empty( $_FILES ) ) {
+            require_once( ABSPATH . 'wp-admin/includes/admin.php' );
+            $id = media_handle_upload( 'async-upload', $post_id ); //post id of Client Files page
+            unset( $_FILES );
+            if( is_wp_error( $id ) ) {
+                $errors['upload_error'] = $id;
+                $id = false;
+            }
+
+            if( $errors ) {
+                echo "<p>There was an error uploading your file.</p>";
+            }
+        }
+
+        $attachment_id = $id;
+
         //validation
         if(empty($bulan_pajak)){
             $errors[] = '<b>Bulan</b> Tidak Boleh Kosong';
@@ -402,7 +419,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 }else if($is_add || $is_edit){
     wp_enqueue_media();
 ?>
-<form class="box p-5" method="post">
+<form class="box p-5" method="post" enctype="multipart/form-data">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
     <table class="form-table">
@@ -442,15 +459,17 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tr>
                 <th scope="row"><label for="name">File</label></th>
                 <td>
-                    <div id='link-preview'>
-                        <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                    <?php if($attachment_id != null && $attachment_id != ''){ ?>
                         <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
                         <br/>
                         <br/>
-                        <?php } ?>
-                    </div>
-                    <input type='hidden' name='custom_attachment_id' id='attachment_id' value='<?php echo $attachment_id == null ? get_option( 'media_selector_attachment_id' ) : $attachment_id; ?>'>
-                    <input id="upload_image_button" type="button" class="button btn btn-primary" value="<?php _e( 'Browse File' ); ?>" />
+                    <?php } ?>
+                    <p id="async-upload-wrap"><label for="async-upload">File Upload:</label>
+                    <input type="file" id="async-upload" name="async-upload"> </p>
+
+                    <p><input type="hidden" name="post_id" id="post_id" value="<?php echo $post_id ?>" />
+                    <?php wp_nonce_field( 'client-file-upload' ); ?>
+                    <input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>" /></p>
                 </td>
             </tr>
             <tr>
@@ -470,7 +489,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <td>
                     <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <input type="submit" class="btn btn-primary" value="Submit" name="html-upload">
                 </td>
             </tr>
         </tbody>
@@ -482,59 +501,3 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 
 </div>
 </div>
-
-
-<?php
-$my_saved_attachment_post_id = get_option( 'media_selector_attachment_id', 0 );
-?>
-<script type="text/javascript" src="<?php echo $my_plugin ?>/assets/js/jquery-3.6.0.min.js"></script>
-<script type='text/javascript'>
-    jQuery( document ).ready( function( $ ) {
-        // Uploading files
-        var file_frame;
-        var wp_media_post_id = wp.media.model.settings.post.id; // Store the old id
-        var set_to_post_id = <?php echo $my_saved_attachment_post_id; ?>; // Set this
-        jQuery('#upload_image_button').on('click', function( event ){
-            event.preventDefault();
-            // If the media frame already exists, reopen it.
-            if ( file_frame ) {
-                // Set the post ID to what we want
-                file_frame.uploader.uploader.param( 'post_id', set_to_post_id );
-                // Open frame
-                file_frame.open();
-                return;
-            } else {
-                // Set the wp.media post id so the uploader grabs the ID we want when initialised
-                wp.media.model.settings.post.id = set_to_post_id;
-            }
-            // Create the media frame.
-            file_frame = wp.media.frames.file_frame = wp.media({
-                title: 'Select a image to upload',
-                button: {
-                    text: 'Use this image',
-                },
-                multiple: false // Set to true to allow multiple files to be selected
-            });
-            // When an image is selected, run a callback.
-            file_frame.on( 'select', function() {
-                // We set multiple to false so only get one image from the uploader
-                attachment = file_frame.state().get('selection').first().toJSON();
-
-                console.log(attachment);
-                // Do something with attachment.id and/or attachment.url here
-                //$( '#image-preview' ).attr( 'src', attachment.url ).css( 'width', 'auto' );
-                $( '#attachment_id' ).val( attachment.id );
-
-                $('#link-preview').html('<a href="'+attachment.url+'" target="_blank">'+attachment.url+'</a><br/><br/>');
-                // Restore the main post ID
-                wp.media.model.settings.post.id = wp_media_post_id;
-            });
-                // Finally, open the modal
-                file_frame.open();
-        });
-        // Restore the main ID when the add media button is pressed
-        jQuery( 'a.add_media' ).on( 'click', function() {
-            wp.media.model.settings.post.id = wp_media_post_id;
-        });
-    });
-</script>
