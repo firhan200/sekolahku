@@ -1,4 +1,5 @@
-<link href="http://localhost/sekolahku/wp-content/plugins/legal101_tracking/assets/plugins/bootstrap-5.1.3/css/bootstrap.min.css" rel="stylesheet"></link>
+<link href="<?php echo plugin_dir_url('/')._plugin_name ?>/assets/plugins/bootstrap-5.1.3/css/bootstrap.min.css" rel="stylesheet"></link>
+
 
 <style>
     body{
