@@ -41,9 +41,6 @@ if($_POST['action_type_val'] != null){
 
 //set label
 $action_label = "Faktur";
-if(count($errors) < 1){
-    $action_label .= " (<a href='".site_url('/')._admin_pages_home.'?action_type=edit&id='.$user->id."'>".$user->company_name."</a>)";
-}
 if($action_type != null){
     $nomor_faktur = '';
     $tanggal_faktur = null;
@@ -195,13 +192,29 @@ if(count($errors) < 1){
 ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline">
-        <?php echo $action_label; ?>
-    </h1>
-
-    <?php if($is_list){ ?>
-    <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-sm btn-primary">Tambah Baru</a>
-    <?php } ?>
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="wp-heading-inline">
+                <?php echo $action_label; ?>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id ?>"><?php echo $user->company_name ?></a></li>
+                    <?php if($is_list){ ?>
+                        <li class="breadcrumb-item active" aria-current="page">Faktur</li>
+                    <?php }else{ ?>
+                        <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">Faktur</a></li>
+                        <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
+                    <?php } ?>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-6 text-end">
+            <?php if($is_list){ ?>
+                <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-danger"><i class="fa fa-plus"></i> Tambah Baru</a>
+            <?php } ?>
+        </div>
+    </div>
 
     <?php if(count($success) > 0){
         foreach($success as $msg){
@@ -331,26 +344,32 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <form class="box p-5" method="post">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
-    <table class="form-table">
-        <tbody>
-            <tr>
-                <th scope="row"><label for="name">Nomor Faktur</label></th>
-                <td><textarea rows="5" cols="100" name="nomor_faktur" maxlength="250"><?php echo $nomor_faktur; ?></textarea></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Tanggal</label></th>
-                <td><input type="text" class="regular-text custom_date" name="tanggal_faktur" value="<?php echo $tanggal_faktur; ?>" maxlength="50"></td>
-            </tr>
-            <tr>
-                <td>
-                </td>
-                <td>
-                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Nomor Faktur
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <textarea rows="5" cols="100" class="form-control" name="nomor_faktur" maxlength="250"><?php echo $nomor_faktur; ?></textarea>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Tanggal
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control custom_date" name="tanggal_faktur" value="<?php echo $tanggal_faktur; ?>" maxlength="50">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+            <button type="submit" class="btn btn-danger">Submit</button>
+        </div>
+    </div>
 </form>
 <?php
 }

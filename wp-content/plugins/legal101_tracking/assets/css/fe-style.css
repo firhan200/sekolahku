@@ -27,11 +27,6 @@ body{
     margin-bottom:40px !important;
 }
 
-.form-control{
-    height:45px;
-    border-left:0px;
-}
-
 .bg-default{
     background-color: #6C63FF !important;
 }

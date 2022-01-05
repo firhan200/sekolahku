@@ -41,9 +41,6 @@ if($_POST['action_type_val'] != null){
 
 //set label
 $action_label = "SPT Tahunan";
-if(count($errors) < 1){
-    $action_label .= " (<a href='".site_url('/')._admin_pages_home.'?action_type=edit&id='.$user->id."'>".$user->company_name."</a>)";
-}
 if($action_type != null){
     $tahun = date('Y');
     $attachment_id = null;
@@ -98,21 +95,24 @@ if(count($errors) < 1){
         $status = $_POST['status'];
 
         $post_id = $attachment_id;
-        if ( isset( $_POST['html-upload'] ) && ! empty( $_FILES ) ) {
-            require_once( ABSPATH . 'wp-admin/includes/admin.php' );
-            $id = media_handle_upload( 'async-upload', $post_id ); //post id of Client Files page
-            unset( $_FILES );
-            if( is_wp_error( $id ) ) {
-                $errors['upload_error'] = $id;
-                $id = false;
-            }
 
-            if( $errors ) {
-                echo "<p>There was an error uploading your file.</p>";
+        if($_FILES['async-upload']['name']){
+            if ( isset( $_POST['html-upload'] ) && !empty( $_FILES ) ) {
+                require_once( ABSPATH . 'wp-admin/includes/admin.php' );
+                $att_id = media_handle_upload( 'async-upload', $post_id ); //post id of Client Files page
+                unset( $_FILES );
+                if( is_wp_error( $att_id ) ) {
+                    $errors['upload_error'] = $att_id;
+                    $att_id = false;
+                }
+    
+                if( $errors ) {
+                    echo "<p>There was an error uploading your file.</p>";
+                }
             }
+    
+            $attachment_id = $att_id;
         }
-
-        $attachment_id = $id;
 
         //validation
         if(empty($tahun)){
@@ -214,13 +214,29 @@ if(count($errors) < 1){
 ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline">
-        <?php echo $action_label; ?>
-    </h1>
-
-    <?php if($is_list){ ?>
-    <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-sm btn-primary">Tambah Baru</a>
-    <?php } ?>
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="wp-heading-inline">
+                <?php echo $action_label; ?>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id ?>"><?php echo $user->company_name ?></a></li>
+                    <?php if($is_list){ ?>
+                        <li class="breadcrumb-item active" aria-current="page">SPT</li>
+                    <?php }else{ ?>
+                        <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">SPT</a></li>
+                        <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
+                    <?php } ?>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-6 text-end">
+            <?php if($is_list){ ?>
+                <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-danger"><i class="fa fa-plus"></i> Tambah Baru</a>
+            <?php } ?>
+        </div>
+    </div>
 
     <?php if(count($success) > 0){
         foreach($success as $msg){
@@ -368,59 +384,64 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <form class="box p-5" method="post" enctype="multipart/form-data">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
-    <table class="form-table">
-        <tbody>
-            <tr>
-                <th scope="row"><label for="tahun">Tahun</label></th>
-                <td>
-                    <select name="tahun" required>
-                        <?php
-                        for($year = 1960; $year <= 2030; $year++){
-                            $isSelected = $tahun == $year ? 'selected' : '';
-                            echo '<option value="'.$year.'" '.$isSelected.'>'.$year.'</option>';
-                        }
-                        ?>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">File</label></th>
-                <td>
-                    <?php if($attachment_id != null && $attachment_id != ''){ ?>
-                        <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
-                        <br/>
-                        <br/>
-                    <?php } ?>
-                    <p id="async-upload-wrap"><label for="async-upload">File Upload:</label>
-                    <input type="file" id="async-upload" name="async-upload"> </p>
 
-                    <p><input type="hidden" name="post_id" id="post_id" value="<?php echo $post_id ?>" />
-                    <?php wp_nonce_field( 'client-file-upload' ); ?>
-                    <input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>" /></p>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Status</label></th>
-                <td>
-                    <select name="status" required>
-                        <option value="">-- Pilih Status --</option>
-                        <option value="<?php echo PERIZINAN_PENDING ?>" <?php echo $status == PERIZINAN_PENDING ? 'selected' : '' ?>><?php echo 'Pending'; ?></option>
-                        <option value="<?php echo PERIZINAN_ON_PROGRESS ?>" <?php echo $status == PERIZINAN_ON_PROGRESS ? 'selected' : '' ?>><?php echo 'On-Progress'; ?></option>
-                        <option value="<?php echo PERIZINAN_DONE ?>" <?php echo $status == PERIZINAN_DONE ? 'selected' : '' ?>><?php echo 'Done'; ?></option>
-                        <option value="<?php echo PERIZINAN_CANCELLED ?>" <?php echo $status == PERIZINAN_CANCELLED ? 'selected' : '' ?>><?php echo 'Cancelled'; ?></option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                </td>
-                <td>
-                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
-                    <input type="submit" class="btn btn-primary" value="Submit" name="html-upload">
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Tahun
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <select name="tahun" class="form-select" required>
+                <?php
+                for($year = 1960; $year <= 2030; $year++){
+                    $isSelected = $tahun == $year ? 'selected' : '';
+                    echo '<option value="'.$year.'" '.$isSelected.'>'.$year.'</option>';
+                }
+                ?>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            File
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                <input type="hidden" name="custom_attachment_id" value="<?php echo $attachment_id ?>"/>
+                <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
+                <br/>
+                <br/>
+            <?php } ?>
+            <p id="async-upload-wrap"><label for="async-upload"></label>
+            <input type="file" class="form-control" id="async-upload" name="async-upload"> </p>
+
+            <p><input type="hidden" name="post_id" id="post_id" value="<?php echo $post_id ?>" />
+            <?php wp_nonce_field( 'client-file-upload' ); ?>
+            <input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>" /></p>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Status
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <select name="status" class="form-control" required>
+                <option value="">-- Pilih Status --</option>
+                <option value="<?php echo PERIZINAN_PENDING ?>" <?php echo $status == PERIZINAN_PENDING ? 'selected' : '' ?>><?php echo 'Pending'; ?></option>
+                <option value="<?php echo PERIZINAN_ON_PROGRESS ?>" <?php echo $status == PERIZINAN_ON_PROGRESS ? 'selected' : '' ?>><?php echo 'On-Progress'; ?></option>
+                <option value="<?php echo PERIZINAN_DONE ?>" <?php echo $status == PERIZINAN_DONE ? 'selected' : '' ?>><?php echo 'Done'; ?></option>
+                <option value="<?php echo PERIZINAN_CANCELLED ?>" <?php echo $status == PERIZINAN_CANCELLED ? 'selected' : '' ?>><?php echo 'Cancelled'; ?></option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+            <input type="submit" class="btn btn-danger" value="Submit" name="html-upload">
+        </div>
+    </div>
 </form>
 <?php
 }

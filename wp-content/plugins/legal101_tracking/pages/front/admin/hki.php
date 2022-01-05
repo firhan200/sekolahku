@@ -40,10 +40,7 @@ if($_POST['action_type_val'] != null){
 }
 
 //set label
-$action_label = "HKI";
-if(count($errors) < 1){
-    $action_label .= " (<a href='".site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id."'>".$user->company_name."</a>)";
-}
+$action_label = "Hak Kekayaan Intelektual";
 if($action_type != null){
     $minuta = '';
     $pemohon = '';
@@ -224,13 +221,29 @@ if(count($errors) < 1){
 ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline">
-        <?php echo $action_label; ?>
-    </h1>
-
-    <?php if($is_list){ ?>
-    <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-sm btn-primary">Tambah Baru</a>
-    <?php } ?>
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="wp-heading-inline">
+                <?php echo $action_label; ?>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id ?>"><?php echo $user->company_name ?></a></li>
+                    <?php if($is_list){ ?>
+                        <li class="breadcrumb-item active" aria-current="page">HKI</li>
+                    <?php }else{ ?>
+                        <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">HKI</a></li>
+                        <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
+                    <?php } ?>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-6 text-end">
+            <?php if($is_list){ ?>
+                <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-danger"><i class="fa fa-plus"></i> Tambah Baru</a>
+            <?php } ?>
+        </div>
+    </div>
 
     <?php if(count($success) > 0){
         foreach($success as $msg){
@@ -435,57 +448,88 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <?php
 if($is_edit){
     //kelola dokumen
-    echo '<a href="'.$hki_documents_url.$id.'" class="button button-primary">Kelola Dokumen</a>';
+    echo '<a href="'.$hki_documents_url.$id.'" class="btn btn-secondary">Kelola Dokumen</a>';
+    echo '<div class="mb-4"></div>';
 }
 ?>
 
 <form class="box p-5" method="post">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
-    <table class="form-table">
-        <tbody>
-            <tr>
-                <th scope="row"><label for="name">Pemohon</label></th>
-                <td><input type="text" class="regular-text" name="pemohon" value="<?php echo $pemohon; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Pekerjaan</label></th>
-                <td><input type="text" class="regular-text" name="pekerjaan" value="<?php echo $pekerjaan; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">No. Agenda</label></th>
-                <td><input type="text" class="regular-text" name="no_agenda" value="<?php echo $no_agenda; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Class</label></th>
-                <td><input type="text" class="regular-text" name="class" value="<?php echo $class; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Tanggal Penerimaan</label></th>
-                <td><input type="text" class="regular-text custom_date" name="tanggal_penerimaan" value="<?php echo $tanggal_penerimaan; ?>" maxlength="50"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Deadline</label></th>
-                <td><input type="text" class="regular-text custom_date" name="deadline" value="<?php echo $deadline; ?>" maxlength="50"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Status</label></th>
-                <td><textarea rows="5" cols="100" name="status" maxlength="250"><?php echo $status; ?></textarea></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Minuta</label></th>
-                <td><textarea rows="5" cols="100" name="minuta" maxlength="250"><?php echo $minuta; ?></textarea></td>
-            </tr>
-            <tr>
-                <td>
-                </td>
-                <td>
-                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Pemohon
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="pemohon" value="<?php echo $pemohon; ?>" maxlength="250">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Pekerjaan
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="pekerjaan" value="<?php echo $pekerjaan; ?>" maxlength="250">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            No. Agenda
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="no_agenda" value="<?php echo $no_agenda; ?>" maxlength="250">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Class
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="class" value="<?php echo $class; ?>" maxlength="250">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Tanggal Penerimaan
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control custom_date" name="tanggal_penerimaan" value="<?php echo $tanggal_penerimaan; ?>" maxlength="50">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Deadline
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control custom_date" name="deadline" value="<?php echo $deadline; ?>" maxlength="50">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Status
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <textarea rows="5" cols="100" class="form-control" name="status" maxlength="250"><?php echo $status; ?></textarea>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Minuta
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <textarea rows="5" cols="100" class="form-control" name="minuta" maxlength="250"><?php echo $minuta; ?></textarea>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+            <button type="submit" class="btn btn-danger">Submit</button>
+        </div>
+    </div>
 </form>
 <?php
 }

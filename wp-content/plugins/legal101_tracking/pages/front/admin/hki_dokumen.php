@@ -30,6 +30,12 @@ if($parent_id == null){
 
 $selected_user_id = $hki->user_id;
 
+//get user
+$user = $wpdb->get_row("SELECT * FROM "._tbl_users." WHERE id = $selected_user_id");
+if($user == null){
+    $errors[] = 'User tidak ditemukan';
+}
+
 //get page to show
 $action_type = $_GET['action_type'];
 
@@ -42,9 +48,6 @@ if($_POST['action_type_val'] != null){
 
 //set label
 $action_label = "Dokumen HKI";
-if(count($errors) < 1){
-    $action_label .= " (<a href='".site_url('/')._admin_pages_home.'?action_type=edit&id='.$hki->user_id."'>".$hki->pemohon.'</a>: <a href="'.site_url('/')._admin_pages_hki.'?user_id='.$hki->user_id.'">'.$hki->pekerjaan."</a>)";
-}
 if($action_type != null){
     $attachment_id = null;
 
@@ -95,11 +98,11 @@ if(count($errors) < 1){
         $post_id = $attachment_id;
         if ( isset( $_POST['html-upload'] ) && ! empty( $_FILES ) ) {
             require_once( ABSPATH . 'wp-admin/includes/admin.php' );
-            $id = media_handle_upload( 'async-upload', $post_id ); //post id of Client Files page
+            $att_id = media_handle_upload( 'async-upload', $post_id ); //post id of Client Files page
             unset( $_FILES );
-            if( is_wp_error( $id ) ) {
-                $errors['upload_error'] = $id;
-                $id = false;
+            if( is_wp_error( $att_id ) ) {
+                $errors['upload_error'] = $att_id;
+                $att_id = false;
             }
 
             if( $errors ) {
@@ -107,7 +110,7 @@ if(count($errors) < 1){
             }
         }
 
-        $attachment_id = $id;
+        $attachment_id = $att_id;
 
         if(count($errors) == 0){
             //all input valid
@@ -198,13 +201,30 @@ if(count($errors) < 1){
 ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline">
-        <?php echo $action_label; ?>
-    </h1>
-
-    <?php if($is_list){ ?>
-    <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-sm btn-primary">Tambah Baru</a>
-    <?php } ?>
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="wp-heading-inline">
+                <?php echo $action_label; ?>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id ?>"><?php echo $user->company_name ?></a></li>
+                    <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_hki."?&user_id=".$hki->user_id ?>"><?php echo $hki->pemohon.' - '.$hki->pekerjaan ?></a></li>
+                    <?php if($is_list){ ?>
+                        <li class="breadcrumb-item active" aria-current="page">Dokumen</li>
+                    <?php }else{ ?>
+                        <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">Dokumen</a></li>
+                        <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
+                    <?php } ?>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-6 text-end">
+            <?php if($is_list){ ?>
+                <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-danger"><i class="fa fa-plus"></i> Tambah Baru</a>
+            <?php } ?>
+        </div>
+    </div>
 
     <?php if(count($success) > 0){
         foreach($success as $msg){
@@ -335,35 +355,35 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <form class="box p-5" method="post" enctype="multipart/form-data">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="hki_id" value="<?php echo $hki->id; ?>"/>
-    <table class="form-table">
-        <tbody>
-            <tr>
-                <th scope="row"><label for="name">File</label></th>
-                <td>
-                    <?php if($attachment_id != null && $attachment_id != ''){ ?>
-                        <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
-                        <br/>
-                        <br/>
-                    <?php } ?>
-                    <p id="async-upload-wrap"><label for="async-upload">File Upload:</label>
-                    <input type="file" id="async-upload" name="async-upload"> </p>
 
-                    <p><input type="hidden" name="post_id" id="post_id" value="<?php echo $post_id ?>" />
-                    <?php wp_nonce_field( 'client-file-upload' ); ?>
-                    <input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>" /></p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                </td>
-                <td>
-                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
-                    <input type="submit" class="btn btn-primary" value="Submit" name="html-upload">
-                </td>
-            </tr>
-           
-        </tbody>
-    </table>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            File
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
+                <br/>
+                <br/>
+            <?php } ?>
+            <p id="async-upload-wrap"><label for="async-upload"></label>
+            <input type="file" id="async-upload" class="form-control" name="async-upload" required> </p>
+
+            <p><input type="hidden" name="post_id" id="post_id" value="<?php echo $post_id ?>" />
+            <?php wp_nonce_field( 'client-file-upload' ); ?>
+            <input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>" /></p>
+        </div>
+    </div>
+
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+            <input type="submit" class="btn btn-danger" value="Submit" name="html-upload">
+        </div>
+    </div>
 </form>
 <?php
 }

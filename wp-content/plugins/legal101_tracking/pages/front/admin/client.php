@@ -285,13 +285,28 @@ if(count($errors) < 1){
 ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline">
-        <?php echo $action_label; ?>
-    </h1>
-
-    <?php if($is_list){ ?>
-    <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-primary btn-sm">Tambah Baru</a>
-    <?php } ?>
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="wp-heading-inline">
+                <?php echo $action_label; ?>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <?php if($is_list){ ?>
+                        <li class="breadcrumb-item active" aria-current="page">Client</li>
+                    <?php }else{ ?>
+                        <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">Client</a></li>
+                        <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
+                    <?php } ?>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-6 text-end">
+            <?php if($is_list){ ?>
+                <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-danger"><i class="fa fa-plus"></i> Tambah Baru</a>
+            <?php } ?>
+        </div>
+    </div>
 
     <?php if(count($success) > 0){
         foreach($success as $msg){
@@ -481,6 +496,31 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </tr>
                 <?php } ?>
             </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                        <span>Nama Perusahaan</span>
+                    </th>
+                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                        <span>Total Perizinan</span>
+                    </th>
+                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                        <span>Total HKI</span>
+                    </th>
+                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                        <span>Total Faktur</span>
+                    </th>
+                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                        <span>Total PPN</span>
+                    </th>
+                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                        <span>Total SPT Tahunan</span>
+                    </th>
+                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                        <span>Status</span>
+                    </th>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </form>
@@ -496,97 +536,148 @@ $list_admin = $wpdb->get_results("SELECT * FROM "._tbl_administrators." ORDER BY
 <?php
 if($is_edit){
     //kelola dokumen
-    echo '<a href="'.$perizinan_url.$id.'" class="button button-primary">Kelola Perizinan</a>&nbsp;';
-    echo '<a href="'.$hki_url.$id.'" class="button button-primary">Kelola HKI</a>&nbsp;';
-    echo '<a href="'.$faktur_url.$id.'" class="button button-primary">Kelola Faktur</a>&nbsp;';
-    echo '<a href="'.$ppn_url.$id.'" class="button button-primary">Kelola PPN</a>&nbsp;';
-    echo '<a href="'.$spt_url.$id.'" class="button button-primary">Kelola SPT Tahunan</a>&nbsp;';
+    echo '<a href="'.$perizinan_url.$id.'" class="btn btn-secondary">Kelola Perizinan</a>&nbsp;';
+    echo '<a href="'.$hki_url.$id.'" class="btn btn-secondary">Kelola HKI</a>&nbsp;';
+    echo '<a href="'.$faktur_url.$id.'" class="btn btn-secondary">Kelola Faktur</a>&nbsp;';
+    echo '<a href="'.$ppn_url.$id.'" class="btn btn-secondary">Kelola PPN</a>&nbsp;';
+    echo '<a href="'.$spt_url.$id.'" class="btn btn-secondary">Kelola SPT Tahunan</a>&nbsp;';
+    echo '<div class="mb-4"></div>';
 }
 ?>
 
 <form class="box p-5" method="post">
+    <div class="alert alert-warning">Form bertanda * = Wajib di isi</div>
     <input type="hidden" name="submit" value="true"/>
-    <table class="form-table">
-        <tbody>
-            <tr>
-                <th scope="row"><label for="name">Email Address</label></th>
-                <td><input type="email" class="regular-text" name="email_address" value="<?php echo $email_address; ?>" maxlength="150" required></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Password</label></th>
-                <td>
-                    <div class="wp-pwd">
-                        <span class="password-input-wrapper">
-                            <input type="password" name="password" id="password" class="regular-text" autocomplete="off" <?php echo $is_add ? 'required' : ''; ?>>
-                        </span>
-                        <button type="button" class="button btn-password-show wp-hide-pw hide-if-no-js" data-toggle="0" aria-label="Tampilkan sandi">
-                            <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
-                            <span class="text">Tampilkan</span>
-                        </button>
-                    </div>
-                    <?php if($is_edit){
-                        echo '<div class="alert alert-warning">Kosongkan <b>Password</b> apabila tidak ingin mengubah password lama.</div>';
-                    } ?>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Nama Perusahaan</label></th>
-                <td><input type="text" class="regular-text" name="company_name" value="<?php echo $company_name; ?>" maxlength="250" required></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Nama PIC</label></th>
-                <td><input type="text" class="regular-text" name="pic_name" value="<?php echo $pic_name; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Alamat Perusahaan</label></th>
-                <td><input type="text" class="regular-text" name="company_address" value="<?php echo $company_address; ?>" maxlength="250"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Telephone</label></th>
-                <td><input type="text" class="regular-text" name="phone" value="<?php echo $phone; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Fax</label></th>
-                <td><input type="text" class="regular-text" name="fax" value="<?php echo $fax; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">No. NPWP Perusahaan</label></th>
-                <td><input type="text" class="regular-text" name="company_npwp" value="<?php echo $company_npwp; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Direktur Utama</label></th>
-                <td><input type="text" class="regular-text" name="main_director" value="<?php echo $main_director; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">NIB</label></th>
-                <td><input type="text" class="regular-text" name="nib" value="<?php echo $nib; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Nomor Identitas</label></th>
-                <td><input type="text" class="regular-text" name="identity_number" value="<?php echo $identity_number; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">Website</label></th>
-                <td><input type="text" class="regular-text" name="website" value="<?php echo $website; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="name">NPWP</label></th>
-                <td><input type="text" class="regular-text" name="npwp" value="<?php echo $npwp; ?>" maxlength="150"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="is_active">Status</label></th>
-                <td><input class="form-control" name="is_active" type="checkbox" <?php echo $is_active==1 ? 'checked' : ''; ?>/>&nbsp;Is Active</td>
-            </tr>
-            <tr>
-                <td>
-                </td>
-                <td>
-                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+
+    <div class="mb-3 row align-items-center">
+        <label for="name" class="col-sm-12 col-md-4 col-lg-3">Email Address*</label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="email" class="form-control" name="email_address" value="<?php echo $email_address; ?>" maxlength="150" required>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Password<?php echo $is_add ? '*' : ''; ?>
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <div class="input-group mb-3 wp-pwd">
+                <input type="password" name="password" id="password" class="form-control" autocomplete="off" <?php echo $is_add ? 'required' : ''; ?>>
+                <button class="button btn btn-secondary btn-password-show wp-hide-pw hide-if-no-js" type="button" id="button-addon2">
+                    <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+                    <span class="text">Tampilkan</span>
+                </button>
+            </div>
+               
+            <?php if($is_edit){
+                echo '<div class="text-muted">(i) Kosongkan <b>Password</b> apabila tidak ingin mengubah password lama.</div>';
+            } ?>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Nama Perusahaan*
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="company_name" value="<?php echo $company_name; ?>" maxlength="250" required>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Nama PIC
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="pic_name" value="<?php echo $pic_name; ?>" maxlength="250">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Alamat Perusahaan
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="company_address" value="<?php echo $company_address; ?>" maxlength="250">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Telephone
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="phone" value="<?php echo $phone; ?>" maxlength="150">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Fax
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="fax" value="<?php echo $fax; ?>" maxlength="150">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            No. NPWP Perusahaan
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="company_npwp" value="<?php echo $company_npwp; ?>" maxlength="150">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Direktur Utama
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="main_director" value="<?php echo $main_director; ?>" maxlength="150">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            NIB
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="nib" value="<?php echo $nib; ?>" maxlength="150">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Nomor Identitas
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="identity_number" value="<?php echo $identity_number; ?>" maxlength="150">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Website
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="website" value="<?php echo $website; ?>" maxlength="150">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            NPWP
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="npwp" value="<?php echo $npwp; ?>" maxlength="150">
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Status
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input class="form-control" name="is_active" type="checkbox" <?php echo $is_active==1 ? 'checked' : ''; ?>/>&nbsp;Is Active
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+            <button type="submit" class="btn btn-danger">Submit</button>
+        </div>
+    </div>
 </form>
 <?php
 }
