@@ -225,6 +225,7 @@ if(count($errors) < 1){
 
             //show list
             $is_list = false;
+            $is_add = false;
             $is_edit = true;
 
             echo "<script>window.history.pushState('page2', 'Title', '".$edit_url.$object_id."');</script>";
@@ -294,17 +295,17 @@ if(count($errors) < 1){
 
     <?php if(count($success) > 0){
         foreach($success as $msg){
-            echo '<div class="notice notice-success is-dismissible"><p>'.$msg.'</p></div>';
+            echo '<div class="alert alert-success"><p>'.$msg.'</p></div>';
         }
     } ?>
 
     <?php if(count($errors) > 0){
         foreach($errors as $msg){
-            echo '<div class="notice notice-error is-dismissible"><p>'.$msg.'</p></div>';
+            echo '<div class="alert alert-danger"><p>'.$msg.'</p></div>';
         }
     } ?>
 
-    <hr class="wp-header-end">
+    <div class="mb-3"></div>
 
 <?php
 if($is_list){
@@ -503,7 +504,7 @@ if($is_edit){
 }
 ?>
 
-<form method="post">
+<form class="box p-5" method="post">
     <input type="hidden" name="submit" value="true"/>
     <table class="form-table">
         <tbody>
@@ -580,8 +581,8 @@ if($is_edit){
                 <td>
                 </td>
                 <td>
-                    <a href="<?php echo $list_url; ?>" class="button button-secondary">Back</a>
-                    <button type="submit" class="button button-primary">Submit</button>
+                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </td>
             </tr>
         </tbody>

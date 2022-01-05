@@ -46,7 +46,13 @@ $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." 
 
             <strong>Minuta:</strong>
             <div class="bg-light p-4">
-                ??
+                <?php
+                echo '<ul>';
+                foreach($list_hki as $hki){
+                    echo '<li>'.htmlspecialchars($hki->minuta).'</li>';
+                }
+                echo '</ul>';
+                ?>
             </div>
         </div>
     </div>
@@ -63,26 +69,28 @@ foreach($list_hki as $hki){
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-hover table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Dokumen</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php
-                        foreach($list_hki_dokumen as $hki_dokumen){
-                            if($hki_dokumen->hki_id == $hki->id){
-                                echo '<tr>';
-                                echo '<td>'.date('d M Y', strtotime($hki_dokumen->created_on)).'</td>';
-                                echo '<td><a href="'.wp_get_attachment_url($hki_dokumen->attachment_id).'" target="_blank">'.wp_get_attachment_url($hki_dokumen->attachment_id).'</a></td>';
-                                echo '</tr>';
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Dokumen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            foreach($list_hki_dokumen as $hki_dokumen){
+                                if($hki_dokumen->hki_id == $hki->id){
+                                    echo '<tr>';
+                                    echo '<td>'.date('d M Y', strtotime($hki_dokumen->created_on)).'</td>';
+                                    echo '<td><a href="'.wp_get_attachment_url($hki_dokumen->attachment_id).'" target="_blank">'.wp_get_attachment_url($hki_dokumen->attachment_id).'</a></td>';
+                                    echo '</tr>';
+                                }
                             }
-                        }
-                        ?>
-                        </tbody>
-                    </table>
+                            ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

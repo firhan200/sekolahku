@@ -201,7 +201,7 @@ if(count($errors) < 1){
         }
     } ?>
 
-    <hr class="wp-header-end">
+    <div class="mb-3"></div>
 
 <?php
 if($is_list){
@@ -315,7 +315,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 }else if($is_add || $is_edit){
     wp_enqueue_media();
 ?>
-<form method="post">
+<form class="box p-5" method="post">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="hki_id" value="<?php echo $hki->id; ?>"/>
     <table class="form-table">
@@ -331,15 +331,15 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         <?php } ?>
                     </div>
                     <input type='hidden' name='custom_attachment_id' id='attachment_id' value='<?php echo $attachment_id == null ? get_option( 'media_selector_attachment_id' ) : $attachment_id; ?>'>
-                    <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Browse File' ); ?>" />
+                    <input id="upload_image_button" type="button" class="button btn btn-primary" value="<?php _e( 'Browse File' ); ?>" />
                 </td>
             </tr>
             <tr>
                 <td>
                 </td>
                 <td>
-                    <a href="<?php echo $list_url; ?>" class="button button-secondary">Back</a>
-                    <button type="submit" class="button button-primary">Submit</button>
+                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </td>
             </tr>
            

@@ -373,6 +373,7 @@ function legal101_activated() {
 		$sql = "CREATE TABLE $tbl_hki (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
 		user_id mediumint(9) NOT NULL,
+		minuta varchar(255) NULL,
 		pemohon varchar(255) NULL,
 		pekerjaan varchar(255) NULL,
 		no_agenda varchar(255) NULL,

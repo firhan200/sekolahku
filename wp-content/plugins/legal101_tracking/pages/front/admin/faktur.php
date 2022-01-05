@@ -215,7 +215,7 @@ if(count($errors) < 1){
         }
     } ?>
 
-    <hr class="wp-header-end">
+    <div class="mb-3"></div>
 
 <?php
 if($is_list){
@@ -328,7 +328,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <?php 
 }else if($is_add || $is_edit){
 ?>
-<form method="post">
+<form class="box p-5" method="post">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
     <table class="form-table">
@@ -345,8 +345,8 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <td>
                 </td>
                 <td>
-                    <a href="<?php echo $list_url; ?>" class="button button-secondary">Back</a>
-                    <button type="submit" class="button button-primary">Submit</button>
+                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </td>
             </tr>
         </tbody>

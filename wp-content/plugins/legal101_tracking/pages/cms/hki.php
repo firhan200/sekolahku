@@ -39,6 +39,7 @@ if(count($errors) < 1){
     $action_label .= " (<a href='".admin_url('/admin.php?page=users&action_type=edit&id='.$user->id)."'>".$user->company_name."</a>)";
 }
 if($action_type != null){
+    $minuta = '';
     $pemohon = '';
     $pekerjaan = '';
     $no_agenda = '';
@@ -58,6 +59,7 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
+            $minuta = $data->minuta;
             $pemohon = $data->pemohon;
             $pekerjaan = $data->pekerjaan;
             $no_agenda = $data->no_agenda;
@@ -96,6 +98,7 @@ $delete_url = $list_url.'&action_type=delete&id=';
 if(count($errors) < 1){
     if($_POST['submit']){
         $user_id = $_POST['user_id'];
+        $minuta = $_POST['minuta'];
         $pemohon = $_POST['pemohon'];
         $pekerjaan = $_POST['pekerjaan'];
         $no_agenda = $_POST['no_agenda'];
@@ -115,6 +118,7 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'user_id' => $user_id,
+                        'minuta' => $minuta,
                         'pemohon' => $pemohon,
                         'pekerjaan' => $pekerjaan,
                         'no_agenda' => $no_agenda,
@@ -125,6 +129,7 @@ if(count($errors) < 1){
                     ),
                     array(
                         '%d',
+                        '%s',
                         '%s',
                         '%s',
                         '%s',
@@ -143,6 +148,7 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
+                        'minuta' => $minuta,
                         'pemohon' => $pemohon,
                         'pekerjaan' => $pekerjaan,
                         'no_agenda' => $no_agenda,
@@ -526,6 +532,10 @@ if($is_edit){
             <tr>
                 <th scope="row"><label for="name">Status</label></th>
                 <td><textarea rows="5" cols="100" name="status" maxlength="250"><?php echo $status; ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Minuta</label></th>
+                <td><textarea rows="5" cols="100" name="minuta" maxlength="250"><?php echo $minuta; ?></textarea></td>
             </tr>
             <tr>
                 <td>

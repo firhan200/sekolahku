@@ -307,7 +307,7 @@ if(count($errors) < 1){
 <?php
 if($is_list){
 //get list from database
-$query = "SELECT u.*, (SELECT COUNT(*) FROM "._tbl_perizinan." WHERE user_id=u.id) AS total_perizinan, (SELECT COUNT(*) FROM "._tbl_hki." WHERE user_id=u.id) AS total_hki, (SELECT COUNT(*) FROM "._tbl_faktur." WHERE user_id=u.id) AS total_faktur, (SELECT COUNT(*) FROM "._tbl_ppn." WHERE user_id=u.id) AS total_ppn, (SELECT COUNT(*) FROM "._tbl_spt_tahunan." WHERE user_id=u.id) AS total_spt FROM ".$table_name." AS u";
+$query = "SELECT u.*, a.full_name as admin_name, a.id as admin_id, (SELECT COUNT(*) FROM "._tbl_perizinan." WHERE user_id=u.id) AS total_perizinan, (SELECT COUNT(*) FROM "._tbl_hki." WHERE user_id=u.id) AS total_hki, (SELECT COUNT(*) FROM "._tbl_faktur." WHERE user_id=u.id) AS total_faktur, (SELECT COUNT(*) FROM "._tbl_ppn." WHERE user_id=u.id) AS total_ppn, (SELECT COUNT(*) FROM "._tbl_spt_tahunan." WHERE user_id=u.id) AS total_spt FROM ".$table_name." AS u LEFT JOIN "._tbl_administrators." AS a ON u.administrator_id=a.id";
 $keyword = '';
 
 //filter
@@ -382,6 +382,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Nama Perusahaan</span>
+                    </a>
+                </th>
+                <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Admin</span>
                     </a>
                 </th>
                 <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
@@ -479,6 +484,13 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </td>
                 <td class="column-status" data-colname="status">
+                    <a href="<?php echo admin_url('/admin.php?page=administrators&action_type=edit&id='.$data->admin_id) ?>" aria-label="Edit">
+                        <?php 
+                        echo $data->admin_name;
+                        ?>
+                    </a>
+                </td>
+                <td class="column-status" data-colname="status">
                     <a href="<?php echo $perizinan_url.$data->id ?>" aria-label="Edit">
                         <?php 
                         echo $data->total_perizinan;
@@ -534,6 +546,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Nama Perusahaan</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Admin</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">

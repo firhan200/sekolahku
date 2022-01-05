@@ -14,7 +14,7 @@ $list_ppn = $wpdb->get_results("SELECT * FROM "._tbl_ppn." WHERE user_id = '".$_
 $list_spt = $wpdb->get_results("SELECT * FROM "._tbl_spt_tahunan." WHERE user_id = '".$_SESSION[SESSION_ID]."' ORDER BY tahun DESC");
 
 //get available years
-$available_dates = $wpdb->get_results('SELECT * FROM '._tbl_faktur.' f WHERE tanggal_faktur IS NOT NULL GROUP BY YEAR(f.tanggal_faktur), MONTH(f.tanggal_faktur) ORDER BY tanggal_faktur DESC');
+$available_dates = $wpdb->get_results('SELECT * FROM '._tbl_faktur.' f WHERE tanggal_faktur IS NOT NULL AND user_id = '.$_SESSION[SESSION_ID].' GROUP BY YEAR(f.tanggal_faktur), MONTH(f.tanggal_faktur) ORDER BY tanggal_faktur DESC');
 
 //extra function
 function intToMonth($int){

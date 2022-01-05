@@ -45,6 +45,7 @@ if(count($errors) < 1){
     $action_label .= " (<a href='".site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id."'>".$user->company_name."</a>)";
 }
 if($action_type != null){
+    $minuta = '';
     $pemohon = '';
     $pekerjaan = '';
     $no_agenda = '';
@@ -64,6 +65,7 @@ if($action_type != null){
         $id = $_GET['id'];
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
+            $minuta = $data->minuta;
             $pemohon = $data->pemohon;
             $pekerjaan = $data->pekerjaan;
             $no_agenda = $data->no_agenda;
@@ -102,6 +104,7 @@ $delete_url = $list_url.'&action_type=delete&id=';
 if(count($errors) < 1){
     if($_POST['submit']){
         $user_id = $_POST['user_id'];
+        $minuta = $_POST['minuta'];
         $pemohon = $_POST['pemohon'];
         $pekerjaan = $_POST['pekerjaan'];
         $no_agenda = $_POST['no_agenda'];
@@ -121,6 +124,7 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'user_id' => $user_id,
+                        'minuta' => $minuta,
                         'pemohon' => $pemohon,
                         'pekerjaan' => $pekerjaan,
                         'no_agenda' => $no_agenda,
@@ -131,6 +135,7 @@ if(count($errors) < 1){
                     ),
                     array(
                         '%d',
+                        '%s',
                         '%s',
                         '%s',
                         '%s',
@@ -149,6 +154,7 @@ if(count($errors) < 1){
                 $wpdb->update(
                     $table_name,
                     array(
+                        'minuta' => $minuta,
                         'pemohon' => $pemohon,
                         'pekerjaan' => $pekerjaan,
                         'no_agenda' => $no_agenda,
@@ -238,7 +244,7 @@ if(count($errors) < 1){
         }
     } ?>
 
-    <hr class="wp-header-end">
+    <div class="mb-3"></div>
 
 <?php
 if($is_list){
@@ -433,7 +439,7 @@ if($is_edit){
 }
 ?>
 
-<form method="post">
+<form class="box p-5" method="post">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
     <table class="form-table">
@@ -467,11 +473,15 @@ if($is_edit){
                 <td><textarea rows="5" cols="100" name="status" maxlength="250"><?php echo $status; ?></textarea></td>
             </tr>
             <tr>
+                <th scope="row"><label for="name">Minuta</label></th>
+                <td><textarea rows="5" cols="100" name="minuta" maxlength="250"><?php echo $minuta; ?></textarea></td>
+            </tr>
+            <tr>
                 <td>
                 </td>
                 <td>
-                    <a href="<?php echo $list_url; ?>" class="button button-secondary">Back</a>
-                    <button type="submit" class="button button-primary">Submit</button>
+                    <a href="<?php echo $list_url; ?>" class="btn btn-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </td>
             </tr>
         </tbody>
