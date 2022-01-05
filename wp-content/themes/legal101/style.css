@@ -1,0 +1,67 @@
+/*
+Theme Name: Legal 101
+Text Domain: legal101
+Version: 1.0
+Description: legal 101 special theme.
+Author: Firhan
+Author URI: https://firhan200.github.io
+*/
+
+.legal101-navbar{
+    background-color: rgba(15, 15, 15, 0.8);
+    padding-top:0px !important;
+    padding-bottom:0px !important;
+}
+
+.legal101-left-nav .nav-item a{
+    padding-top:40px;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    margin-bottom:20px !important;
+}
+
+.legal101-left-nav .nav-item .active{
+    background-color: #f43930;
+}
+
+.legal101-right-nav .nav-item a{
+    font-size:14pt;
+    text-transform: uppercase;
+    color: #eaeaea !important;
+}
+
+.legal101-footer{
+    padding-top:50px;
+    padding-bottom:50px;
+    background-color: #262626;
+    color:#838383;
+}
+
+.legal101-footer-title{
+    font-size: 14px;
+    color: #eaeaea;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding-bottom:20px;
+}
+
+.legal101-footer-link{
+    list-style-type: none;
+    padding-left: 0px;
+    line-height: 35px;
+}
+.legal101-footer-link a{
+    color:#838383;
+    padding-left:0px;
+    text-decoration: none;
+    transition: padding-left 1s;
+}
+
+.legal101-footer-link a:hover{
+    color:#eaeaea;
+    text-decoration: none;
+    padding-left:20px;
+}
+
+.legal101-main-container{
+}
