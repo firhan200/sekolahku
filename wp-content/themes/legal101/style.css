@@ -14,13 +14,17 @@ Author URI: https://firhan200.github.io
 }
 
 .legal101-left-nav .nav-item a{
-    padding-top:40px;
+    display: block;
+    padding-top:30px;
     padding-left: 20px !important;
     padding-right: 20px !important;
     margin-bottom:20px !important;
+    padding-bottom: 15px;
+    color:#eaeaea;
+    text-decoration: none;
 }
 
-.legal101-left-nav .nav-item .active{
+.legal101-left-nav .active a{
     background-color: #f43930;
 }
 
@@ -28,6 +32,8 @@ Author URI: https://firhan200.github.io
     font-size:14pt;
     text-transform: uppercase;
     color: #eaeaea !important;
+    margin-left: 30px;
+    text-decoration: none;
 }
 
 .legal101-footer{

@@ -11,32 +11,33 @@
 
 </head>
 <body>
-    <nav class="legal101-navbar navbar navbar-expand-lg navbar-dark">
+    <nav class="legal101-navbar navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Logo</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="legal101-left-nav navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link " aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Promo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Our Service</a>
-                    </li>
-                </ul>
-                <ul class="legal101-right-nav navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Client&nbsp;&nbsp;&nbsp;&nbsp;|</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Admin</a>
-                    </li>
-                </ul>
+                <?php
+                    wp_nav_menu(
+                        array(
+                            'menu' => 'primary',
+                            'container' => '',
+                            'theme_location' => 'primary',
+                            'items_wrap' => '<ul class="legal101-left-nav navbar-nav me-auto mb-2 mb-lg-0">%3$s</ul>',
+                        )
+                    );
+                ?>
+                 <?php
+                    wp_nav_menu(
+                        array(
+                            'menu' => 'primary_right',
+                            'container' => '',
+                            'theme_location' => 'primary_right',
+                            'items_wrap' => '<ul class="legal101-right-nav navbar-nav ms-auto mb-2 mb-lg-0">%3$s</ul>',
+                        )
+                    );
+                ?>
             </div>
         </div>
     </nav>

@@ -13,29 +13,46 @@
                     <div class="legal101-footer-title">
                         Social Media
                     </div>
-                    <ul class="legal101-footer-link">
-                        <li><a href="">LinkedId</a></li>
-                        <li><a href="">Instagram</a></li>
-                    </ul>
+                    <?php
+                        wp_nav_menu(
+                            array(
+                                'menu' => 'social_media_menu',
+                                'container' => '',
+                                'theme_location' => 'social_media_menu',
+                                'items_wrap' => '<ul class="legal101-footer-link">%3$s</ul>',
+                            )
+                        );
+                    ?>
                 </div>
                 <div class="col-sm-12 col-md-3">
                     <div class="legal101-footer-title">
                         Company
                     </div>
-                    <ul class="legal101-footer-link">
-                        <li><a href="">Promo</a></li>
-                        <li><a href="">Our Service</a></li>
-                        <li><a href="">NIB & OSS</a></li>
-                    </ul>
+                    <?php
+                        wp_nav_menu(
+                            array(
+                                'menu' => 'company_menu',
+                                'container' => '',
+                                'theme_location' => 'company_menu',
+                                'items_wrap' => '<ul class="legal101-footer-link">%3$s</ul>',
+                            )
+                        );
+                    ?>
                 </div>
                 <div class="col-sm-12 col-md-3">
                     <div class="legal101-footer-title">
                         Services
                     </div>
-                    <ul class="legal101-footer-link">
-                        <li><a href="">Building and Insutry Permit</a></li>
-                        <li><a href="">Intellectual Property Registration</a></li>
-                    </ul>
+                    <?php
+                        wp_nav_menu(
+                            array(
+                                'menu' => 'services_menu',
+                                'container' => '',
+                                'theme_location' => 'services_menu',
+                                'items_wrap' => '<ul class="legal101-footer-link">%3$s</ul>',
+                            )
+                        );
+                    ?>
                 </div>
             </div>
         </div>
