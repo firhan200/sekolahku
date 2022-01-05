@@ -2,6 +2,10 @@ $(document).ready(function(){
     var hostUrl = $("#host_url").val();
     var pluginName = $("body").data('plugin-name');
 
+    $("#filter_faktur").change(function(){
+        $("#form_filter_faktur").submit();
+    })
+
     $(".legal101_logout_btn").click(function(){
         var confirm = window.confirm("Apakah anda yakin ingin keluar?");
         if(confirm){

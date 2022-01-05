@@ -11,36 +11,38 @@ $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." 
     <div class="row">
         <div class="col-12">
             <h2 class="text-center mb-3 section-heading">Project Status HKI</h2>
-            <table class="table table-hover table-bordered mb-3">
-                <thead>
-                    <tr>
-                        <th>Pemohon</th>
-                        <th>Pekerjaan</th>
-                        <th>No Agenda</th>
-                        <th>Class</th>
-                        <th>Tanggal Penerimaan</th>
-                        <th>Status</th>
-                        <th>Deadline</th>
-                        <th>Doc</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    foreach($list_hki as $hki){
-                        echo '<tr>';
-                        echo '<td>'.htmlspecialchars($hki->pemohon).'</td>';
-                        echo '<td>'.htmlspecialchars($hki->pekerjaan).'</td>';
-                        echo '<td>'.htmlspecialchars($hki->no_agenda).'</td>';
-                        echo '<td>'.htmlspecialchars($hki->class).'</td>';
-                        echo '<td>'.date("d/m/Y", strtotime($hki->tanggal_penerimaan)).'</td>';
-                        echo '<td>'.htmlspecialchars($hki->status).'</td>';
-                        echo '<td>'.date("d/m/Y", strtotime($hki->deadline)).'</td>';
-                        echo '<td><a href="#" data-bs-toggle="modal" data-bs-target="#hki_dokumen_'.$hki->id.'">Lihat Dokumen</a></td>';
-                        echo '</tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered mb-3">
+                    <thead>
+                        <tr>
+                            <th>Pemohon</th>
+                            <th>Pekerjaan</th>
+                            <th>No Agenda</th>
+                            <th>Class</th>
+                            <th>Tanggal Penerimaan</th>
+                            <th>Status</th>
+                            <th>Deadline</th>
+                            <th>Doc</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach($list_hki as $hki){
+                            echo '<tr>';
+                            echo '<td>'.htmlspecialchars($hki->pemohon).'</td>';
+                            echo '<td>'.htmlspecialchars($hki->pekerjaan).'</td>';
+                            echo '<td>'.htmlspecialchars($hki->no_agenda).'</td>';
+                            echo '<td>'.htmlspecialchars($hki->class).'</td>';
+                            echo '<td>'.date("d/m/Y", strtotime($hki->tanggal_penerimaan)).'</td>';
+                            echo '<td>'.htmlspecialchars($hki->status).'</td>';
+                            echo '<td>'.date("d/m/Y", strtotime($hki->deadline)).'</td>';
+                            echo '<td><a href="#" data-bs-toggle="modal" data-bs-target="#hki_dokumen_'.$hki->id.'">Lihat Dokumen</a></td>';
+                            echo '</tr>';
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
 
             <strong>Minuta:</strong>
             <div class="bg-light p-4">
