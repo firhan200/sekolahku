@@ -87,3 +87,16 @@ Author URI: https://firhan200.github.io
 .main-title-height{
 	height:100px;
 }
+
+#sample_slider .owl-nav .owl-prev, #sample_slider .owl-nav .owl-next {
+    background-color: rgba(244,57,48,0.6) !important;
+	width: 40px !important;
+    height: 40px !important;
+    border-radius: 20px;
+    font-size: 10pt;
+    background-size: 10px 15px !important;
+}
+
+#sample_slider .owl-nav .owl-prev:hover, #sample_slider .owl-nav .owl-next:hover {
+    background-color: rgba(244,57,48,0.9) !important;
+}
