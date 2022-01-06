@@ -3,11 +3,23 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-12 col-md-3">
-                    Blok AR Jl. Ruko Modern Land
+                    <?php
+                    $custom_logo_id = get_theme_mod( 'custom_logo' );
+                    $logo = wp_get_attachment_image_src( $custom_logo_id , 'full' );
+                    
+                    if ( has_custom_logo() ) {
+                        echo '<a class="navbar-brand" href="'.site_url('/').'"><img height="50" src="' . esc_url( $logo[0] ) . '" alt="' . get_bloginfo( 'name' ) . '"></a>';
+                    } else {
+                        echo '<h1>' . get_bloginfo('name') . '</h1>';
+                    }
+                    ?>
                     <br/>
-                    Kec Tangerang
                     <br/>
-                    +62 812-1234-5678
+                    <?php if ( is_active_sidebar( 'company-information-footer' ) ) { ?>
+                        <ul id="sidebar">
+                            <?php dynamic_sidebar('company-information-footer'); ?>
+                        </ul>
+                    <?php } ?>
                 </div>
                 <div class="col-sm-12 col-md-3">
                     <div class="legal101-footer-title">

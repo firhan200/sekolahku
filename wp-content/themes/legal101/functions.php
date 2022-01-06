@@ -1,6 +1,10 @@
 <?php
+
 function legal101_theme_support(){
+    add_theme_support( 'custom-logo' );
     add_theme_support('title-tag');
+    add_theme_support('widgets');
+    add_theme_support('widgets-block-editor');
 }
 
 add_action('after_setup_theme', 'legal101_theme_support');
@@ -40,5 +44,22 @@ function legal101_register_styles(){
 add_action('wp_enqueue_scripts', 'legal101_register_styles');
 
 add_theme_support('title-tag');
+
+
+/* Widgets */
+
+add_action('widgets_init', 'legal101_register_sidebars');
+     
+function legal101_register_sidebars() { 
+    register_sidebar(array(
+      'name'=> __( 'Company Information Footer', 'textdomain' ),  
+      'id'=> 'company-information-footer',  
+      'description'=> 'Change Company Information that display on footer.',  
+      'before_widget' => '<div id="%1$s" class="widget %2$s">',
+      'after_widget' => '</div>',
+      'before_title' => '<h2 class="">',
+      'after_title' => '</h2>',        
+    ));
+}
 
 ?>
