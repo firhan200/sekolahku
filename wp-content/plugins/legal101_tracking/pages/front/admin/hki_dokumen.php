@@ -1,4 +1,3 @@
-<div class="container main-container">
 
 <?php
 $menu_hki = true;
@@ -199,27 +198,32 @@ if(count($errors) < 1){
     }
 }
 ?>
-
+<div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="legal-ts-breadcrumb breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home ?>">Client</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id ?>"><?php echo $user->company_name ?></a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_hki."?&user_id=".$hki->user_id ?>"><?php echo $hki->pemohon.' - '.$hki->pekerjaan ?></a></li>
+                        <?php if($is_list){ ?>
+                            <li class="breadcrumb-item active" aria-current="page">Dokumen</li>
+                        <?php }else{ ?>
+                            <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">Dokumen</a></li>
+                            <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
+                        <?php } ?>
+                    </ol>
+                </nav>
+                <h1 class="legal-ts-main-title"><?php echo $action_label; ?></h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container main-container">
 <div class="wrap">
     <div class="row">
-        <div class="col-md-6">
-            <h1 class="wp-heading-inline">
-                <?php echo $action_label; ?>
-            </h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id ?>"><?php echo $user->company_name ?></a></li>
-                    <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_hki."?&user_id=".$hki->user_id ?>"><?php echo $hki->pemohon.' - '.$hki->pekerjaan ?></a></li>
-                    <?php if($is_list){ ?>
-                        <li class="breadcrumb-item active" aria-current="page">Dokumen</li>
-                    <?php }else{ ?>
-                        <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">Dokumen</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
-                    <?php } ?>
-                </ol>
-            </nav>
-        </div>
-        <div class="col-md-6 text-end">
+        <div class="col-md-12 text-end">
             <?php if($is_list){ ?>
                 <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-danger"><i class="fa fa-plus"></i> Tambah Baru</a>
             <?php } ?>
@@ -331,16 +335,6 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </tr>
                 <?php } ?>
             </tbody>
-            <tfoot>
-                <tr>
-                    <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Link</span>
-                    </th>
-                    <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Tanggal</span>
-                    </th>
-                </tr>
-            </tfoot>
         </table>
     </div>
 </form>

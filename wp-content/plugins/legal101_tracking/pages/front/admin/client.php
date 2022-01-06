@@ -1,4 +1,3 @@
-<div class="container main-container">
 <?php
 $menu_dashboard = true;
 global $wpdb;
@@ -284,24 +283,29 @@ if(count($errors) < 1){
 }
 ?>
 
+<div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="legal-ts-breadcrumb breadcrumb">\
+                        <?php if($is_list){ ?>
+                            <li class="breadcrumb-item active" aria-current="page">Client</li>
+                        <?php }else{ ?>
+                            <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">Client</a></li>
+                            <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
+                        <?php } ?>
+                    </ol>
+                </nav>
+                <h1 class="legal-ts-main-title">Client</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container main-container">
 <div class="wrap">
     <div class="row">
-        <div class="col-md-6">
-            <h1 class="wp-heading-inline">
-                <?php echo $action_label; ?>
-            </h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <?php if($is_list){ ?>
-                        <li class="breadcrumb-item active" aria-current="page">Client</li>
-                    <?php }else{ ?>
-                        <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">Client</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
-                    <?php } ?>
-                </ol>
-            </nav>
-        </div>
-        <div class="col-md-6 text-end">
+        <div class="col-md-12 text-end">
             <?php if($is_list){ ?>
                 <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-danger"><i class="fa fa-plus"></i> Tambah Baru</a>
             <?php } ?>
@@ -496,31 +500,6 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </tr>
                 <?php } ?>
             </tbody>
-            <tfoot>
-                <tr>
-                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                        <span>Nama Perusahaan</span>
-                    </th>
-                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                        <span>Total Perizinan</span>
-                    </th>
-                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                        <span>Total HKI</span>
-                    </th>
-                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                        <span>Total Faktur</span>
-                    </th>
-                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                        <span>Total PPN</span>
-                    </th>
-                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                        <span>Total SPT Tahunan</span>
-                    </th>
-                    <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                        <span>Status</span>
-                    </th>
-                </tr>
-            </tfoot>
         </table>
     </div>
 </form>

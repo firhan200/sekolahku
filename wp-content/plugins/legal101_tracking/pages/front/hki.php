@@ -6,11 +6,24 @@ $menu_hki = true;
 $list_hki = $wpdb->get_results("SELECT h.* FROM "._tbl_hki." AS h WHERE h.user_id = '".$_SESSION[SESSION_ID]."'");
 $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." AS hd LEFT JOIN "._tbl_hki." AS h ON hd.hki_id=h.id WHERE h.user_id = '".$_SESSION[SESSION_ID]."'");
 ?>
-
+<div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="legal-ts-breadcrumb breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._pages_home ?>">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">HKI</li>
+                    </ol>
+                </nav>
+                <h1 class="legal-ts-main-title">Project Status HKI</h1>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container main-container">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center mb-3 section-heading">Project Status HKI</h2>
             <div class="table-responsive">
                 <table class="table table-hover table-bordered mb-3">
                     <thead>
@@ -36,7 +49,7 @@ $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." 
                             echo '<td>'.date("d/m/Y", strtotime($hki->tanggal_penerimaan)).'</td>';
                             echo '<td>'.htmlspecialchars($hki->status).'</td>';
                             echo '<td>'.date("d/m/Y", strtotime($hki->deadline)).'</td>';
-                            echo '<td><a href="#" data-bs-toggle="modal" data-bs-target="#hki_dokumen_'.$hki->id.'">Lihat Dokumen</a></td>';
+                            echo '<td><a href="#" data-bs-toggle="modal" data-bs-target="#hki_dokumen_'.$hki->id.'">Click Here</a></td>';
                             echo '</tr>';
                         }
                         ?>

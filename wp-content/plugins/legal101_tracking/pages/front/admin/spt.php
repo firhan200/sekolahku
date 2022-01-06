@@ -1,4 +1,3 @@
-<div class="container main-container">
 
 <?php
 $menu_spt = true;
@@ -212,26 +211,31 @@ if(count($errors) < 1){
     }
 }
 ?>
-
+<div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="legal-ts-breadcrumb breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home ?>">Client</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id ?>"><?php echo $user->company_name ?></a></li>
+                        <?php if($is_list){ ?>
+                            <li class="breadcrumb-item active" aria-current="page">SPT</li>
+                        <?php }else{ ?>
+                            <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">SPT</a></li>
+                            <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
+                        <?php } ?>
+                    </ol>
+                </nav>
+                <h1 class="legal-ts-main-title"><?php echo $action_label; ?></h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container main-container">
 <div class="wrap">
     <div class="row">
-        <div class="col-md-6">
-            <h1 class="wp-heading-inline">
-                <?php echo $action_label; ?>
-            </h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?php echo site_url('/')._admin_pages_home."?action_type=edit&id=".$parent_id ?>"><?php echo $user->company_name ?></a></li>
-                    <?php if($is_list){ ?>
-                        <li class="breadcrumb-item active" aria-current="page">SPT</li>
-                    <?php }else{ ?>
-                        <li class="breadcrumb-item"><a href="<?php echo $list_url ?>">SPT</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><?php echo $is_add ? 'Create' : 'Edit' ?></li>
-                    <?php } ?>
-                </ol>
-            </nav>
-        </div>
-        <div class="col-md-6 text-end">
+        <div class="col-md-12 text-end">
             <?php if($is_list){ ?>
                 <a href="<?php echo $add_url; ?>" class="page-title-action btn btn-danger"><i class="fa fa-plus"></i> Tambah Baru</a>
             <?php } ?>
@@ -357,19 +361,6 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </tr>
                 <?php } ?>
             </tbody>
-            <tfoot>
-                <tr>
-                    <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Tahun SPT</span>
-                    </th>
-                    <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Link Dokumen</span>
-                    </th>
-                    <th scope="col" class="manage-column column-title column-primary sortable desc">
-                            <span>Status</span>
-                    </th>
-                </tr>
-            </tfoot>
         </table>
     </div>
 </form>
@@ -455,54 +446,3 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <?php
 $my_saved_attachment_post_id = get_option( 'media_selector_attachment_id', 0 );
 ?>
-<script type="text/javascript" src="<?php echo $my_plugin ?>/assets/js/jquery-3.6.0.min.js"></script>
-<script type='text/javascript'>
-    jQuery( document ).ready( function( $ ) {
-        // Uploading files
-        var file_frame;
-        var wp_media_post_id = wp.media.model.settings.post.id; // Store the old id
-        var set_to_post_id = <?php echo $my_saved_attachment_post_id; ?>; // Set this
-        jQuery('#upload_image_button').on('click', function( event ){
-            event.preventDefault();
-            // If the media frame already exists, reopen it.
-            if ( file_frame ) {
-                // Set the post ID to what we want
-                file_frame.uploader.uploader.param( 'post_id', set_to_post_id );
-                // Open frame
-                file_frame.open();
-                return;
-            } else {
-                // Set the wp.media post id so the uploader grabs the ID we want when initialised
-                wp.media.model.settings.post.id = set_to_post_id;
-            }
-            // Create the media frame.
-            file_frame = wp.media.frames.file_frame = wp.media({
-                title: 'Select a image to upload',
-                button: {
-                    text: 'Use this image',
-                },
-                multiple: false // Set to true to allow multiple files to be selected
-            });
-            // When an image is selected, run a callback.
-            file_frame.on( 'select', function() {
-                // We set multiple to false so only get one image from the uploader
-                attachment = file_frame.state().get('selection').first().toJSON();
-
-                console.log(attachment);
-                // Do something with attachment.id and/or attachment.url here
-                //$( '#image-preview' ).attr( 'src', attachment.url ).css( 'width', 'auto' );
-                $( '#attachment_id' ).val( attachment.id );
-
-                $('#link-preview').html('<a href="'+attachment.url+'" target="_blank">'+attachment.url+'</a><br/><br/>');
-                // Restore the main post ID
-                wp.media.model.settings.post.id = wp_media_post_id;
-            });
-                // Finally, open the modal
-                file_frame.open();
-        });
-        // Restore the main ID when the add media button is pressed
-        jQuery( 'a.add_media' ).on( 'click', function() {
-            wp.media.model.settings.post.id = wp_media_post_id;
-        });
-    });
-</script>

@@ -60,13 +60,28 @@ function intToMonth($int){
     return $month;
 }
 ?>
-
+<div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="legal-ts-breadcrumb breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._pages_home ?>">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Perpajakan</li>
+                    </ol>
+                </nav>
+                <h1 class="legal-ts-main-title">Perpajakan</h1>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container main-container">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center mb-3 section-heading">Perpajakan</h2>
-
             <div class="row mb-4">
+                <div class="col-sm-12 col-lg-2 col-md-3 align-middle">
+                    Faktur
+                </div>
                 <div class="col-sm-12 col-lg-4 col-md-6">
                     <form id="form_filter_faktur" method="GET">
                         <select class="form-select" name="filter" id="filter_faktur">
@@ -105,6 +120,10 @@ function intToMonth($int){
                 </table>
             </div>
 
+            <div class="mb-5">
+                Jumlah Faktur : <?php echo count($list_faktur); ?>
+            </div>
+
             <h4 class="mb-3">1. Laporan PPN</h4>
             <div class="table-responsive">
                 <table class="table table-responsive table-hover table-bordered mb-3">
@@ -136,7 +155,7 @@ function intToMonth($int){
                             }
 
                             echo '</td>';
-                            echo '<td><a href="'.wp_get_attachment_url($ppn->attachment_id).'" target="_blank">'.wp_get_attachment_url($ppn->attachment_id).'</a></td>';
+                            echo '<td><a href="'.wp_get_attachment_url($ppn->attachment_id).'" target="_blank">Pdf</a></td>';
                             echo '</tr>';
                         }
                         ?>
@@ -144,7 +163,7 @@ function intToMonth($int){
                 </table>
             </div>
 
-            <h4 class="mb-3">2. Laporan SPT Tahunan</h4>
+            <h4 class="mb-3 mt-5">2. Laporan SPT Tahunan</h4>
             <div class="table-responsive">
                 <table class="table table-hover table-bordered mb-3">
                     <thead>
@@ -175,7 +194,7 @@ function intToMonth($int){
                             }
 
                             echo '</td>';
-                            echo '<td><a href="'.wp_get_attachment_url($spt->attachment_id).'" target="_blank">'.wp_get_attachment_url($spt->attachment_id).'</a></td>';
+                            echo '<td><a href="'.wp_get_attachment_url($spt->attachment_id).'" target="_blank">Pdf</a></td>';
                             echo '</tr>';
                         }
                         ?>

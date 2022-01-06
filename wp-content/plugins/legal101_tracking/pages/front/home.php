@@ -6,10 +6,24 @@ $menu_dashboard = true;
 $profil = $wpdb->get_row("SELECT * FROM "._tbl_users." WHERE id = '".$_SESSION[SESSION_ID]."'");
 ?>
 
+<div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="legal-ts-breadcrumb breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._pages_home ?>">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                    </ol>
+                </nav>
+                <h1 class="legal-ts-main-title">Profile</h1>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container main-container">
     <div class="row">
         <div class="col-12">
-            <h1 class="text-center section-heading">Profil</h1>
             <div class="row mt-5">
                 <div class="col-md-6">
                     <div class="row info-detail">

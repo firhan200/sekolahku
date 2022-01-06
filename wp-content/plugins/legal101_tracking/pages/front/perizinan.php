@@ -5,11 +5,24 @@ $menu_perizinan = true;
 //get profile
 $list_perizinan = $wpdb->get_results("SELECT p.*, u.company_name AS company_name, u.company_address AS company_address FROM "._tbl_perizinan." AS p LEFT JOIN "._tbl_users." AS u ON p.user_id=u.id WHERE p.user_id = '".$_SESSION[SESSION_ID]."'");
 ?>
-
+<div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="legal-ts-breadcrumb breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo site_url('/')._pages_home ?>">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Perizinan</li>
+                    </ol>
+                </nav>
+                <h1 class="legal-ts-main-title">Project Status Perizinan</h1>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container main-container">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center mb-3 section-heading">Project Status Perizinan</h2>
             <div class="table-responsive">
                 <table class="table table-hover table-bordered mb-3">
                     <thead>

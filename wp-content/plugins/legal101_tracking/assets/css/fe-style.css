@@ -5,21 +5,6 @@ body{
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.navbar{
-    height:70px;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-    background-color: #fff;
-}
-
-.nav-item{
-    margin-right:20px;
-    font-size:11pt;
-}
-
-.nav-item > .active{
-    color:#25b15f !important;
-}
-
 .section-heading{
     font-size:48px;
     font-weight:bold;
@@ -110,12 +95,20 @@ body{
     .quiz_container{
         margin-top:125px;
     }
+
+    .main-header{
+        height:200px;
+    }
 }
 
 /* Landscape tablets and medium desktops */
 @media (min-width: 992px) and (max-width: 1199px) {
     .quiz_container{
         margin-top:125px;
+    }
+
+    .main-header{
+        height:200px;
     }
 }
 
@@ -124,6 +117,10 @@ body{
     .quiz_container{
         margin-top:125px;
     }
+
+    .main-header{
+        height:200px;
+    }
 }
 
 /* Landscape phones and portrait tablets */
@@ -131,12 +128,22 @@ body{
     .quiz_container{
         margin-top:175px;
     }
+
+    .main-header{
+        height:300px !important;
+        padding-top:100px !important;
+    }
 }
 
 /* Portrait phones and smaller */
 @media (max-width: 480px) {
     .quiz_container{
         margin-top:185px;
+    }
+
+    .main-header{
+        height:300px !important;
+        padding-top:100px !important;
     }
 }
 
@@ -169,54 +176,101 @@ input[type=checkbox]:checked::before {
     width: 1.3125rem;
 }
 
-.form-table{
-    width: 920px;
-}
-
-.form-table tr{
-    height:50px;
-}
-
-.form-table th{
-    width:250px !important;
-}
-
-.form-table .regular-text{
-    height:40px;
-    width:250px;
-    border:0px;
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.form-table textarea{
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.form-table select{
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
 .login-box{
     background-color: #fff;
     padding:30px;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     border-radius: 15px;
+}
+
+.legal101-navbar{
+    background-color: rgba(15, 15, 15, 0.8);
+    padding-top:0px !important;
+    padding-bottom:0px !important;
+}
+
+.legal101-left-nav .nav-item a{
+    display: block;
+    padding-top:30px;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    margin-bottom:20px !important;
+    padding-bottom: 15px;
+    color:#eaeaea;
+    text-decoration: none;
+}
+
+.legal101-left-nav .active{
+    background-color: #f43930;
+}
+
+.legal101-right-nav .nav-item a{
+    font-size:14pt;
+    text-transform: uppercase;
+    color: #eaeaea !important;
+    margin-left: 30px;
+    text-decoration: none;
+}
+
+.legal101-footer{
+    padding-top:50px;
+    padding-bottom:50px;
+    background-color: #262626;
+    color:#838383;
+}
+
+.legal101-footer-title{
+    font-size: 14px;
+    color: #eaeaea;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding-bottom:20px;
+}
+
+.legal101-footer-link{
+    list-style-type: none;
+    padding-left: 0px;
+    line-height: 35px;
+}
+.legal101-footer-link a{
+    color:#838383;
+    padding-left:0px;
+    text-decoration: none;
+    transition: padding-left 1s;
+}
+
+.legal101-footer-link a:hover{
+    color:#eaeaea;
+    text-decoration: none;
+    padding-left:20px;
+}
+
+.main-header{
+    height:400px;
+    padding-top:150px;
+}
+
+.legal-ts-main-title{
+    font-size:40pt;
+    color:#fff;
+}
+
+.legal-ts-breadcrumb li a{
+    color:#b1b3b6;
+}
+
+.legal-ts-breadcrumb .active{
+    color:#fff;
+}
+
+#sidebar{
+    padding-left:0px;
+}
+
+.table thead{
+    background-color: #252525;
+}
+
+.table thead tr th{
+    color: #fff;
 }
