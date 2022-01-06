@@ -274,3 +274,21 @@ input[type=checkbox]:checked::before {
 .table thead tr th{
     color: #fff;
 }
+
+.overlay-bg{
+    background-color: rgba(0,0,0,0.7); /* Black background with opacity */
+    z-index: -1;
+    height: 100vh;
+    width: 100%;
+    position: absolute;
+}
+
+.full-bg{
+    background: url("../img/bg.jpg") no-repeat center fixed;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: -2;
+    opacity: 0.8;
+}

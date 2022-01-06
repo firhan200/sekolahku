@@ -57,6 +57,9 @@ $my_plugin = plugin_dir_url('').'/'._plugin_name;
             </div>
         </nav>
         <!-- logged in footer -->
+    <?php
+    }
+    ?>
 
         <div class="container-fluid legal101-footer">
             <div class="container">
@@ -128,9 +131,7 @@ $my_plugin = plugin_dir_url('').'/'._plugin_name;
                 </div>
             </div>
         </div>
-        <?php
-    }
-    ?>
+        
 
     <script type="text/javascript" src="<?php echo $my_plugin ?>/assets/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="<?php echo $my_plugin ?>/assets/plugins/bootstrap-5.1.3/js/bootstrap.min.js"></script>

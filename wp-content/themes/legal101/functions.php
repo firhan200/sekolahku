@@ -60,6 +60,46 @@ function legal101_register_sidebars() {
       'before_title' => '<h2 class="">',
       'after_title' => '</h2>',        
     ));
+
+    register_sidebar(array(
+      'name'=> __( 'Login Image Icon', 'textdomain' ),  
+      'id'=> 'legal101-login-icon',  
+      'description'=> 'Change Login Image Icon.',  
+      'before_widget' => '<div id="%1$s" class="widget %2$s">',
+      'after_widget' => '</div>',
+      'before_title' => '<h2 class="">',
+      'after_title' => '</h2>',        
+    ));
+
+    register_sidebar(array(
+      'name'=> __( 'Social Image Icon', 'textdomain' ),  
+      'id'=> 'legal101-social-icon',  
+      'description'=> 'Change Social Image Icon.',  
+      'before_widget' => '<div id="%1$s" class="widget %2$s">',
+      'after_widget' => '</div>',
+      'before_title' => '<h2 class="">',
+      'after_title' => '</h2>',        
+    ));
+
+    register_sidebar(array(
+      'name'=> __( 'Login - Left Content', 'textdomain' ),  
+      'id'=> 'legal101-login-left-content',  
+      'description'=> 'Login - Left Content',  
+      'before_widget' => '<div id="%1$s" class="widget %2$s">',
+      'after_widget' => '</div>',
+      'before_title' => '<h2 class="">',
+      'after_title' => '</h2>',        
+    ));
+
+    register_sidebar(array(
+      'name'=> __( 'Login - Contact Us', 'textdomain' ),  
+      'id'=> 'legal101-contact-us',  
+      'description'=> 'Login - Contact Us',  
+      'before_widget' => '<div id="%1$s" class="widget %2$s">',
+      'after_widget' => '</div>',
+      'before_title' => '<h2 class="">',
+      'after_title' => '</h2>',        
+    ));
 }
 
 ?>

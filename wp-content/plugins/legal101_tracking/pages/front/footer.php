@@ -1,14 +1,12 @@
 <?php
 $my_plugin = plugin_dir_url('').'/'._plugin_name;
-?>
-    <?php
-    if ( ! session_id() ) {
-        session_start();
-    }
 
+?>
+
+    <?php
     //check if login
     if(isset($_SESSION[SESSION_ID]) && !isset($hide_menu)){
-        ?>
+    ?>
         <nav class="legal101-navbar navbar navbar-expand-lg navbar-dark fixed-top">
             <div class="container">
                 <?php
@@ -48,6 +46,9 @@ $my_plugin = plugin_dir_url('').'/'._plugin_name;
             </div>
         </nav>
         <!-- logged in footer -->
+    <?php
+    }
+    ?>
 
         <div class="container-fluid legal101-footer">
             <div class="container">
@@ -119,9 +120,7 @@ $my_plugin = plugin_dir_url('').'/'._plugin_name;
                 </div>
             </div>
         </div>
-        <?php
-    }
-    ?>
+    
 
     
 
