@@ -5,6 +5,7 @@ function legal101_theme_support(){
     add_theme_support('title-tag');
     add_theme_support('widgets');
     add_theme_support('widgets-block-editor');
+    add_theme_support( 'post-thumbnails'); // Add it for posts
 }
 
 add_action('after_setup_theme', 'legal101_theme_support');

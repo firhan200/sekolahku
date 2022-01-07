@@ -100,3 +100,58 @@ Author URI: https://firhan200.github.io
 #sample_slider .owl-nav .owl-prev:hover, #sample_slider .owl-nav .owl-next:hover {
     background-color: rgba(244,57,48,0.9) !important;
 }
+
+.legal101-post-list li{
+    background-color: #262626;
+    padding:30px;
+}
+
+.legal101-post-list li a{
+    color:rgb(233, 232, 232);
+    font-size:16pt;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.legal101-post-list li a:hover{
+    color:#fff;
+    text-decoration: underline;
+}
+
+.legal101-post-list li .wp-block-latest-posts__post-excerpt{
+    color:rgb(206, 206, 206);
+    font-size:12pt;
+    font-weight: 200;
+}
+
+.legal101-post-list li .wp-block-latest-posts__featured-image{
+    margin-bottom: 20px;
+    margin-top:-30px;
+    margin-left:-30px;
+    margin-right:-30px;
+}
+
+.legal101-post-list li .wp-block-latest-posts__featured-image::after{
+    content: "";
+    display: block;
+    width: 100px;
+    height: 5px;
+    background-color: #cf2e2e;
+    margin-left: 30px;
+}
+
+.legal101-post-list li .wp-block-latest-posts__featured-image img{
+    width:100%;
+}
+
+.legal101-single-post{
+    margin-top:150px;
+    margin-bottom:150px;
+}
+
+.legal101-single-post-box{
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    padding:20px;
+    border-radius: 10px;
+    background-color: #fff;
+}
