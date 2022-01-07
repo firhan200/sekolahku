@@ -750,3 +750,60 @@ function ppn_page(){
 function spt_page(){
     include_once( __DIR__ . '/pages/cms/spt.php' );
 }
+
+/* shortcode */
+function legal101_our_practice_function() {
+	global $wpdb;
+
+	$return_string = "";
+
+	//get our practice post type
+	$our_practices = get_posts(array(
+		'category' => get_cat_ID('Our Practice'),
+	));
+
+	$pills = '';
+	$contents = '';
+	foreach($our_practices as $key => $our_practice){
+		$is_active = $key == 0 ? 'active' : '';
+
+		$pills .= '<li class="nav-item" role="presentation">';
+		$pills .= '<button class="nav-link '.$is_active.'" data-bs-toggle="pill" data-bs-target="#legal101-our-practice-'.$our_practice->ID.'" type="button" role="tab" aria-controls="legal101-our-practice-'.$our_practice->ID.'" aria-selected="true">'.$our_practice->post_title.'</button>';
+		$pills .= '</li>';
+
+		$contents .= '<div class="tab-pane fade show '.$is_active.'" id="legal101-our-practice-'.$our_practice->ID.'" role="tabpanel">';
+		$contents .= '<div class="card mb-3">
+			<div class="row g-0 legal101-our-practice-item">
+				<div class="col-md-8 ctr">
+					<div class="card-body">
+						<h5 class="card-title">'.$our_practice->post_title.'</h5>
+						<p class="card-text">'.$our_practice->post_excerpt.'</p>
+						<a href="'.$our_practice->guid.'" class="lgl-see-more">See More</a>
+					</div>
+				</div>
+				<div class="col-md-4 tmb">
+				'.get_the_post_thumbnail($our_practice->ID).'
+				</div>
+			</div>
+		</div>';
+		$contents .= '</div>';
+	}
+
+	$pills_html = '<ul class="nav nav-pills legal101-our-practice-pills" role="tablist">'.$pills.'</ul>';
+	$contents_html = '<div class="tab-content" id="pills-tabContent">'.$contents.'</div>';
+
+	$return_string = $pills_html . $contents_html;
+
+	return $return_string;
+}
+
+function register_legal101_shortcodes(){
+	add_shortcode('legal101-our-practice', 'legal101_our_practice_function');
+}
+
+add_action( 'init', 'register_legal101_shortcodes');
+
+function shortcode_footer_func() {
+	wp_enqueue_style("legal101-shortcode-style", plugins_url("/assets/css/shortcode-style.css", __FILE__));
+  }
+add_action( 'wp_footer', 'shortcode_footer_func' );
