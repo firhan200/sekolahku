@@ -5,6 +5,17 @@ $menu_hki = true;
 //get profile
 $list_hki = $wpdb->get_results("SELECT h.* FROM "._tbl_hki." AS h WHERE h.user_id = '".$_SESSION[SESSION_ID]."'");
 $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." AS hd LEFT JOIN "._tbl_hki." AS h ON hd.hki_id=h.id WHERE h.user_id = '".$_SESSION[SESSION_ID]."'");
+
+$admin_name = "";
+if(count($list_hki) > 0){
+    $user_id = $list_hki[0]->user_id;
+    $user_info = $wpdb->get_row("SELECT * FROM "._tbl_users." WHERE id = '".$_SESSION[SESSION_ID]."'");
+    if($user_info != null){
+        $admin_info = $wpdb->get_row("SELECT * FROM "._tbl_administrators." WHERE id = '".$user_info->administrator_id."'");
+        $admin_name = $admin_info->full_name;
+    }
+}
+
 ?>
 <div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
     <div class="container">
@@ -35,6 +46,7 @@ $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." 
                             <th>Tanggal Penerimaan</th>
                             <th>Status</th>
                             <th>Deadline</th>
+                            <th>Admin</th>
                             <th>Doc</th>
                         </tr>
                     </thead>
@@ -49,6 +61,7 @@ $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." 
                             echo '<td>'.date("d/m/Y", strtotime($hki->tanggal_penerimaan)).'</td>';
                             echo '<td>'.htmlspecialchars($hki->status).'</td>';
                             echo '<td>'.date("d/m/Y", strtotime($hki->deadline)).'</td>';
+                            echo '<td>'.htmlspecialchars($admin_name).'</td>';
                             echo '<td><a href="#" data-bs-toggle="modal" data-bs-target="#hki_dokumen_'.$hki->id.'">Click Here</a></td>';
                             echo '</tr>';
                         }
