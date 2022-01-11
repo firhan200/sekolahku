@@ -32,8 +32,14 @@ Author URI: https://firhan200.github.io
     font-size:14pt;
     text-transform: uppercase;
     color: #eaeaea !important;
-    margin-left: 30px;
+    margin-left: 20px;
+	margin-right:10px;
     text-decoration: none;
+}
+
+.legal101-right-nav .nav-item{
+	margin-bottom:20px;
+	margin-top:12px;
 }
 
 .legal101-footer{
@@ -154,4 +160,64 @@ Author URI: https://firhan200.github.io
     padding:20px;
     border-radius: 10px;
     background-color: #fff;
+}
+
+.red-strip::after{
+	content: "";
+    display: block;
+    width: 100px;
+    height: 5px;
+    background-color: #cf2e2e;
+}
+
+/*make the menu sub-menu items drop down on mouse hover */
+ul.sub-menu{ 
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    list-style:none;
+    padding-left:5px;
+    padding:5px;
+}
+
+.sub-menu li a{
+    color:#000 !important;
+}
+
+ul.legal101-left-nav li.menu-item-has-children:hover > ul.sub-menu{
+    display: block;
+}
+
+/* Large desktops and laptops */
+@media (min-width: 1200px) {
+
+}
+
+/* Landscape tablets and medium desktops */
+@media (min-width: 992px) and (max-width: 1199px) {
+
+}
+
+/* Portrait tablets and small desktops */
+@media (min-width: 768px) and (max-width: 991px) {
+	.legal101-left-nav .nav-item a{
+		padding-top:5px;
+		padding-bottom: 5px;
+	}
+}
+
+/* Landscape phones and portrait tablets */
+@media (max-width: 767px) {
+	.legal101-left-nav .nav-item a{
+		padding-top:5px;
+		padding-bottom: 5px;
+	}
+}
+
+/* Portrait phones and smaller */
+@media (max-width: 480px) {
+	.legal101-left-nav .nav-item a{
+		padding-top:5px;
+		padding-bottom: 5px;
+	}
 }
