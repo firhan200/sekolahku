@@ -760,6 +760,7 @@ function legal101_our_practice_function() {
 	//get our practice post type
 	$our_practices = get_posts(array(
 		'category' => get_cat_ID('Our Practice'),
+		'posts_per_page' => 15
 	));
 
 	$pills = '';
