@@ -31,6 +31,9 @@ $siteUrl = site_url();
     <link href="<?php echo $my_plugin; ?>/assets/plugins/fontawesome-free-5.15.4-web/css/all.css" rel="stylesheet"></link>
     <link href="<?php echo $my_plugin; ?>/assets/css/daterangepicker.css" rel="stylesheet"></link>
     <link href="<?php echo $my_plugin; ?>/assets/css/fe-style.css" rel="stylesheet"></link>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap" rel="stylesheet">
 </head>
 <body data-plugin-name="<?php echo _plugin_name ?>" style="<?php echo $bodyStyle ?>">
     <input type="hidden" id="host_url" value="<?php echo get_site_url(); ?>"/>    
