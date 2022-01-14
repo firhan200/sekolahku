@@ -2,19 +2,42 @@
 global $wpdb;
 $menu_pajak = true;
 
-$selected_faktur_date = date("Y-m");
+$selected_faktur_date = null;
 
 if($_GET['filter'] != ''){
-    $selected_faktur_date = $_GET['filter'];
+    $selected_faktur_date = $_GET['filter'] != "" ? $_GET['filter'] : null;
+}
+
+$faktur_query = "SELECT * FROM "._tbl_faktur." WHERE user_id = '".$_SESSION[SESSION_ID]."'";
+$ppn_query = "SELECT * FROM "._tbl_ppn." WHERE user_id = '".$_SESSION[SESSION_ID]."'";
+
+if($selected_faktur_date != null){
+    //explode filter
+    $arr_filter = explode('-', $_GET['filter']);
+    $month = $arr_filter[1];
+    $year = $arr_filter[0];
+
+    $faktur_query .= " AND tanggal_faktur LIKE '%".$selected_faktur_date."-%'";
+    $ppn_query .= " AND bulan_pajak='".$month."' AND tahun_pajak='".$year."'";
 }
 
 //get profile
-$list_faktur = $wpdb->get_results("SELECT * FROM "._tbl_faktur." WHERE user_id = '".$_SESSION[SESSION_ID]."' AND tanggal_faktur LIKE '%".$selected_faktur_date."-%'");
-$list_ppn = $wpdb->get_results("SELECT * FROM "._tbl_ppn." WHERE user_id = '".$_SESSION[SESSION_ID]."' ORDER BY tahun_pajak, bulan_pajak DESC");
+$list_faktur = $wpdb->get_results($faktur_query);
+$list_ppn = $wpdb->get_results($ppn_query);
 $list_spt = $wpdb->get_results("SELECT * FROM "._tbl_spt_tahunan." WHERE user_id = '".$_SESSION[SESSION_ID]."' ORDER BY tahun DESC");
 
 //get available years
 $available_dates = $wpdb->get_results('SELECT * FROM '._tbl_faktur.' f WHERE tanggal_faktur IS NOT NULL AND user_id = '.$_SESSION[SESSION_ID].' GROUP BY YEAR(f.tanggal_faktur), MONTH(f.tanggal_faktur) ORDER BY tanggal_faktur DESC');
+$available_dates_ppn = $wpdb->get_results('SELECT * FROM '._tbl_ppn.' p WHERE user_id = '.$_SESSION[SESSION_ID].' GROUP BY p.bulan_pajak, p.tahun_pajak ORDER BY p.bulan_pajak, p.tahun_pajak DESC');
+
+$filter_date = array();
+foreach($available_dates as $date){
+    $filter_date[] = $date->tanggal_faktur;
+}
+
+foreach($available_dates_ppn as $date){
+    $filter_date[] = date('Y-m', strtotime($date->bulan_pajak.'/01/'.$date->tahun_pajak)).'-01';
+}
 
 //extra function
 function intToMonth($int){
@@ -80,14 +103,15 @@ function intToMonth($int){
         <div class="col-12">
             <div class="row mb-4">
                 <div class="col-sm-12 col-lg-2 col-md-3 align-middle">
-                    Faktur
+                    Penyaringan
                 </div>
                 <div class="col-sm-12 col-lg-4 col-md-6">
                     <form id="form_filter_faktur" method="GET">
                         <select class="form-select" name="filter" id="filter_faktur">
+                            <option value="">Tampil Semua</option>
                             <?php
-                            foreach($available_dates as $available_date){
-                                $strTime = strtotime($available_date->tanggal_faktur);
+                            foreach($filter_date as $available_date){
+                                $strTime = strtotime($available_date);
 
                                 $isSelected = $selected_faktur_date == date("Y-m", $strTime) ? 'selected' : '';
 
@@ -124,7 +148,7 @@ function intToMonth($int){
                 Jumlah Faktur : <?php echo count($list_faktur); ?>
             </div>
 
-            <h4 class="mb-3">1. Laporan PPN</h4>
+            <h4 class="mb-3">1. Laporan PPN (<?php echo empty($selected_faktur_date) ? "Semua" : date("M Y", strtotime($selected_faktur_date)); ?>)</h4>
             <div class="table-responsive">
                 <table class="table table-responsive table-hover table-bordered mb-3">
                     <thead>

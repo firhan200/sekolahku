@@ -221,3 +221,13 @@ ul.legal101-left-nav li.menu-item-has-children:hover > ul.sub-menu{
 		padding-bottom: 5px;
 	}
 }
+
+.round_title{
+	border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.title_min{
+	margin-top: -70px;
+    z-index: 1;
+}
