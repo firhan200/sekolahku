@@ -9,6 +9,10 @@
     wp_head(); 
     ?>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <nav class="legal101-navbar navbar navbar-expand-lg navbar-dark fixed-top">

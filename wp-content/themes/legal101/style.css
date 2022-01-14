@@ -7,6 +7,10 @@ Author: Firhan
 Author URI: https://firhan200.github.io
 */
 
+body{
+	font-family: 'Rubik', sans-serif !important;
+}
+
 .legal101-navbar{
     background-color: rgba(15, 15, 15, 0.8);
     padding-top:0px !important;
