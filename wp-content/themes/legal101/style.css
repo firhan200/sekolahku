@@ -229,6 +229,7 @@ ul.legal101-left-nav li.menu-item-has-children:hover > ul.sub-menu{
 .round_title{
 	border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
+	text-transform: uppercase;
 }
 
 .title_min{
@@ -237,7 +238,8 @@ ul.legal101-left-nav li.menu-item-has-children:hover > ul.sub-menu{
 }
 
 .pll-parent-menu-item{
-	margin-top:30px !important;
+	margin-top:15px !important;
+	margin-left:20px;
 }
 
 .pll-parent-menu-item a{
@@ -258,4 +260,12 @@ ul.legal101-left-nav li.menu-item-has-children:hover > ul.sub-menu{
 	padding-top:5px !important;
 	padding-bottom:5px !important;
 	color:#fff !important;
+}
+
+.pll-parent-menu-item:hover{
+	display: block;
+}
+
+ul.legal101-right-nav li.menu-item-has-children:hover > ul.sub-menu{
+    display: block;
 }
