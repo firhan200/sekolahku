@@ -757,12 +757,25 @@ function legal101_our_practice_function() {
 
 	$return_string = "";
 
+	$curr_language = pll_current_language();
+    $cate = 'Our Practice';
+    
+    if($curr_language == 'id'){
+        $cate = 'Our Practice';
+    }
+    else if($curr_language == 'en'){
+        $cate = 'Our Practice - EN';
+    }
+    else if($curr_language == 'zh'){
+        $cate = 'Our Practice - CN';
+    }
+
 	//get our practice post type
 	$our_practices = get_posts(array(
-		'category' => get_cat_ID('Our Practice'),
+		'category' => get_cat_ID($cate),
 		'posts_per_page' => 15
 	));
-
+	
 	$pills = '';
 	$contents = '';
 	foreach($our_practices as $key => $our_practice){

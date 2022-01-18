@@ -235,3 +235,11 @@ ul.legal101-left-nav li.menu-item-has-children:hover > ul.sub-menu{
 	margin-top: -70px;
     z-index: 1;
 }
+
+.menu-item-has-children{
+	margin-top:30px
+}
+
+.menu-item-has-children a{
+	color:#eaeaea;
+}
