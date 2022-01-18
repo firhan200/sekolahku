@@ -236,10 +236,26 @@ ul.legal101-left-nav li.menu-item-has-children:hover > ul.sub-menu{
     z-index: 1;
 }
 
-.menu-item-has-children{
-	margin-top:30px
+.pll-parent-menu-item{
+	margin-top:30px !important;
 }
 
-.menu-item-has-children a{
+.pll-parent-menu-item a{
 	color:#eaeaea;
+}
+
+.nav-item .sub-menu{
+	padding:0px;
+}
+
+.nav-item .sub-menu li a{
+	padding-top:5px !important;
+	padding-bottom:5px !important;
+	margin-bottom:0px !important;
+}
+
+.nav-item .sub-menu .active a{
+	padding-top:5px !important;
+	padding-bottom:5px !important;
+	color:#fff !important;
 }
