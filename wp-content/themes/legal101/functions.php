@@ -112,6 +112,16 @@ function legal101_register_sidebars() {
       'before_title' => '<h2 class="">',
       'after_title' => '</h2>',        
     ));
+
+    register_sidebar(array(
+      'name'=> __( 'Floating Section', 'textdomain' ),  
+      'id'=> 'legal101-floating-section',  
+      'description'=> 'Floating Section',  
+      'before_widget' => '<div id="%1$s" class="widget %2$s">',
+      'after_widget' => '</div>',
+      'before_title' => '<h2 class="">',
+      'after_title' => '</h2>',        
+    ));
 }
 
 ?>
