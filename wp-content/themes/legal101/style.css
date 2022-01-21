@@ -184,6 +184,8 @@ ul.sub-menu{
     list-style:none;
     padding-left:5px;
     padding:5px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .sub-menu li a{
