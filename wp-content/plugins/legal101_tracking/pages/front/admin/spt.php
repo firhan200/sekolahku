@@ -44,6 +44,7 @@ if($action_type != null){
     $tahun = date('Y');
     $attachment_id = null;
     $status = PERIZINAN_PENDING;
+    $filename = null;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -59,6 +60,7 @@ if($action_type != null){
             $tahun = $data->tahun;
             $attachment_id = $data->attachment_id;
             $status = $data->status;
+            $filename = $data->filename;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -92,6 +94,7 @@ if(count($errors) < 1){
         $tahun = $_POST['tahun'];
         $attachment_id = $_POST['custom_attachment_id'];
         $status = $_POST['status'];
+        $filename = $_POST['filename'];
 
         $post_id = $attachment_id;
 
@@ -130,13 +133,15 @@ if(count($errors) < 1){
                         'user_id' => $user_id,
                         'tahun' => $tahun,
                         'attachment_id' => $attachment_id,
-                        'status' => $status
+                        'status' => $status,
+                        'filename' => $filename
                     ),
                     array(
                         '%d',
                         '%s',
                         '%s',
                         '%d',
+                        '%s'
                     )
                 );
 
@@ -150,7 +155,8 @@ if(count($errors) < 1){
                     array(
                         'tahun' => $tahun,
                         'attachment_id' => $attachment_id,
-                        'status' => $status
+                        'status' => $status,
+                        'filename' => $filename
                     ),
                     array('id' => $id)
                 );
@@ -315,6 +321,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                             <span>Tahun SPT</span>
                     </th>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                            <span>Nama File</span>
+                    </th>
+                    <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
                             <span>Link Dokumen</span>
                     </th>
                     <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
@@ -341,6 +350,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                                 </a>
                             </span>
                         </div>
+                    </td>
+                    <td class="column-target-date" data-colname="target_date">
+                        <?php echo $data->filename; ?>
                     </td>
                     <td class="column-target-date" data-colname="target_date">
                         <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
@@ -375,6 +387,15 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 <form class="box p-5" method="post" enctype="multipart/form-data">
     <input type="hidden" name="submit" value="true"/>
     <input type="hidden" name="user_id" value="<?php echo $user->id; ?>"/>
+
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
+            Nama File
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="filename" value="<?php echo $filename; ?>" maxlength="250">
+        </div>
+    </div>
 
     <div class="mb-3 row align-items-center">
         <label class="col-sm-12 col-md-4 col-lg-3">

@@ -38,6 +38,8 @@ if($action_type != null){
     $identity_number = '';
     $website = '';
     $npwp = '';
+    $progress_message = '';
+    $minuta = '';
     $is_active = 1;
 
     if($action_type == 'add'){
@@ -64,6 +66,8 @@ if($action_type != null){
             $identity_number = $data->identity_number;
             $website = $data->website;
             $npwp = $data->npwp;
+            $progress_message = $data->progress_message;
+            $minuta = $data->minuta;
             $is_active = $data->is_active;
         }else{
             $errors[] = 'Data tidak ditemukan';
@@ -113,6 +117,8 @@ if(count($errors) < 1){
         $identity_number = $_POST['identity_number'];
         $website = $_POST['website'];
         $npwp = $_POST['npwp'];
+        $progress_message = $_POST['progress_message'];
+        $minuta = $_POST['minuta'];
         $is_active = $_POST['is_active'] == 'on' ? 1 : 0;
 
         //validation
@@ -162,10 +168,14 @@ if(count($errors) < 1){
                         'identity_number' => $identity_number,
                         'website' => $website,
                         'npwp' => $npwp,
+                        'progress_message' => $progress_message,
+                        'minuta' => $minuta,
                         'is_active' => $is_active
                     ),
                     array(
                         '%d',
+                        '%s',
+                        '%s',
                         '%s',
                         '%s',
                         '%s',
@@ -202,6 +212,8 @@ if(count($errors) < 1){
                     'identity_number' => $identity_number,
                     'website' => $website,
                     'npwp' => $npwp,
+                    'progress_message' => $progress_message,
+                    'minuta' => $minuta,
                     'is_active' => $is_active
                 );
 
@@ -689,6 +701,14 @@ if($is_edit){
             <tr>
                 <th scope="row"><label for="name">NPWP</label></th>
                 <td><input type="text" class="regular-text" name="npwp" value="<?php echo $npwp; ?>" maxlength="150"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Progress Message</label></th>
+                <td><textarea class="regular-text" name="progress_message"  maxlength="250"><?php echo $progress_message; ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Minuta</label></th>
+                <td><textarea class="regular-text" name="minuta"  maxlength="250"><?php echo $minuta; ?></textarea></td>
             </tr>
             <tr>
                 <th scope="row"><label for="is_active">Status</label></th>

@@ -40,6 +40,7 @@ if(count($errors) < 1){
 }
 if($action_type != null){
     $attachment_id = null;
+    $filename = null;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -53,6 +54,7 @@ if($action_type != null){
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
             $attachment_id = $data->attachment_id;
+            $filename = $data->filename;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -85,6 +87,7 @@ if(count($errors) < 1){
     if($_POST['submit']){
         $hki_id = $_POST['hki_id'];
         $attachment_id = $_POST['attachment_id'];
+        $filename = $_POST['filename'];
 
         if(count($errors) == 0){
             //all input valid
@@ -97,10 +100,12 @@ if(count($errors) < 1){
                     array(
                         'hki_id' => $hki_id,
                         'attachment_id' => $attachment_id,
+                        'filename' => $filename
                     ),
                     array(
                         '%d',
-                        '%d'
+                        '%d',
+                        '%s'
                     )
                 );
 
@@ -113,6 +118,7 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'attachment_id' => $attachment_id,
+                        'filename' => $filename
                     ),
                     array('id' => $id)
                 );
@@ -274,6 +280,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </td>
                 <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Nama File</span>
+                    </a>
+                </th>
+                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>Link</span>
                     </a>
                 </th>
@@ -300,7 +311,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </th>
                 <td class="title column-title has-row-actions column-primary page-name">
-                    <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
+                    <?php echo $data->filename; ?>
 
                     <div class="row-actions action_container">
                         <span class="edit">
@@ -316,6 +327,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         </span>
                     </div>
                 </td>
+                <td class="title column-title has-row-actions column-primary page-name">
+                    <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
+                </td>
                 <td class="column-target-date" data-colname="target_date">
                     <?php 
                         echo date('d M Y', strtotime($data->created_on));
@@ -330,6 +344,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     <label class="screen-reader-text" for="cb-select-all-2">Pilih Semua</label>
                     <input id="cb-select-all-2" type="checkbox">
                 </td>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Nama File</span>
+                    </a>
+                </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Link</span>
@@ -357,6 +376,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     <input type="hidden" name="hki_id" value="<?php echo $hki->id; ?>"/>
     <table class="form-table">
         <tbody>
+            <tr>
+                <th scope="row"><label for="name">Nama File</label></th>
+                <td><input type="text" class="regular-text" name="filename" value="<?php echo $filename; ?>" maxlength="250"></td>
+            </tr>
             <tr>
                 <th scope="row"><label for="name">File</label></th>
                 <td>

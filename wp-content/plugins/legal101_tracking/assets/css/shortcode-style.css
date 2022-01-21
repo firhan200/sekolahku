@@ -40,19 +40,43 @@
 
 .legal101-our-practice-pills li button{
     background-color: transparent;
-    font-weight: 500;
+    font-weight: bold;
     color: rgb(185 185 185);
-    text-decoration: underline;
 }
 
 
 .legal101-our-practice-pills li button:hover{
-    color: rgb(36, 36, 36);
+    color: rgb(185 185 185);
+}
+
+.legal101-our-practice-pills li button::after{
+    display: block;
+    content: " ";
+    width: 0%;
+    height: 2px;
+    margin-top:5px;
+    background-color: rgb(185 185 185);
+    -webkit-transition: width .5s ease-in-out;
+    -moz-transition: width .5s ease-in-out;
+    -o-transition: width .5s ease-in-out;
+    transition: width .5s ease-in-out;
+}
+
+.legal101-our-practice-pills li button:hover::after{
+    width: 100%;
 }
 
 .legal101-our-practice-pills .nav-link.active{
     background-color: transparent;
-    font-weight: 500;
-    color: rgb(36, 36, 36);
-    text-decoration: underline;
+    text-transform: capitalize;
+    color: #f43930;
+}
+
+.legal101-our-practice-pills .nav-link.active::after{
+    display: block;
+    content: " ";
+    width: 100%;
+    height: 2px;
+    margin-top:5px;
+    background-color: #f43930;
 }

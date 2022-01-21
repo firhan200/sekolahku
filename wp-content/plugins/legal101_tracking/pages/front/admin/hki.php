@@ -172,6 +172,24 @@ if(count($errors) < 1){
             echo "<script>window.history.pushState('page2', 'Title', '".$edit_url.$object_id."');</script>";
         }
     }
+    else if($_POST['update_client']){
+        $minuta = $_POST['minuta'];
+
+        //update into wpdb database
+        $wpdb->update(
+            _tbl_users,
+            array(
+                'minuta' => $minuta
+            ),
+            array('id' => $selected_user_id)
+        );
+
+        //success
+        $success[] = 'Data berhasil disimpan';
+
+        //get user again
+        $user = $wpdb->get_row("SELECT * FROM "._tbl_users." WHERE id = $selected_user_id");
+    }
 
     //check if delete
     if($is_delete){
@@ -251,13 +269,13 @@ if(count($errors) < 1){
 
     <?php if(count($success) > 0){
         foreach($success as $msg){
-            echo '<div class="alert alert-success"><p>'.$msg.'</p></div>';
+            echo '<div class="alert alert-success mt-3"><p>'.$msg.'</p></div>';
         }
     } ?>
 
     <?php if(count($errors) > 0){
         foreach($errors as $msg){
-            echo '<div class="alert alert-danger"><p>'.$msg.'</p></div>';
+            echo '<div class="alert alert-danger mt-3"><p>'.$msg.'</p></div>';
         }
     } ?>
 
@@ -410,13 +428,25 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </tr>
                 <?php } ?>
             </tbody>
-        </table>
+        </table> 
     </div>
 </form>
     <?php
     // Display the paging information
     echo '<div id="paging"><p>', $prevlink, ' Halaman <b>', $page, '</b> dari <b>', $pages, '</b> , Menampilkan <b>', $start, '-', $end, '</b> dari <b>', $total, '</b> Hasil ', $nextlink, ' </p></div>';
     ?>
+
+    <form action="" method="post">
+        <input type="hidden" name="update_client" value="true"/>
+        <input type="hidden" name="user_id" value="<?php echo $selected_user_id; ?>"/>
+        <div>
+            <label>Minuta</label>
+            <textarea name="minuta" class="form-control"><?php echo htmlspecialchars($user->minuta) ?></textarea>
+        </div>
+        <div class="mt-3 text-end">
+            <button type="submit" class="btn btn-danger">Simpan</button>
+        </div>
+    </form>
 <?php 
 }else if($is_add || $is_edit){
 ?>
@@ -489,7 +519,7 @@ if($is_edit){
             <textarea rows="5" cols="100" class="form-control" name="status" maxlength="250"><?php echo $status; ?></textarea>
         </div>
     </div>
-    <div class="mb-3 row align-items-center">
+    <div class="mb-3 row align-items-center" style="display:none;">
         <label class="col-sm-12 col-md-4 col-lg-3">
             Minuta
         </label>

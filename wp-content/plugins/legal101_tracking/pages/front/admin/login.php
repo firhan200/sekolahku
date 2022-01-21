@@ -23,8 +23,6 @@ $my_plugin = plugin_dir_url('')._plugin_name;
                 <?php } ?>
                 <div class="text-center">
                     <h1>Admin Account</h1>
-                    <div class="mt-4">Not an Admin?</div>
-                    <div><a href="<?php echo site_url('/')._pages_login ?>" class="text-black">Click Here</a></div>
                 </div>
                 <div class="input-group mb-4 mt-4">
                     <span class="input-group-text" id="basic-addon1"><i class="fa fa-envelope"></i></span>
@@ -43,9 +41,6 @@ $my_plugin = plugin_dir_url('')._plugin_name;
                     <?php } ?>
                 </div>
             </form>
-            <?php if ( is_active_sidebar( 'legal101-social-icon' ) ) { ?>
-                <?php dynamic_sidebar('legal101-social-icon'); ?>
-            <?php } ?>
         </div>
     </div>
 </div>

@@ -533,7 +533,7 @@ if($is_edit){
                 <th scope="row"><label for="name">Status</label></th>
                 <td><textarea rows="5" cols="100" name="status" maxlength="250"><?php echo $status; ?></textarea></td>
             </tr>
-            <tr>
+            <tr style="display:none">
                 <th scope="row"><label for="name">Minuta</label></th>
                 <td><textarea rows="5" cols="100" name="minuta" maxlength="250"><?php echo $minuta; ?></textarea></td>
             </tr>

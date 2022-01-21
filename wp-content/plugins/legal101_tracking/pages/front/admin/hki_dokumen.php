@@ -49,6 +49,7 @@ if($_POST['action_type_val'] != null){
 $action_label = "Dokumen HKI";
 if($action_type != null){
     $attachment_id = null;
+    $filename = null;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -62,6 +63,7 @@ if($action_type != null){
         $data = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = $id");
         if($data != null){
             $attachment_id = $data->attachment_id;
+            $filename = $data->filename;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -93,23 +95,27 @@ if(count($errors) < 1){
     if($_POST['submit']){
         $hki_id = $_POST['hki_id'];
         $attachment_id = $_POST['custom_attachment_id'];
+        $filename = $_POST['filename'];
 
         $post_id = $attachment_id;
-        if ( isset( $_POST['html-upload'] ) && ! empty( $_FILES ) ) {
-            require_once( ABSPATH . 'wp-admin/includes/admin.php' );
-            $att_id = media_handle_upload( 'async-upload', $post_id ); //post id of Client Files page
-            unset( $_FILES );
-            if( is_wp_error( $att_id ) ) {
-                $errors['upload_error'] = $att_id;
-                $att_id = false;
+        if($_FILES['async-upload']['name']){
+            if ( isset( $_POST['html-upload'] ) && ! empty( $_FILES ) ) {
+                require_once( ABSPATH . 'wp-admin/includes/admin.php' );
+                $att_id = media_handle_upload( 'async-upload', $post_id ); //post id of Client Files page
+                unset( $_FILES );
+                if( is_wp_error( $att_id ) ) {
+                    $errors['upload_error'] = $att_id;
+                    $att_id = false;
+                }
+
+                if( $errors ) {
+                    echo "<p>There was an error uploading your file.</p>";
+                }
             }
 
-            if( $errors ) {
-                echo "<p>There was an error uploading your file.</p>";
-            }
+            $attachment_id = $att_id;
         }
 
-        $attachment_id = $att_id;
 
         if(count($errors) == 0){
             //all input valid
@@ -122,10 +128,12 @@ if(count($errors) < 1){
                     array(
                         'hki_id' => $hki_id,
                         'attachment_id' => $attachment_id,
+                        'filename' => $filename,
                     ),
                     array(
                         '%d',
-                        '%d'
+                        '%d',
+                        '%s'
                     )
                 );
 
@@ -138,6 +146,7 @@ if(count($errors) < 1){
                     $table_name,
                     array(
                         'attachment_id' => $attachment_id,
+                        'filename' => $filename,
                     ),
                     array('id' => $id)
                 );
@@ -300,6 +309,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <thead>
                 <tr>
                     <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                            <span>Nama File</span>
+                    </th>
+                    <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
                             <span>Link</span>
                     </th>
                     <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
@@ -310,9 +322,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <tbody>
                 <?php foreach($list_of_data as $key => $data){ ?>
                 <tr id="post-<?php echo $key+1; ?>" class="type-post">
-                    <td class="title column-title has-row-actions column-primary page-name">
-                        <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
-
+                    <td class="column-target-date" data-colname="target_date">
+                        <?php 
+                            echo $data->filename;
+                        ?>
                         <div class="row-actions action_container">
                             <span class="edit">
                                 <a href="<?php echo $edit_url.$data->id ?>" aria-label="Edit">
@@ -326,6 +339,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                                 </a>
                             </span>
                         </div>
+                    </td>
+                    <td class="title column-title has-row-actions column-primary page-name">
+                        <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
                     </td>
                     <td class="column-target-date" data-colname="target_date">
                         <?php 
@@ -352,16 +368,26 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
 
     <div class="mb-3 row align-items-center">
         <label class="col-sm-12 col-md-4 col-lg-3">
+            Nama File
+        </label>
+        <div class="col-sm-12 col-md-8 col-ld-9">
+            <input type="text" class="form-control" name="filename" value="<?php echo $filename; ?>" maxlength="250">
+        </div>
+    </div>
+
+    <div class="mb-3 row align-items-center">
+        <label class="col-sm-12 col-md-4 col-lg-3">
             File
         </label>
         <div class="col-sm-12 col-md-8 col-ld-9">
             <?php if($attachment_id != null && $attachment_id != ''){ ?>
+                <input type="hidden" name="custom_attachment_id" value="<?php echo $attachment_id ?>"/>
                 <a href="<?php echo wp_get_attachment_url($attachment_id) ?>" target="_blank"><?php echo wp_get_attachment_url($attachment_id) ?></a>
                 <br/>
                 <br/>
             <?php } ?>
             <p id="async-upload-wrap"><label for="async-upload"></label>
-            <input type="file" id="async-upload" class="form-control" name="async-upload" required> </p>
+            <input type="file" id="async-upload" class="form-control" name="async-upload"> </p>
 
             <p><input type="hidden" name="post_id" id="post_id" value="<?php echo $post_id ?>" />
             <?php wp_nonce_field( 'client-file-upload' ); ?>

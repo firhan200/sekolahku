@@ -3,6 +3,8 @@ global $wpdb;
 $menu_perizinan = true;
 
 //get profile
+$profil = $wpdb->get_row("SELECT * FROM "._tbl_users." WHERE id = '".$_SESSION[SESSION_ID]."'");
+
 $list_perizinan = $wpdb->get_results("SELECT p.*, u.company_name AS company_name, u.company_address AS company_address FROM "._tbl_perizinan." AS p LEFT JOIN "._tbl_users." AS u ON p.user_id=u.id WHERE p.user_id = '".$_SESSION[SESSION_ID]."'");
 ?>
 <div class="main-header" style="background-image:url('<?php echo $my_plugin; ?>/assets/img/header.jpg')">
@@ -68,11 +70,7 @@ $list_perizinan = $wpdb->get_results("SELECT p.*, u.company_name AS company_name
             <strong>Progress Message:</strong>
             <div class="bg-light p-4">
                 <?php
-                echo '<ul>';
-                foreach($list_perizinan as $perizinan){
-                    echo '<li>'.htmlspecialchars($perizinan->progress_message).'</li>';
-                }
-                echo '</ul>';
+                echo htmlspecialchars($profil->progress_message);
                 ?>
             </div>
         </div>

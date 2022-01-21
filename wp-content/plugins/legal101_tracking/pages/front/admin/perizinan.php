@@ -151,6 +151,24 @@ if(count($errors) < 1){
             echo "<script>window.history.pushState('page2', 'Title', '".$edit_url.$object_id."');</script>";
         }
     }
+    else if($_POST['update_client']){
+        $progress_message = $_POST['progress_message'];
+
+        //update into wpdb database
+        $wpdb->update(
+            _tbl_users,
+            array(
+                'progress_message' => $progress_message
+            ),
+            array('id' => $selected_user_id)
+        );
+
+        //success
+        $success[] = 'Data berhasil disimpan';
+
+        //get user again
+        $user = $wpdb->get_row("SELECT * FROM "._tbl_users." WHERE id = $selected_user_id");
+    }
 
     //check if delete
     if($is_delete){
@@ -357,6 +375,18 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
     // Display the paging information
     echo '<div id="paging"><p>', $prevlink, ' Halaman <b>', $page, '</b> dari <b>', $pages, '</b> , Menampilkan <b>', $start, '-', $end, '</b> dari <b>', $total, '</b> Hasil ', $nextlink, ' </p></div>';
     ?>
+
+    <form action="" method="post">
+        <input type="hidden" name="update_client" value="true"/>
+        <input type="hidden" name="user_id" value="<?php echo $selected_user_id; ?>"/>
+        <div>
+            <label>Progress Message</label>
+            <textarea name="progress_message" class="form-control"><?php echo htmlspecialchars($user->progress_message) ?></textarea>
+        </div>
+        <div class="mt-3 text-end">
+            <button type="submit" class="btn btn-danger">Simpan</button>
+        </div>
+    </form>
 <?php 
 }else if($is_add || $is_edit){
 ?>
@@ -372,7 +402,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
             <textarea rows="5" class="form-control" cols="100" name="description" maxlength="250"><?php echo $description; ?></textarea>
         </div>
     </div>
-    <div class="mb-3 row align-items-center">
+    <div class="mb-3 row align-items-center" style="display:none;">
         <label class="col-sm-12 col-md-4 col-lg-3">
             Progress Message
         </label>

@@ -317,6 +317,8 @@ function legal101_activated() {
 		identity_number varchar(150) NULL,
 		website varchar(150) NULL,
 		npwp varchar(150) NULL,
+		minuta varchar(255) NULL,
+		progress_message varchar(255) NULL,
 		is_active smallint(1) DEFAULT 1 NOT NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
@@ -397,6 +399,7 @@ function legal101_activated() {
 		$sql = "CREATE TABLE $tbl_hki_documents (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
 		hki_id mediumint(9) NOT NULL,
+		filename varchar(255) NULL,
 		attachment_id mediumint(9) NOT NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
@@ -435,6 +438,7 @@ function legal101_activated() {
 		bulan_pajak int NOT NULL,
 		tahun_pajak varchar(4) NOT NULL,
 		status smallint(1) DEFAULT 0 NOT NULL,
+		filename varchar(255) NULL,
 		attachment_id mediumint(9) NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
@@ -454,6 +458,7 @@ function legal101_activated() {
 		user_id mediumint(9) NOT NULL,
 		tahun varchar(4) NOT NULL,
 		status smallint(1) DEFAULT 0 NOT NULL,
+		filename varchar(255) NULL,
 		attachment_id mediumint(9) NULL,
 		created_on timestamp DEFAULT current_timestamp,
 		updated_on timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
@@ -757,7 +762,7 @@ function legal101_our_practice_function() {
 
 	$return_string = "";
 
-	$curr_language = pll_current_language();
+	$curr_language = 'id';//pll_current_language();
     $cate = 'Our Practice';
     
     if($curr_language == 'id'){
@@ -804,7 +809,7 @@ function legal101_our_practice_function() {
 	}
 
 	$pills_html = '<ul class="nav nav-pills legal101-our-practice-pills" role="tablist">'.$pills.'</ul>';
-	$contents_html = '<div class="tab-content" id="pills-tabContent">'.$contents.'</div>';
+	$contents_html = '<div class="tab-content mt-5" id="pills-tabContent">'.$contents.'</div>';
 
 	$return_string = $pills_html . $contents_html;
 

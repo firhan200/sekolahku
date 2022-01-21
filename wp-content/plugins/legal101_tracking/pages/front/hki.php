@@ -3,6 +3,9 @@ global $wpdb;
 $menu_hki = true;
 
 //get profile
+$profil = $wpdb->get_row("SELECT * FROM "._tbl_users." WHERE id = '".$_SESSION[SESSION_ID]."'");
+
+//get profile
 $list_hki = $wpdb->get_results("SELECT h.* FROM "._tbl_hki." AS h WHERE h.user_id = '".$_SESSION[SESSION_ID]."'");
 $list_hki_dokumen = $wpdb->get_results("SELECT hd.* FROM "._tbl_hki_documents." AS hd LEFT JOIN "._tbl_hki." AS h ON hd.hki_id=h.id WHERE h.user_id = '".$_SESSION[SESSION_ID]."'");
 
@@ -73,11 +76,7 @@ if(count($list_hki) > 0){
             <strong>Minuta:</strong>
             <div class="bg-light p-4">
                 <?php
-                echo '<ul>';
-                foreach($list_hki as $hki){
-                    echo '<li>'.htmlspecialchars($hki->minuta).'</li>';
-                }
-                echo '</ul>';
+                echo htmlspecialchars($profil->minuta);
                 ?>
             </div>
         </div>
@@ -109,7 +108,7 @@ foreach($list_hki as $hki){
                                 if($hki_dokumen->hki_id == $hki->id){
                                     echo '<tr>';
                                     echo '<td>'.date('d M Y', strtotime($hki_dokumen->created_on)).'</td>';
-                                    echo '<td><a href="'.wp_get_attachment_url($hki_dokumen->attachment_id).'" target="_blank">'.wp_get_attachment_url($hki_dokumen->attachment_id).'</a></td>';
+                                    echo '<td><a href="'.wp_get_attachment_url($hki_dokumen->attachment_id).'" target="_blank">'.$hki_dokumen->filename.'</a></td>';
                                     echo '</tr>';
                                 }
                             }

@@ -43,6 +43,7 @@ if($action_type != null){
     $tahun_pajak = date('Y');
     $attachment_id = null;
     $status = PERIZINAN_PENDING;
+    $filename = null;
 
     if($action_type == 'add'){
         $is_add = true;
@@ -59,6 +60,7 @@ if($action_type != null){
             $tahun_pajak = $data->tahun_pajak;
             $attachment_id = $data->attachment_id;
             $status = $data->status;
+            $filename = $data->filename;
         }else{
             $errors[] = 'Data tidak ditemukan';
         }
@@ -93,6 +95,7 @@ if(count($errors) < 1){
         $tahun_pajak = $_POST['tahun_pajak'];
         $attachment_id = $_POST['attachment_id'];
         $status = $_POST['status'];
+        $filename = $_POST['filename'];
 
         //validation
         if(empty($bulan_pajak)){
@@ -116,7 +119,8 @@ if(count($errors) < 1){
                         'bulan_pajak' => $bulan_pajak,
                         'tahun_pajak' => $tahun_pajak,
                         'attachment_id' => $attachment_id,
-                        'status' => $status
+                        'status' => $status,
+                        'filename' => $filename
                     ),
                     array(
                         '%d',
@@ -124,6 +128,7 @@ if(count($errors) < 1){
                         '%s',
                         '%s',
                         '%d',
+                        '%s'
                     )
                 );
 
@@ -138,7 +143,8 @@ if(count($errors) < 1){
                         'bulan_pajak' => $bulan_pajak,
                         'tahun_pajak' => $tahun_pajak,
                         'attachment_id' => $attachment_id,
-                        'status' => $status
+                        'status' => $status,
+                        'filename' => $filename
                     ),
                     array('id' => $id)
                 );
@@ -349,6 +355,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 </th>
                 <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
+                        <span>Nama File</span>
+                    </a>
+                </th>
+                <th scope="col" id="description" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
                         <span>Link Dokumen</span>
                     </a>
                 </th>
@@ -392,6 +403,9 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                     </div>
                 </td>
                 <td class="column-target-date" data-colname="target_date">
+                    <?php echo $data->filename; ?>
+                </td>
+                <td class="column-target-date" data-colname="target_date">
                     <?php echo '<a href="'.wp_get_attachment_url($data->attachment_id).'" target="_blank">'.wp_get_attachment_url($data->attachment_id).'</a>'; ?>
                 </td>
                 <td class="column-status" data-colname="status">
@@ -419,6 +433,11 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
                     <a href="#">
                         <span>Tanggal Pajak</span>
+                    </a>
+                </th>
+                <th scope="col" class="manage-column column-title column-primary sortable desc">
+                    <a href="#">
+                        <span>Nama File</span>
                     </a>
                 </th>
                 <th scope="col" class="manage-column column-title column-primary sortable desc">
@@ -479,6 +498,10 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                         ?>
                     </select>
                 </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="name">Nama File</label></th>
+                <td><input type="text" class="regular-text" name="filename" value="<?php echo $filename; ?>" maxlength="250"></td>
             </tr>
             <tr>
                 <th scope="row"><label for="name">File</label></th>

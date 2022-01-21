@@ -179,7 +179,7 @@ function intToMonth($int){
                             }
 
                             echo '</td>';
-                            echo '<td><a href="'.wp_get_attachment_url($ppn->attachment_id).'" target="_blank">Pdf</a></td>';
+                            echo '<td><a href="'.wp_get_attachment_url($ppn->attachment_id).'" target="_blank">'.$ppn->filename.'</a></td>';
                             echo '</tr>';
                         }
                         ?>
@@ -218,7 +218,7 @@ function intToMonth($int){
                             }
 
                             echo '</td>';
-                            echo '<td><a href="'.wp_get_attachment_url($spt->attachment_id).'" target="_blank">Pdf</a></td>';
+                            echo '<td><a href="'.wp_get_attachment_url($spt->attachment_id).'" target="_blank">'.$spt->filename.'</a></td>';
                             echo '</tr>';
                         }
                         ?>

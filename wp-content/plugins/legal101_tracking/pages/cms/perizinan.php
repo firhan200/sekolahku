@@ -405,7 +405,7 @@ $list_of_data = $wpdb->get_results($query.' LIMIT '.$limit.' OFFSET '.$offset);
                 <th scope="row"><label for="name">Deskripsi</label></th>
                 <td><textarea rows="5" cols="100" name="description" maxlength="250"><?php echo $description; ?></textarea></td>
             </tr>
-            <tr>
+            <tr style="display:none;">
                 <th scope="row"><label for="name">Progress Message</label></th>
                 <td><textarea rows="5" cols="100" name="progress_message" maxlength="250"><?php echo $progress_message; ?></textarea></td>
             </tr>
