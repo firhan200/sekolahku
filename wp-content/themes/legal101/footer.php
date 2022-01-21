@@ -23,14 +23,14 @@
                 </div>
                 <div class="col-sm-12 col-md-3">
                     <div class="legal101-footer-title">
-                        Social Media
+                        OUR PRACTICE
                     </div>
                     <?php
                         wp_nav_menu(
                             array(
-                                'menu' => 'social_media_menu',
+                                'menu' => 'our_practice_menu',
                                 'container' => '',
-                                'theme_location' => 'social_media_menu',
+                                'theme_location' => 'our_practice_menu',
                                 'items_wrap' => '<ul class="legal101-footer-link">%3$s</ul>',
                             )
                         );
@@ -65,6 +65,15 @@
                             )
                         );
                     ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-end">
+                    <?php if ( is_active_sidebar( 'legal101-footer-social-media' ) ) { ?>
+                        <ul id="sidebar">
+                            <?php dynamic_sidebar('legal101-footer-social-media'); ?>
+                        </ul>
+                    <?php } ?>
                 </div>
             </div>
         </div>

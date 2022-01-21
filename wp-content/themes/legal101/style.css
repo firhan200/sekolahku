@@ -30,6 +30,8 @@ body{
 
 .legal101-left-nav .active a{
     background-color: #f43930;
+    border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
 }
 
 .legal101-right-nav .nav-item a{

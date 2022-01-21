@@ -16,6 +16,7 @@ function legal101_menus(){
         'primary' => 'Top Menu',
         'primary_right' => 'Top Right Menu',
         'social_media_menu' => 'Social Media Menu',
+        'our_practice_menu' => 'Our Practice Menu',
         'company_menu' => 'Company Menu',
         'services_menu' => 'Services Menu'
     );
@@ -96,6 +97,16 @@ function legal101_register_sidebars() {
       'name'=> __( 'Login - Contact Us', 'textdomain' ),  
       'id'=> 'legal101-contact-us',  
       'description'=> 'Login - Contact Us',  
+      'before_widget' => '<div id="%1$s" class="widget %2$s">',
+      'after_widget' => '</div>',
+      'before_title' => '<h2 class="">',
+      'after_title' => '</h2>',        
+    ));
+
+    register_sidebar(array(
+      'name'=> __( 'Footer - Social Media', 'textdomain' ),  
+      'id'=> 'legal101-footer-social-media',  
+      'description'=> 'Footer - Social Media',  
       'before_widget' => '<div id="%1$s" class="widget %2$s">',
       'after_widget' => '</div>',
       'before_title' => '<h2 class="">',

@@ -759,10 +759,30 @@ function spt_page(){
 /* shortcode */
 function legal101_our_practice_function() {
 	global $wpdb;
+	?>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(".legal101-our-practice-pills-btn").click(function(){
+				var host = window.location.href;
+				window.history.replaceState(null, null, $(this).attr("data-bs-target"));
+			})
+
+			//get url
+			var fullUrl = window.location.href;
+			var arr = fullUrl.split("#");
+			if(arr[1] !== undefined){
+				var params = arr[1];
+
+				var triggerEl = $('button[data-bs-target="#'+params+'"]');
+				triggerEl.click();
+			}
+		})
+	</script>
+	<?php
 
 	$return_string = "";
 
-	$curr_language = 'id';//pll_current_language();
+	$curr_language = pll_current_language();
     $cate = 'Our Practice';
     
     if($curr_language == 'id'){
@@ -787,7 +807,7 @@ function legal101_our_practice_function() {
 		$is_active = $key == 0 ? 'active' : '';
 
 		$pills .= '<li class="nav-item" role="presentation">';
-		$pills .= '<button class="nav-link '.$is_active.'" data-bs-toggle="pill" data-bs-target="#legal101-our-practice-'.$our_practice->ID.'" type="button" role="tab" aria-controls="legal101-our-practice-'.$our_practice->ID.'" aria-selected="true">'.$our_practice->post_title.'</button>';
+		$pills .= '<button class="nav-link '.$is_active.' legal101-our-practice-pills-btn" data-bs-toggle="pill" data-bs-target="#legal101-our-practice-'.$our_practice->ID.'" type="button" role="tab" aria-controls="legal101-our-practice-'.$our_practice->ID.'" aria-selected="true">'.$our_practice->post_title.'</button>';
 		$pills .= '</li>';
 
 		$contents .= '<div class="tab-pane fade show '.$is_active.'" id="legal101-our-practice-'.$our_practice->ID.'" role="tabpanel">';
