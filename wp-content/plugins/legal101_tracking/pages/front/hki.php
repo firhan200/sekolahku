@@ -76,7 +76,7 @@ if(count($list_hki) > 0){
             <strong>Minuta:</strong>
             <div class="bg-light p-4">
                 <?php
-                echo htmlspecialchars($profil->minuta);
+                echo '<pre>'.$profil->minuta.'</pre>';
                 ?>
             </div>
         </div>
@@ -90,7 +90,7 @@ foreach($list_hki as $hki){
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Dokumen <?php echo $hki->pemohon.' '.$hki->pekerjaan ?></h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Dokumen</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -99,7 +99,8 @@ foreach($list_hki as $hki){
                             <thead>
                                 <tr>
                                     <th>Tanggal</th>
-                                    <th>Dokumen</th>
+                                    <th>Nama Dokumen</th>
+                                    <th>Link</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -108,7 +109,8 @@ foreach($list_hki as $hki){
                                 if($hki_dokumen->hki_id == $hki->id){
                                     echo '<tr>';
                                     echo '<td>'.date('d M Y', strtotime($hki_dokumen->created_on)).'</td>';
-                                    echo '<td><a href="'.wp_get_attachment_url($hki_dokumen->attachment_id).'" target="_blank">'.$hki_dokumen->filename.'</a></td>';
+                                    echo '<td>'.$hki_dokumen->filename.'</td>';
+                                    echo '<td><a href="'.wp_get_attachment_url($hki_dokumen->attachment_id).'" target="_blank"><i class="fa fa-file-alt"></i></a></td>';
                                     echo '</tr>';
                                 }
                             }

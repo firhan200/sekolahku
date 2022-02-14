@@ -70,7 +70,7 @@ $list_perizinan = $wpdb->get_results("SELECT p.*, u.company_name AS company_name
             <strong>Progress Message:</strong>
             <div class="bg-light p-4">
                 <?php
-                echo htmlspecialchars($profil->progress_message);
+                echo '<pre>'.$profil->progress_message.'</pre>';
                 ?>
             </div>
         </div>
